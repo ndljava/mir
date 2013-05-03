@@ -3,10 +3,12 @@ package com.leyou.net.protocol {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.tools.print;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.HexUtil;
 	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.enum.ChatEnum;
 	import com.leyou.enum.TaskEnum;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
@@ -127,14 +129,16 @@ package com.leyou.net.protocol {
 //			AlertWindow.showWin("物品出售成功");
 			UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "物品出售成功");
 			updataMoney(td.Recog);
+			var id:int=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemFromId].s.id;
 			MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
 			UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
+			UIManager.getInstance().toolsWnd.updataShortcutGrid(id);
 			MyInfoManager.getInstance().resetWaitItem();
 		}
 
 		//卖东西-fail
 		static public function sm_userSellItem_fail(td:TDefaultMessage, body:String):void {
-			AlertWindow.showWin("您不能出售此物品");
+			PopupManager.showAlert("您不能出售此物品");
 //			'您不能出售此物品.'
 		}
 

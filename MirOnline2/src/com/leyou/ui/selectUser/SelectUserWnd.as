@@ -4,6 +4,7 @@ package com.leyou.ui.selectUser {
 	import com.ace.ui.button.GroupButton;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.button.event.ButtonEvent;
+	import com.ace.ui.lable.Label;
 	import com.leyou.config.Core;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.login.Cmd_Login;
@@ -56,10 +57,9 @@ package com.leyou.ui.selectUser {
 		private function onSelected(evt:Event):void {
 			if (this.selectBtn1.isOn) {
 				if (this.userBtn1.userNameLbl.text != "") {
-					Core.selectInfo=this.arr[0];
+					Core.selectInfo.copy(this.arr[0]);
 					this.selectName=this.userBtn1.userNameLbl.text;
 				} else {
-					trace("创建角色1");
 					UIManager.getInstance().addCreatUserWnd();
 					this.visible=false;
 				}
@@ -67,9 +67,8 @@ package com.leyou.ui.selectUser {
 			if (this.selectBtn2.isOn) {
 				if (this.userBtn2.userNameLbl.text != "") {
 					this.selectName=this.userBtn2.userNameLbl.text;
-					Core.selectInfo=this.arr[1];
+					Core.selectInfo.copy(this.arr[1]);
 				} else {
-					trace("创建角色2");
 					UIManager.getInstance().addCreatUserWnd();
 					this.visible=false;
 				}
@@ -117,31 +116,26 @@ package com.leyou.ui.selectUser {
 
 				this.userBtn1.updata(info);
 				this.selectName=info.name;
-				if (Core.selectInfo != null) {
-					Core.selectInfo.updateInfoExceptAccount(info);
-				} else
-					Core.selectInfo=this.arr[0];
+				Core.selectInfo.copy(this.arr[0]);
 			}
 
 			if (arr.length > 8) {
 				info=new SelectUserInfo();
 				info.name=arr[5];
-				if (info.name.indexOf("*") != -1) {
-					this.selectBtn2.turnOn(false);
-					info.name=info.name.substring(1);
-					this.selectName=info.name;
-					if (Core.selectInfo != null)
-						Core.selectInfo.updateInfoExceptAccount(info);
-					else
-						Core.selectInfo=info;
-				}
 				info.race=int(arr[6]);
 				info.hair=int(arr[7]);
 				info.level=int(arr[8]);
 				info.sex=int(arr[9]);
 				this.arr.push(info);
 
+				if (info.name.indexOf("*") != -1) {
+					this.selectBtn2.turnOn(false);
+					info.name=info.name.substring(1);
+					this.selectName=info.name;
+					Core.selectInfo.copy(info);
+				}
 				this.userBtn2.updata(info);
+
 			}
 		}
 

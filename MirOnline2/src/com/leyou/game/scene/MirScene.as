@@ -11,6 +11,7 @@ package com.leyou.game.scene {
 	import com.ace.gameData.player.PlayerInfo;
 	import com.ace.loader.LoaderManager;
 	import com.ace.loaderSync.SyncLoader;
+	import com.ace.manager.KeysManager;
 	import com.ace.manager.LayerManager;
 	import com.ace.manager.LibManager;
 	import com.ace.reuse.ReuseDic;
@@ -18,12 +19,15 @@ package com.leyou.game.scene {
 	import com.ace.ui.img.child.Image;
 	import com.ace.utils.DebugUtil;
 	import com.leyou.config.Core;
+	import com.leyou.data.net.role.TNakedAbility;
 	import com.leyou.game.DebugGame;
 	import com.leyou.game.scene.child.Item;
 	import com.leyou.game.scene.player.Living;
 	import com.leyou.game.scene.player.MyPlayer;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Chat;
+	import com.leyou.net.protocol.Cmd_Role;
+	import com.leyou.net.protocol.Cmd_backPack;
 
 	import flash.display.BitmapData;
 	import flash.events.KeyboardEvent;
@@ -41,23 +45,16 @@ package com.leyou.game.scene {
 			super.init();
 			this.reuseDic=new ReuseDic(Living, 200);
 			this.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-//			LayerManager.getInstance().mainLayer.visible=false;
+			KeysManager.getInstance().addKeyFun(KeysEnum.SPACE, this.test); //测试
+			//			LayerManager.getInstance().mainLayer.visible=false;
+		}
+
+		private function test():void {
+			LayerManager.getInstance().mainLayer.visible=!LayerManager.getInstance().mainLayer.visible;
 		}
 
 		private function onKeyUp(evt:KeyboardEvent):void {
 			switch (evt.keyCode) {
-				case KeysEnum.F1:
-					DebugGame.test();
-					break;
-				case KeysEnum.H:
-					if (Core.me.info.isOnMount)
-						Cmd_Chat.cm_say("@下马");
-					else
-						Cmd_Chat.cm_say("@骑马");
-					break;
-				case KeysEnum.M:
-					UIManager.getInstance().mapWnd.open();
-					break;
 				case KeysEnum.KEY0:
 				case KeysEnum.KEY1:
 				case KeysEnum.KEY2:
@@ -70,28 +67,8 @@ package com.leyou.game.scene {
 				case KeysEnum.KEY9:
 					UIManager.getInstance().toolsWnd.onShortcutDown(evt.keyCode - 48);
 					break;
-				case KeysEnum.ENTER:
-					UIManager.getInstance().chatWnd.onStageEnter();
-					break;
-				case KeysEnum.SPACE:
-					//					UIEnum.TEMP_TEST=!UIEnum.TEMP_TEST;
-					LayerManager.getInstance().mainLayer.visible=!LayerManager.getInstance().mainLayer.visible;
-					break;
-				case KeysEnum.B:
-					var a:SyncLoader=LivingAvatar.SYNC_LOADER;
-					var b:SyncLoader=Image.SYNC_LOADER;
-					break;
-				case KeysEnum.C:
-					DebugUtil.GC();
-					break;
-				case KeysEnum.N:
-					var c:LoaderManager=LibManager.getInstance();
-					c.toString();
-					break;
 			}
-
 		}
-
 
 		//传送到x地图
 		override public function gotoMap($mapName:String, pt:Point):void {
@@ -152,7 +129,8 @@ package com.leyou.game.scene {
 
 		public function addOtherLiving(info:LivingInfo, nameStr:String):Living {
 			if (this.playerObj[info.id]) {
-				Living(this.playerObj[info.id]).changeDir(info.currentDir); //原地改变方向
+				if (info.type != 50)
+					Living(this.playerObj[info.id]).changeDir(info.currentDir); //原地改变方向
 				nameStr && Living(this.playerObj[info.id]).setName(nameStr); //刷怪添加名字
 
 				return this.playerObj[info.id] as Living;

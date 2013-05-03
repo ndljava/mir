@@ -30,7 +30,7 @@ package com.leyou.game.skill.bullets {
 		}
 
 
-		private var passSkill:Array=[6, 20, 22, 19, 29, 15, 14, 16, 28, 36, 43]; //抗拒火环|火墙|地狱雷光|瞬间转移|魔法盾|困魔咒|隐身术
+		private var passSkill:Array=[6, 20, 22, 19, 29, 15, 14, 16, 28, 36, 43,24]; //抗拒火环|火墙|地狱雷光|瞬间转移|魔法盾|困魔咒|隐身术|技能圣剑
 
 		//释放者，接受者、鼠标格子、子弹类型、特效
 		public function addBullet(playerId:int, targetId:int, tx:int, ty:int, type:int, bulletId:int):void {
@@ -82,7 +82,7 @@ package com.leyou.game.skill.bullets {
 
 			//是否旋转
 			if (info.isRotation) {
-				if (rp && bullet is BulletFly) {
+				if (/*rp && */bullet is BulletFly) {
 					pt.y-=50;
 				}
 				bullet.rotation=Math.atan2(pt.y - bullet.y, pt.x - bullet.x) * 180 / Math.PI;

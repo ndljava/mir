@@ -52,16 +52,16 @@ package com.leyou.ui.team {
 			for each (head in teamHeadVec) {
 				this.headList.delFromPane(head);
 			}
-			 
+
 			teamHeadVec.length=0;
 
 			var tinfo:TeamInfo;
 			for each (tinfo in info) {
-				if (tinfo != null && MyInfoManager.getInstance().name!=tinfo.name) {
+				if (tinfo != null && MyInfoManager.getInstance().name != tinfo.name) {
 					head=new TeamHeader();
 					head.updateInfo(tinfo);
 					head.scaleX=head.scaleY=.8;
-					
+
 					this.headList.addToPane(head);
 					head.y=teamHeadVec.length * (head.height - 10);
 					teamHeadVec.push(head);
@@ -70,8 +70,8 @@ package com.leyou.ui.team {
 
 			if (teamHeadVec.length > 0)
 				this.headList.visible=true;
-			
-			//updateHpandMp();
+
+			updateHpandMp();
 		}
 
 		/**

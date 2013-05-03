@@ -73,11 +73,11 @@ package com.leyou.ui.role {
 		}
 
 		private function updateGridInfo(i:int, Info:TClientItem):void {
-			if (i == 14) {
+			if (i == ItemEnum.U_HORSE) {
 				(this.gridArr[2] as EquipGrid).updataInfo(Info);
-			} else if (i == 13) {
+			} else if (i == ItemEnum.U_ZHULI) {
 				(this.gridArr[4] as EquipGrid).updataInfo(Info);
-			} else if (i == 15) {
+			} else if (i == ItemEnum.U_ITEM) {
 				(this.gridArr[0] as EquipGrid).updataInfo(Info);
 			} else if (i == ItemEnum.U_ARMRINGL || i == ItemEnum.U_ARMRINGR) {
 				(this.gridArr[i] as EquipGrid).updataInfo(Info);
@@ -111,9 +111,17 @@ package com.leyou.ui.role {
 		public function takeOffResult(f:Boolean):void {
 			if (this._takeOffEquipId == -1)
 				return;
+			var i:int;
 			if (f) { //成功
-				MyInfoManager.getInstance().equips[_takeOffEquipId].s=null;
-				(this.gridArr[this._takeOffEquipId] as EquipGrid).clearMe();
+				MyInfoManager.getInstance().equips[this._takeOffEquipId].s=null;
+				if(this._takeOffEquipId==ItemEnum.U_HORSE)
+					i=ItemEnum.U_RIGHTHAND;
+				else if(this._takeOffEquipId==ItemEnum.U_ZHULI)
+					i=ItemEnum.U_HELMET;
+				else if(this._takeOffEquipId==ItemEnum.U_ITEM)
+					i=ItemEnum.U_DRESS;
+				else i=this._takeOffEquipId;
+				(this.gridArr[i] as EquipGrid).clearMe();
 			} else { //失败
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr(MyInfoManager.getInstance().equips[this._takeOffEquipId].s.name + " 脱装备失败", SystemNoticeEnum.IMG_WARN);
 			}

@@ -102,6 +102,7 @@ package com.leyou.ui.tools.child {
 				this.updataInfo(null);
 				this.dataId=fromItem.dataId;
 				this.iconBmp.bitmapData=fromItem.itemBmp;
+				this.numLbl.text="";
 				UIManager.getInstance().skillWnd.setSkillGridShortCut(this.dataId, this.gridId);
 			}
 

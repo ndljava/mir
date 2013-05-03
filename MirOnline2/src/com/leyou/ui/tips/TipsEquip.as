@@ -1,8 +1,11 @@
 package com.leyou.ui.tips {
 	import com.ace.enum.FontEnum;
 	import com.ace.enum.ItemEnum;
+	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.backPack.TClientItem;
+	import com.ace.gameData.backPack.TSClientItem;
 	import com.ace.gameData.player.MyInfoManager;
+	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.lable.Label;
@@ -12,6 +15,7 @@ package com.leyou.ui.tips {
 	import com.leyou.enum.MarketEnum;
 	import com.leyou.enum.TipsEnum;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.tips.child.TipsGrid;
 	import com.leyou.utils.TipsUtil;
 	
@@ -77,7 +81,8 @@ package com.leyou.ui.tips {
 				this.lbl.htmlText+=TipsUtil.getColorStr("数量：" + info.numStr, TipsEnum.COLOR_WHITE);
 			if (info.properArr != null) {
 				for (i=0; i < info.properArr.length; i++) {
-					this.lbl.htmlText+=TipsUtil.getColorStr(info.properArr[i], TipsEnum.COLOR_GOLD);
+//					this.lbl.htmlText+=TipsUtil.getColorStr(info.properArr[i], TipsEnum.COLOR_GOLD);
+					this.lbl.htmlText+=info.properArr[i];
 				}
 			}
 			if (info.limit != null) {
@@ -124,10 +129,10 @@ package com.leyou.ui.tips {
 			this.info.instruction2=info.s.note;
 			this.info.limit=TipsUtil.getLimitStr(info.s.limitType, info.s.limitLevle);
 			if(UIManager.getInstance().shopWnd.visible)
-				this.info.price=info.s.price + "金币";
+				this.info.price=info.s.price*.5 + "金币";
 			else 
 				this.info.price="";
-			var obj:Object=ItemEnum.itemNameDic;
+//			var obj:Object=ItemEnum.itemNameDic;
 			this.info.wight=info.s.weight;
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type)];
 			this.info.properArr=TipsUtil.getProperNum(info.s);
@@ -187,6 +192,30 @@ package com.leyou.ui.tips {
 //			this.info.properArr=//属性
 //			this.info.durability=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
 			this.updateInfo(this.info);
+		}
+		
+		/**
+		 *其他玩家的装备 
+		 * @param info
+		 * 
+		 */		
+		public function otherRoleTip(info:TSClientItem):void{
+			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.wIndex-1);
+//			tInfo.source=info.
+			if(tInfo==null)
+				return;
+			this.info.clearMe();
+			tInfo=Cmd_backPack.GetItemAddValue(null,tInfo,info.btValue);
+			this.info.name=tInfo.name;
+			this.info.instruction1=TipsUtil.getInstructionByFlag(tInfo.limitCheck,TipsEnum.TYPE_TIPS_EQUIP);
+			this.info.limit=TipsUtil.getLimitStr(tInfo.limitType,tInfo.limitLevle,false);
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(tInfo.type)];
+			this.info.Looks=tInfo.appr;
+			this.info.durability=Math.ceil(info.Dura/1000)+"/"+Math.ceil(info.DuraMax/1000);
+			this.info.properArr=TipsUtil.getProperNum(tInfo);
+			this.info.wight=tInfo.weight;
+			this.updateInfo(this.info);
+			
 		}
 	}
 }

@@ -5,9 +5,11 @@ package com.leyou.net.protocol.login {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.player.PlayerInfo;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.HexUtil;
 	import com.leyou.config.Core;
 	import com.leyou.enum.TaskEnum;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
@@ -104,15 +106,15 @@ package com.leyou.net.protocol.login {
 		//创建角色-fail
 		static public function sm_newChr_fail(td:TDefaultMessage, body:String):void {
 			if(td.Recog==0)
-				AlertWindow.showWin("输入的名称包含非法字符！");
+				PopupManager.showAlert("输入的名称包含非法字符！");
 			else if(td.Recog==2)
-				AlertWindow.showWin("创建的名称服务器已有！");
+				PopupManager.showAlert("创建的名称服务器已有！");
 			else if(td.Recog==3)
-				AlertWindow.showWin("服务器只能创建两个游戏人物！");
+				PopupManager.showAlert("服务器只能创建两个游戏人物！");
 			else if(td.Recog==4)
-				AlertWindow.showWin("创建游戏人物时出现错误！");
+				PopupManager.showAlert("创建游戏人物时出现错误！");
 			else
-				AlertWindow.showWin("创建游戏人物时出现未知错误！");
+				PopupManager.showAlert("创建游戏人物时出现未知错误！");
 				
 		/*case td.Recog of
 		0: ('[错误] 输入的名称包含非法字符！', [mbOk]);

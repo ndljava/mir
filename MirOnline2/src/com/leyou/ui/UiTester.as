@@ -1,5 +1,6 @@
 package com.leyou.ui {
 	import com.ace.enum.FontEnum;
+	import com.ace.enum.UIEnum;
 	import com.ace.manager.CursorManager;
 	import com.ace.manager.LibManager;
 	import com.ace.manager.SoundManager;
@@ -14,9 +15,8 @@ package com.leyou.ui {
 	import com.ace.ui.button.event.ButtonEvent;
 	import com.ace.ui.input.children.TextInput;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.AlertWindow;
-	import com.ace.ui.window.children.ConfirmInputWindow;
-	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.LoadUtil;
 	
 	import flash.events.Event;
@@ -102,13 +102,13 @@ package com.leyou.ui {
 					new NTSC(2012, 4, 28);
 					break;
 				case "alertBtn":
-					AlertWindow.showWin("我们的类型属于第三种，在这一种，又可分为两种类型。一类是完全的客户端回合制RPG网页版，包括魔幻大陆等很多之前的回合制都是这种模式；一类是把以前武林英雄这种RPG，把没有多人同屏显示做成了同屏多人显示，把战斗文字播报做成了图形化自动战斗。从效果来看");
+						PopWindow.showWnd(UIEnum.WND_TYPE_ALERT,WindInfo.getAlertInfo("我们的类型属于第三种，在这一种，又可分为两种类型。一类是完全的客户端回合制RPG网页版，包括魔幻大陆等很多之前的回合制都是这种模式；一类是把以前武林英雄这种RPG，把没有多人同屏显示做成了同屏多人显示，把战斗文字播报做成了图形化自动战斗。从效果来看"),"alertWnd");
 					break;
 				case "okBtn":
-					ConfirmWindow.showWin("们的类型属于第三种，在这一种，又可分为两种类型。一类是完全的客户端回合制RPG网页版，包括魔幻大陆等");
+					PopWindow.showWnd(UIEnum.WND_TYPE_CONFIRM,WindInfo.getInputInfo("们的类型属于第三种，在这一种，又可分为两种类型。一类是完全的客户端回合制RPG网页版，包括魔幻大陆等"),"asd");
 					break;
 				case "inputBtn":
-					ConfirmInputWindow.showWin("的类型属于第三种，在这一种，又可分为两种");
+					PopWindow.showWnd(UIEnum.WND_TYPE_INPUT,WindInfo.getInputInfo("请输入价钱:"),"inputWnd");
 					break;
 				case "playBgmCbox":
 					if (this.playBgmCbox.isOn)

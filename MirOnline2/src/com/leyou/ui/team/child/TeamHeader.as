@@ -45,7 +45,6 @@ package com.leyou.ui.team.child {
 		public function updateHpandMp(player:LivingModel):void {
 			if (player.infoB.hp <= 0)
 				return;
-
 			this.hp.scaleX=(player.infoB.hp / player.infoB.baseInfo.MaxHP)
 		}
 

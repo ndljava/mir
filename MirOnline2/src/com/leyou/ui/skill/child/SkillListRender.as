@@ -80,7 +80,6 @@ package com.leyou.ui.skill.child {
 
 				if (info.level >= 3) {
 					this.studyBtn.text="满级";
-//					this.studyBtn.setActive(false);
 					if (this.studyBtn.hasEventListener(MouseEvent.CLICK))
 						this.studyBtn.removeEventListener(MouseEvent.CLICK, this.onBtnClick);
 				} else {

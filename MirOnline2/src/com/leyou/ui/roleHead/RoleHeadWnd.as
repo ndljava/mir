@@ -7,6 +7,8 @@ package com.leyou.ui.roleHead {
 	import com.ace.ui.lable.Label;
 	import com.leyou.utils.PlayerUtil;
 
+	import flash.events.MouseEvent;
+
 	public class RoleHeadWnd extends AutoSprite {
 		private var userheadImg:Image;
 		private var hpImg:Image;
@@ -21,6 +23,7 @@ package com.leyou.ui.roleHead {
 			super(LibManager.getInstance().getXML("config/ui/RoleHeadWnd.xml"));
 			this.y=-20;
 			this.init();
+			this.mouseEnabled=true;
 		}
 
 		private function init():void {
@@ -32,6 +35,11 @@ package com.leyou.ui.roleHead {
 			this.nameLbl=this.getUIbyID("nameLbl") as Label;
 			this.lvLbl=this.getUIbyID("lvLbl") as Label;
 			this.raceLbl=this.getUIbyID("raceLbl") as Label;
+			this.addEventListener(MouseEvent.CLICK, onThisClick);
+		}
+
+		private function onThisClick(evt:MouseEvent):void {
+			evt.stopPropagation();
 		}
 
 		//更新显示信息
@@ -54,7 +62,8 @@ package com.leyou.ui.roleHead {
 				mmp=this.hmpW;
 			this.mpImg.setWH(mmp, this.hmpH);
 		}
-		public function updateLevel():void{
+
+		public function updateLevel():void {
 			this.lvLbl.text=MyInfoManager.getInstance().level.toString();
 		}
 	}

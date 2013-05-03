@@ -6,6 +6,8 @@ package com.leyou.ui.shop.child {
 	import com.ace.manager.LibManager;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.ui.backpack.child.ItemTip;
@@ -64,7 +66,7 @@ package com.leyou.ui.shop.child {
 					if (tc == null)
 						return;
 					
-					ConfirmWindow.showWin("确认卖出?",function():void
+					PopupManager.showConfirm("确认卖出?",function():void
 					{
 						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
 						//协议

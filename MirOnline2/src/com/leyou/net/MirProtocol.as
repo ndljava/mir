@@ -234,7 +234,7 @@ package com.leyou.net {
 		public static const SM_BUTCH:uint=637; //野蛮?
 		public static const SM_MAGICFIRE:uint=638; //地狱火,火墙??
 		public static const SM_MAGICFIRE_FAIL:uint=639;
-		public static const SM_MAGIC_LVEXP:uint=640;
+		public static const SM_MAGIC_LVEXP:uint=640;//技能的熟练度值 改变 暂无
 		public static const SM_DURACHANGE:uint=642;
 		public static const SM_MERCHANTSAY:uint=643; //商人说话
 		public static const SM_MERCHANTDLGCLOSE:uint=644;
@@ -419,7 +419,7 @@ package com.leyou.net {
 		public static const SM_CLOSECLIENT:uint=6072;
 		public static const SM_GETTHREAD:uint=6073;
 		public static const SM_USERTHREAD:uint=6074;
-		public static const SM_OPENMITEMWIN:uint=6075;
+		public static const SM_OPENMITEMWIN:uint=6075;//打开合成
 		public static const SM_FIFITEM_FAIL:uint=6076;
 		public static const SM_FIFITEM_SUCC:uint=6077;
 		public static const SM_QUERYLOSTITEM:uint=6078;
@@ -1080,9 +1080,9 @@ package com.leyou.net {
 		public static const SM_BAITANITEM_FAIL:uint=5072;
 		public static const SM_LOGIP:uint=5073;
 
-		public static const CM_FIFITEM:uint=5073;
-		public static const CM_FIFITEMOK:uint=5074;
-		public static const CM_DELFIFITEM:uint=5075;
+		public static const CM_FIFITEM:uint=5073;//背包-到合成
+		public static const CM_FIFITEMOK:uint=5074;//确认合成
+		public static const CM_DELFIFITEM:uint=5075;//合成取回-背包
 
 		public static const CM_DOWN:uint=60000;
 		public static const CM_DOWNMAP:uint=60002;

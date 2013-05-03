@@ -13,6 +13,7 @@ package com.leyou.ui.chat.child {
 	import flash.geom.Rectangle;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
+	import flash.utils.ByteArray;
 
 	public class ChannelComboBox extends Sprite {
 		public var onClickItemFun:Function;
@@ -26,6 +27,7 @@ package com.leyou.ui.chat.child {
 		private var sta:Boolean;
 		private var itemContain:Sprite;
 		private var btnInput:HideInput;
+		private var maxChar:int;
 
 		public function ChannelComboBox(w:Number, h:Number) {
 			this.comboxW=w;
@@ -69,6 +71,15 @@ package com.leyou.ui.chat.child {
 				this.btnInput.text=this.btnInput.text.replace("[", "");
 			if (this.btnInput.text.indexOf("]") > -1)
 				this.btnInput.text=this.btnInput.text.replace("]", "");
+			var btArr:ByteArray=new ByteArray();
+			btArr.writeMultiByte(btnInput.text, "gb2312");
+			if (btArr.length > maxChar * 2) {
+				btArr.length=maxChar * 2;
+				btArr.position=0;
+				this.btnInput.text=btArr.readMultiByte(maxChar * 2, "gb2312");
+				if(this.btnInput.text.indexOf("?")==this.btnInput.text.length-1)
+					this.btnInput.text=this.btnInput.text.replace("?","");
+			}
 		}
 
 		private function onUpBtnClick(evt:MouseEvent=null):void {
@@ -104,7 +115,7 @@ package com.leyou.ui.chat.child {
 		}
 
 		private function getBtnLabText(str:String):String {
-			if(str.length==1&&str.indexOf("/")!=-1)
+			if (str.length == 1 && str.indexOf("/") != -1)
 				return str;
 			if (str.indexOf("/") != -1)
 				return str.substring(0, str.indexOf("/")) + str.slice(str.indexOf("/") + 2);
@@ -207,9 +218,10 @@ package com.leyou.ui.chat.child {
 			this.itemContain.visible=sta;
 			this.sta=sta;
 		}
-		
-		public function setInputMaxChar(num:int):void{
-			this.btnInput.maxChars=num;
+
+		public function setInputMaxChar(num:int):void {
+//			this.btnInput.maxChars=num;
+			this.maxChar=num;
 		}
 	}
 }

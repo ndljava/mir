@@ -1,11 +1,19 @@
 package com.leyou.manager {
 	import com.ace.ICommon.IResize;
+	import com.ace.enum.KeysEnum;
 	import com.ace.enum.UIEnum;
 	import com.ace.game.core.SceneCore;
+	import com.ace.manager.KeysManager;
 	import com.ace.manager.LayerManager;
 	import com.ace.manager.ResizeManager;
 	import com.leyou.config.Core;
+	import com.leyou.game.DebugGame;
 	import com.leyou.game.scene.MirScene;
+	import com.leyou.net.protocol.Cmd_Chat;
+	import com.leyou.net.protocol.Cmd_Guild;
+	import com.leyou.net.protocol.Cmd_Stall;
+	import com.leyou.net.protocol.Cmd_Trade;
+	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.backpack.BackpackWnd;
 	import com.leyou.ui.backpack.BatchUsedMessageWnd;
 	import com.leyou.ui.backpack.SplitMessageWnd;
@@ -14,6 +22,7 @@ package com.leyou.manager {
 	import com.leyou.ui.backpack.child.DiscardMessageWnd;
 	import com.leyou.ui.chat.ChatWnd;
 	import com.leyou.ui.creatUser.CreatUserWnd;
+	import com.leyou.ui.forge.ForgeWnd;
 	import com.leyou.ui.friend.FriendWnd;
 	import com.leyou.ui.guild.GuildWnd;
 	import com.leyou.ui.guild.ManageMessageWnd;
@@ -24,6 +33,7 @@ package com.leyou.manager {
 	import com.leyou.ui.map.MapWnd;
 	import com.leyou.ui.market.FittingRoomWnd;
 	import com.leyou.ui.market.MarketWnd;
+	import com.leyou.ui.otherRole.OtherRoleWnd;
 	import com.leyou.ui.role.PropertyPointWnd;
 	import com.leyou.ui.role.PropertyWnd;
 	import com.leyou.ui.role.RoleWnd;
@@ -93,6 +103,8 @@ package com.leyou.manager {
 		public var noticeCountDown:NoticeCountDown;
 		public var creatUserWnd:CreatUserWnd;
 		public var propertyPointWnd:PropertyPointWnd;
+		public var forgeWnd:ForgeWnd;
+		public var otherRoleWnd:OtherRoleWnd;
 
 
 		public static function getInstance():UIManager {
@@ -109,8 +121,8 @@ package com.leyou.manager {
 
 
 		private function init():void {
-//			this.addCreatUserWnd();
-//			return;
+			//			this.addCreatUserWnd();
+			//			return;
 			this.loginWnd=new LoginWnd();
 			this.loginWnd.x=(UIEnum.WIDTH - 1024) / 2;
 			this.loginWnd.y=(UIEnum.HEIGHT - 768) / 2;
@@ -119,18 +131,18 @@ package com.leyou.manager {
 
 		//选择角色
 		public function addSelectUserWnd():void {
-			if(this.selectUserWnd==null){
+			if (this.selectUserWnd == null) {
 				this.selectUserWnd=new SelectUserWnd();
 				this.selectUserWnd.x=(UIEnum.WIDTH - 1024) / 2;
 				this.selectUserWnd.y=(UIEnum.HEIGHT - 768) / 2;
 				LayerManager.getInstance().gameLayer.addChildAt(this.selectUserWnd, 0);
-			}
-			else this.selectUserWnd.visible=true;
+			} else
+				this.selectUserWnd.visible=true;
 		}
 
 		//创建角色
 		public function addCreatUserWnd():void {
-			if(this.creatUserWnd==null)
+			if (this.creatUserWnd == null)
 				this.creatUserWnd=new CreatUserWnd();
 			LayerManager.getInstance().gameLayer.addChildAt(this.creatUserWnd, 0);
 		}
@@ -206,6 +218,9 @@ package com.leyou.manager {
 			this.noticeMidDownUproll=new NoticeMidDownUproll();
 			this.noticeCountDown=new NoticeCountDown();
 			this.propertyPointWnd=new PropertyPointWnd();
+			this.forgeWnd=new ForgeWnd();
+			this.otherRoleWnd=new OtherRoleWnd();
+
 
 			this.toolsWnd.resize();
 			this.chatWnd.resize();
@@ -241,7 +256,8 @@ package com.leyou.manager {
 			LayerManager.getInstance().windowLayer.addChild(this.stallWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.roleWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.propertyPointWnd);
-
+			LayerManager.getInstance().windowLayer.addChild(this.forgeWnd);
+			LayerManager.getInstance().windowLayer.addChild(this.otherRoleWnd);
 
 			LayerManager.getInstance().mainLayer.addChild(this.chatWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.toolsWnd);
@@ -256,7 +272,30 @@ package com.leyou.manager {
 			LayerManager.getInstance().mainLayer.addChild(this.noticeCountDown);
 
 
+			this.addKeyFun();
+		}
 
+		private function addKeyFun():void {
+			KeysManager.getInstance().addKeyFun(KeysEnum.F1, DebugGame.test);
+			KeysManager.getInstance().addKeyFun(KeysEnum.H, Cmd_Chat.upAndDownHorse); //坐骑 H
+			KeysManager.getInstance().addKeyFun(KeysEnum.V, Cmd_backPack.cm_addStarItem); //会员面板	V
+			KeysManager.getInstance().addKeyFun(KeysEnum.J, Cmd_Trade.cm_dealTry); //交易面板	J
+			KeysManager.getInstance().addKeyFun(KeysEnum.D, Cmd_Stall.cm_btItem); //摆摊功能	D  
+			KeysManager.getInstance().addKeyFun(KeysEnum.G, Cmd_Guild.cm_openGuildDlg); //帮会面板	G
+
+			//			KeysManager.getInstance().addKeyFun(KeysEnum.A, this.roleWnd.open); //切换PK模式	A
+
+			KeysManager.getInstance().addKeyFun(KeysEnum.C, this.roleWnd.open); //人物面板	C
+			KeysManager.getInstance().addKeyFun(KeysEnum.B, this.backPackWnd.open); //背包面板	B
+			KeysManager.getInstance().addKeyFun(KeysEnum.K, this.skillWnd.open); //技能面板	K
+			KeysManager.getInstance().addKeyFun(KeysEnum.T, this.teamWnd.open); //组队面板	T
+			KeysManager.getInstance().addKeyFun(KeysEnum.F, this.friendWnd.open); //好友面板	F
+			KeysManager.getInstance().addKeyFun(KeysEnum.S, this.marketWnd.open); //商城面板	S
+			KeysManager.getInstance().addKeyFun(KeysEnum.M, this.mapWnd.open); //地图面板	M
+			KeysManager.getInstance().addKeyFun(KeysEnum.O, this.settingWnd.open); //系统设置	O
+
+			//			KeysManager.getInstance().addKeyFun(KeysEnum.xxxx, this.roleWnd.open);//   物品、技能快捷键	1-7QWE       
+			KeysManager.getInstance().addKeyFun(KeysEnum.ENTER, this.chatWnd.onStageEnter); //聊天焦点激活	Enter            
 
 		}
 

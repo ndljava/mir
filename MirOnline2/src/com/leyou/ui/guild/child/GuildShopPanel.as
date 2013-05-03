@@ -5,13 +5,13 @@ package com.leyou.ui.guild.child {
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.ConfirmInputWindow;
-	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.ui.guild.child.children.ShopRender;
 	import com.leyou.utils.GuildUtils;
-
+	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 
@@ -146,7 +146,7 @@ package com.leyou.ui.guild.child {
 			if (tc == null)
 				return;
 
-			ConfirmWindow.showWin("确认购买!!!", function():void {
+			PopupManager.showConfirm("确认购买!!!", function():void {
 
 				var arr:Array=GuildUtils.getMemberByName(UIManager.getInstance().guildWnd.memberArr, MyInfoManager.getInstance().name);
 				if (arr == null)

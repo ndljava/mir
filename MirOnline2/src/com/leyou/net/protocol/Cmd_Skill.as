@@ -1,6 +1,7 @@
 package com.leyou.net.protocol {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.playerSkill.TClientMagic;
+	import com.ace.utils.HexUtil;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.NetEncode;
 	
@@ -36,5 +37,15 @@ package com.leyou.net.protocol {
 			br.position=0;
 			cm && cm.read(br);
 		}
+
+		static public function sm_magic_lvExp(td:TDefaultMessage, body:String):void {
+			td.Recog; //{magid}, 
+			td.Param; //{lv}, 
+			td.Tag;//exp
+			UIManager.getInstance().skillWnd.skillExpChange(td.Recog,td.Tag,td.Param);
+			HexUtil.MakeLong(td.Tag, td.Series);
+		}
+		
+		
 	}
 }

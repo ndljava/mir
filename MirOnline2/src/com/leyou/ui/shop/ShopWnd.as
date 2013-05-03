@@ -1,12 +1,14 @@
 package com.leyou.ui.shop {
+	import com.ace.enum.UIEnum;
 	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.AlertWindow;
-	import com.ace.ui.window.children.ConfirmInputWindow;
+	import com.ace.ui.window.children.InputWindow;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.enum.ChatEnum;
 	import com.leyou.enum.ShopEnum;
@@ -14,12 +16,8 @@ package com.leyou.ui.shop {
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.ui.shop.child.GridShop;
-	import com.leyou.ui.shop.child.ShopGrid;
-	import com.leyou.ui.shop.child.ShopListRender;
 	
 	import flash.events.MouseEvent;
-	import flash.events.TimerEvent;
-	import flash.utils.Timer;
 
 	public class ShopWnd extends AutoWindow {
 		private var pageLbl:Label;
@@ -37,8 +35,7 @@ package com.leyou.ui.shop {
 		private var itemArr:Vector.<TStdItem>;
 		private var _evt:MouseEvent;
 		private var doubleClick:Boolean;
-		private var inputAlertWnd:ConfirmInputWindow;
-		private var inputAlertWndSta:Boolean;
+		private var inputW:InputWindow;
 
 		public function ShopWnd() {
 			super(LibManager.getInstance().getXML("config/ui/ShopWnd.xml"));
@@ -198,14 +195,12 @@ package com.leyou.ui.shop {
 //		}
 
 		private function ok(str:String):void {
-			this.inputAlertWndSta=false;
 			if (str == ""||int(str) <=0)
 				return;
 			Cmd_Task.cm_userBuyItem(this.npc, 12 + (this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + this.clickRenderIdx, int(str), this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + this.clickRenderIdx].Name);
 		}
 
 		private function cancle():void {
-			this.inputAlertWndSta=false;
 		}
 
 		//移出render
@@ -248,7 +243,7 @@ package com.leyou.ui.shop {
 		public function buyFailed(reson:int):void {
 			switch (reson) {
 				case 1: //1: FrmDlg.DMessageDlg ('此物品被卖出.', [mbOk]);
-					UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "物品出售成功！");
+					UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "物品购买失败");
 					break;
 				case 2: //2: FrmDlg.DMessageDlg ('您无法携带更多物品了.', [mbOk]);
 					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您无法携带更多物品了",SystemNoticeEnum.IMG_PROMPT);
@@ -271,15 +266,22 @@ package com.leyou.ui.shop {
 
 		public function renderClick(idx:int):void {
 			this.clickRenderIdx=idx;
-			if (this.inputAlertWnd == null || !this.inputAlertWndSta) {
-				this.inputAlertWnd=ConfirmInputWindow.showWin("请输入购买数量", ok, cancle, 1, null, true);
-				this.inputAlertWnd.textbox.text="1";
-				this.inputAlertWnd.textbox.restrict="0-9";
-				this.inputAlertWnd.textbox.input.maxChars=4;
-				this.inputAlertWndSta=true;
-			} else if (this.inputAlertWndSta) {
-				this.inputAlertWnd.textbox.text="1";
-			}
+			var win:WindInfo=WindInfo.getInputInfo("请输入购买数量");
+			win.okFun=ok;
+			win.cancelFun=cancle;
+			inputW=PopWindow.showWnd(UIEnum.WND_TYPE_INPUT,win,"shop_inputWnd") as InputWindow;
+			inputW.textbox.text="1";
+			inputW.textbox.restrict="0-9";
+			inputW.textbox.input.maxChars=4;
+//			if (this.inputAlertWnd == null || !this.inputAlertWndSta) {
+//				this.inputAlertWnd=ConfirmInputWindow.showWin("请输入购买数量", ok, cancle, 1, null, true);
+//				this.inputAlertWnd.textbox.text="1";
+//				this.inputAlertWnd.textbox.restrict="0-9";
+//				this.inputAlertWnd.textbox.input.maxChars=4;
+//				this.inputAlertWndSta=true;
+//			} else if (this.inputAlertWndSta) {
+//				this.inputAlertWnd.textbox.text="1";
+//			}
 		}
 
 		public function renderDoubleClick(idx:int):void {
@@ -288,7 +290,7 @@ package com.leyou.ui.shop {
 			if(table)
 				count=table.stackNum;
 			else count=1;
-			Cmd_Task.cm_userBuyItem(this.npc, 12 + idx, table.stackNum, this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
+			Cmd_Task.cm_userBuyItem(this.npc, 12 + (this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx, table.stackNum, this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
 		}
 
 		public function getInfoByIdx(idx:int):TStdItem {

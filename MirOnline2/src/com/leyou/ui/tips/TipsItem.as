@@ -117,7 +117,7 @@ package com.leyou.ui.tips {
 			this.info.name=info.s.name;
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type)];
 			if (UIManager.getInstance().shopWnd.visible)
-				this.info.price=info.s.price + "金币";
+				this.info.price=info.s.price*.5 + "金币";
 			else
 				this.info.price="";
 			this.info.weight=info.s.weight;

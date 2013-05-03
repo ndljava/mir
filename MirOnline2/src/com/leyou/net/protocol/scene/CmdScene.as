@@ -205,8 +205,8 @@ package com.leyou.net.protocol.scene {
 		//普通攻击
 		static public function sm_hit(td:TDefaultMessage, body:String):void {
 			var player:LivingModel=UIManager.getInstance().mirScene.getPlayer(td.Recog);
-			if (td.Series)
-				player && player.autoAttack(new Point(td.Param, td.Tag), td.Series, 0); //普通
+//			if (td.Series > -1 && td.Series <= 7)为什么加方向判断？服务器好像有时候发过来的方向不在该范围内
+			player && player.autoAttack(new Point(td.Param, td.Tag), td.Series, 0); //普通
 		}
 
 		static public function sm_powerHit(td:TDefaultMessage, body:String):void {

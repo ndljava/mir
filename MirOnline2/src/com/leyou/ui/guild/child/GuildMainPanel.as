@@ -1,21 +1,18 @@
 package com.leyou.ui.guild.child {
 	import com.ace.gameData.player.MyInfoManager;
-	import com.ace.manager.LayerManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.lable.children.TextArea;
-	import com.ace.ui.window.children.ConfirmInputWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.enum.TaskEnum;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
-	import com.leyou.net.MirProtocol;
-	import com.leyou.net.NetEnum;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Task;
-	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.utils.GuildUtils;
-
+	
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 
@@ -179,12 +176,12 @@ package com.leyou.ui.guild.child {
 		 *
 		 */
 		private function changeContribFunc():void {
-			ConfirmInputWindow.showWin("请输入贡献数:", function(msg:String):void {
+			PopupManager.showConfirmInput("请输入贡献数:", function(msg:String):void {
 				if (msg == null || msg.match(/\d*/g).length == 0 || msg == "0")
 					return;
 
 				Cmd_Guild.cm_guildContribute(int(msg));
-				ConfirmInputWindow.showWin("请贡献给的玩家:", inputContribMember);
+				PopupManager.showConfirmInput("请贡献给的玩家:", inputContribMember);
 			});
 
 			function inputContribMember(msg:String):void {
@@ -201,7 +198,7 @@ package com.leyou.ui.guild.child {
 		 *
 		 */
 		private function changeMoneyFunc():void {
-			ConfirmInputWindow.showWin("请输入银两数:", function(msg:String):void {
+			PopupManager.showConfirmInput("请输入银两数:", function(msg:String):void {
 				if (msg == null || msg.match(/\d*/g).length == 0 || msg == "0")
 					return;
 
@@ -217,7 +214,7 @@ package com.leyou.ui.guild.child {
 		 *
 		 */
 		private function changeGoldFunc(i:int, str:String):void {
-			ConfirmInputWindow.showWin(str, function(msg:String):void {
+			PopupManager.showConfirmInput(str, function(msg:String):void {
 				if (msg == null || msg.match(/\d*/g).length == 0 || msg == "0")
 					return;
  

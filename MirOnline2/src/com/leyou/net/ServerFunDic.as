@@ -3,6 +3,7 @@ package com.leyou.net {
 	import com.ace.tools.print;
 	import com.leyou.config.Core;
 	import com.leyou.net.protocol.Cmd_Chat;
+	import com.leyou.net.protocol.Cmd_Forge;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Market;
 	import com.leyou.net.protocol.Cmd_Role;
@@ -134,6 +135,7 @@ package com.leyou.net {
 				//技能
 				dict[MirProtocol.SM_SENDMYMAGIC]=Cmd_Skill.sm_sendMyMagic;
 				dict[MirProtocol.SM_ADDMAGIC]=Cmd_Skill.sm_addMagic;
+				dict[MirProtocol.SM_MAGIC_LVEXP]=Cmd_Skill.sm_magic_lvExp;
 
 				//聊天
 				dict[MirProtocol.SM_HEAR]=Cmd_Chat.sm_hear;
@@ -157,6 +159,9 @@ package com.leyou.net {
 				dict[MirProtocol.SM_LEVELUP]=Cmd_Role.sm_levelUp; //升级
 				//属性分配
 				dict[MirProtocol.SM_ADJUST_BONUS]=Cmd_Role.sm_adjust_bonus;
+				//查看其它玩家
+				dict[MirProtocol.SM_SENDUSERSTATE]=Cmd_Role.sm_sendUserState;
+				
 
 				//交易
 				dict[MirProtocol.SM_DEALMENU]=Cmd_Trade.sm_dealMenu;
@@ -228,7 +233,13 @@ package com.leyou.net {
 				dict[MirProtocol.SM_MASTERTAKEGUILDITEMFAIL]=Cmd_Guild.sm_masterTakeGuildItemFail;
 				dict[MirProtocol.SM_OPENGUILDDLG_FAIL]=Cmd_Guild.sm_openGuildDlg_fail;
 				dict[MirProtocol.SM_SENDGUILDMEMBERLIST]=Cmd_Guild.sm_sendGuildMemberList;
-
+				
+				
+				//合成
+				dict[MirProtocol.SM_OPENMITEMWIN]=Cmd_Forge.sm_openmItemWin;
+				dict[MirProtocol.SM_FIFITEM_SUCC]=Cmd_Forge.sm_fifItem_succ;
+				dict[MirProtocol.SM_FIFITEM_FAIL]=Cmd_Forge.sm_fifItem_fail;
+				
 
 			}
 		}
@@ -238,7 +249,7 @@ package com.leyou.net {
 			MirProtocol.SM_TURN, MirProtocol.SM_SPELL, MirProtocol.SM_MAGICFIRE, MirProtocol.SM_DEATH, MirProtocol.SM_BACKSTEP, //场景 
 			MirProtocol.SM_BAGITEMS, MirProtocol.SM_SAVEITEMLIST, MirProtocol.SM_ADDITEM, MirProtocol.SM_DELITEM, MirProtocol.SM_UPDATEITEM, //背包
 			MirProtocol.SM_SENDMYMAGIC, //技能
-			MirProtocol.SM_ABILITY, MirProtocol.SM_SENDUSEITEMS, MirProtocol.SM_ADJUST_BONUS,//角色
+			MirProtocol.SM_ABILITY, MirProtocol.SM_SENDUSEITEMS, MirProtocol.SM_ADJUST_BONUS,MirProtocol.SM_SENDUSERSTATE,//角色
 			MirProtocol.SM_DEALREMOTEADDITEM, MirProtocol.SM_DEALREMOTEDELITEM, //交易
 			MirProtocol.SM_SENGSHOPITEMS, MirProtocol.SM_SENGSHOPSPECIALLYITEMS, //market
 			MirProtocol.SM_BTITEM, //摆摊

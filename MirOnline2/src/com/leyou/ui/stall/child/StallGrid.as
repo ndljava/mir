@@ -6,9 +6,8 @@ package com.leyou.ui.stall.child {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.AlertWindow;
-	import com.ace.ui.window.children.ConfirmInputWindow;
-	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Stall;
 	import com.leyou.ui.backpack.child.BackpackGrid;
@@ -95,7 +94,7 @@ package com.leyou.ui.stall.child {
 			if (tc == null || tc.s == null)
 				return;
 
-			ConfirmWindow.showWin("你确定要购买么?", buyItem);
+			PopupManager.showConfirm("你确定要购买么?", buyItem);
 		}
 
 		public function send_ChangeItem():void {
@@ -113,22 +112,23 @@ package com.leyou.ui.stall.child {
 			if (tc == null || tc.s == null || g.gridType != ItemEnum.TYPE_GRID_BACKPACK)
 				return;
 
-			ConfirmInputWindow.showWin("请输入价钱:", okPrice, cancelFunc);
+			PopupManager.showConfirmInput("请输入价钱:", okPrice, cancelFunc);
 
 			function okPrice(i:String):void {
 				if (i == null || i == "0" || i == "" || int(i) == 0)
 					return;
 
 				if (i != "" && i.match(/^[0-9]+$/g).length == 0) {
-					AlertWindow.showWin("请输入正确的价钱!", null, function():void {
-						ConfirmInputWindow.showWin("请输入价钱:", okPrice);
+					PopupManager.showAlert("请输入正确的价钱!", function():void {
+						PopupManager.showConfirmInput("请输入价钱:", okPrice);
 					});
 					return;
 				}
 
 				if (i.length >= 10) {
-					AlertWindow.showWin("请输入正确的数值!", null, function():void {
-						ConfirmInputWindow.showWin("请输入价钱:", okPrice);
+
+					PopupManager.showAlert("请输入正确的数值!", function():void {
+						PopupManager.showConfirmInput("请输入价钱:", okPrice);
 					});
 					return;
 				}

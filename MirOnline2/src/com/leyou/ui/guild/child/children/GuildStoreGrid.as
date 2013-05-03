@@ -1,5 +1,4 @@
-package com.leyou.ui.guild.child.children
-{
+package com.leyou.ui.guild.child.children {
 	import com.ace.enum.ItemEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.gameData.backPack.TClientItem;
@@ -9,15 +8,12 @@ package com.leyou.ui.guild.child.children
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.utils.GuildUtils;
 
-	public class GuildStoreGrid extends GridBase
-	{
-		public function GuildStoreGrid(id:int=-1)
-		{
+	public class GuildStoreGrid extends GridBase {
+		public function GuildStoreGrid(id:int=-1) {
 			super(id);
 		}
 
-		override protected function init():void
-		{
+		override protected function init():void {
 			super.init();
 			this.isLock=false;
 			//this.canMove=false;
@@ -32,44 +28,36 @@ package com.leyou.ui.guild.child.children
 			this.selectBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/select.png");
 		}
 
-		override public function updataInfo(info:*):void
-		{
+		override public function updataInfo(info:*):void {
 			super.updataInfo(info);
 
-			
-			if (info != null)
-			{
+
+			if (info != null) {
 				//this.dataId=UIManager.getInstance().guildWnd.storeArr[5].indexOf(info);
 				this.iconBmp.updateBmp("items/" + TClientItem(info).s.appr + ".png");
-			}
-			else
-			{
+			} else {
 				//this.dataId=-1;
 				this.iconBmp.bitmapData=null;
 			}
 		}
-		
-		override public function mouseOverHandler($x:Number, $y:Number):void
-		{
+
+		override public function mouseOverHandler($x:Number, $y:Number):void {
 			super.mouseDownHandler($x, $y);
 			if (this.isEmpty)
 				return;
 		}
 
-		override public function mouseOutHandler():void
-		{
+		override public function mouseOutHandler():void {
 			super.mouseOutHandler();
 		}
 
-		override public function switchHandler(fromItem:GridBase):void
-		{
-			
-			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK)
-			{
+		override public function switchHandler(fromItem:GridBase):void {
+
+			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 				super.switchHandler(fromItem);
-				
+
 				MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
-				
+
 				var tc:TClientItem=MyInfoManager.getInstance().backpackItems[fromItem.dataId] as TClientItem;
 				if (tc == null)
 					return;

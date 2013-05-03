@@ -2,7 +2,9 @@ package com.leyou.ui.role.child {
 	import com.ace.enum.ItemEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.gameData.backPack.TClientItem;
+	import com.ace.gameData.backPack.TSClientItem;
 	import com.ace.gameData.player.MyInfoManager;
+	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.backpack.child.BackpackGrid;
@@ -18,7 +20,7 @@ package com.leyou.ui.role.child {
 		override protected function init():void {
 			super.init();
 			this.isLock=false;
-			this.canMove=true;
+			this.canMove=false;
 			this.gridType=ItemEnum.TYPE_GRID_EQUIP;
 			this.bgBmp.bitmapData=LibManager.getInstance().getImg("ui/character/character_bg.png");
 			this.bgBmp.alpha=0;
@@ -29,11 +31,16 @@ package com.leyou.ui.role.child {
 			this.isLock=false;
 			this.isEmpty=false;
 			this.bgBmp.alpha=1;
-			if (TClientItem(info).isJustFill) {
-				return;
+			if (this.gridType == ItemEnum.TYPE_GRID_EQUIP) {
+				if (TClientItem(info).isJustFill)
+					return;
 			}
+//			if()
 			super.updataInfo(info);
-			this.iconBmp.updateBmp("items/" + TClientItem(info).s.appr + ".png");
+			if (this.gridType == ItemEnum.TYPE_GRID_EQUIP)
+				this.iconBmp.updateBmp("items/" + TClientItem(info).s.appr + ".png");
+			if (this.gridType == ItemEnum.TYPE_GRID_OTHER_EQUIP)
+				this.iconBmp.updateBmp("items/" + TItemInfo(info).appr + ".png");
 			this.iconBmp.x=this.iconBmp.y=(ItemEnum.ITEM_BG_WIDTH - ItemEnum.ITEM_ICO_WIDTH) / 2;
 			this.iconBmp.x=4 + (40 - 28) >> 1;
 			this.iconBmp.y=4 + (40 - 30) >> 1;

@@ -1,8 +1,10 @@
 package com.leyou.utils {
 	import com.ace.enum.ItemEnum;
+	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.table.TItemInfo;
+	import com.ace.utils.HexUtil;
 	import com.leyou.enum.TipsEnum;
 
 	public class TipsUtil {
@@ -17,7 +19,7 @@ package com.leyou.utils {
 					name=ItemEnum.TYPE_ITEM_FOOD; //食物
 					break;
 				case 3:
-					name=ItemEnum.TYPE_ITEM_SCROLL_POTIONS;//药水卷轴
+					name=ItemEnum.TYPE_ITEM_SCROLL_POTIONS; //药水卷轴
 					break;
 				case 50:
 					name=ItemEnum.TYPE_ITEM_CROLL; //卷轴
@@ -163,29 +165,28 @@ package com.leyou.utils {
 		 * @return
 		 *
 		 */
-		public static function getInstructionByFlag(flag:int,itemType:int):String {
+		public static function getInstructionByFlag(flag:int, itemType:int):String {
 			var contion:Array=new Array();
-			var arr:Array=flag.toString(2).split("");//有几个显示几个
+			var arr:Array=flag.toString(2).split(""); //有几个显示几个
 			while (arr.length < 8)
 				arr.unshift(0);
 			//禁止爆出、禁止脱下、静止出售、禁止修理、禁止存仓、禁止交易、禁止丢弃、禁止日志
-			if(arr[6] == 1&&arr[5] == 1&&arr[0] == 1&&arr[2] == 1){
+			if (arr[6] == 1 && arr[5] == 1 && arr[0] == 1 && arr[2] == 1) {
 				contion.push("已绑定");
-				if(itemType==TipsEnum.TYPE_TIPS_EQUIP&&arr[1]==1)
+				if (itemType == TipsEnum.TYPE_TIPS_EQUIP && arr[1] == 1)
 					contion.push("禁止脱下");
-				if (arr[3] == 1&&itemType==TipsEnum.TYPE_TIPS_EQUIP)
+				if (arr[3] == 1 && itemType == TipsEnum.TYPE_TIPS_EQUIP)
 					contion.push("禁止修理");
 				if (arr[4] == 1)
 					contion.push("禁止存仓");
-			}
-			else{
-				if(arr[0]==1)
+			} else {
+				if (arr[0] == 1)
 					contion.push("禁止爆出");
-				if(itemType==TipsEnum.TYPE_TIPS_EQUIP&&arr[1]==1)
+				if (itemType == TipsEnum.TYPE_TIPS_EQUIP && arr[1] == 1)
 					contion.push("禁止脱下");
 				if (arr[2] == 1)
 					contion.push("禁止出售");
-				if (arr[3] == 1&&itemType==TipsEnum.TYPE_TIPS_EQUIP)
+				if (arr[3] == 1 && itemType == TipsEnum.TYPE_TIPS_EQUIP)
 					contion.push("禁止修理");
 				if (arr[4] == 1)
 					contion.push("禁止存仓");
@@ -195,63 +196,103 @@ package com.leyou.utils {
 					contion.push("禁止丢弃");
 			}
 			var str:String=new String();
-			for(var i:int=0;i<contion.length;i++){
-				if(i==contion.length-1)
+			for (var i:int=0; i < contion.length; i++) {
+				if (i == contion.length - 1)
 					str+=contion[i];
-				else str+=contion[i]+"<br>";
+				else
+					str+=contion[i] + "<br>";
 			}
 			return str;
 		}
 
-		public static function getLimitStr(need:int, needLv:int):Array {
+		public static function getLimitStr(need:int, needLv:int,f:Boolean=true):Array {
 			var arr:Array=new Array();
+			var num:int;
 			switch (need) {
 				case 0:
 //					if(MyInfoManager.getInstance().level>=needLv)
 //						arr.push(getColorStr("需要等级：" + needLv,TipsEnum.COLOR_GREEN));
 //					else arr.push(getColorStr("需要等级：" + needLv,TipsEnum.COLOR_WHITE));
-					if(MyInfoManager.getInstance().level<needLv)
-						arr.push(getColorStr("需要等级：" + needLv,TipsEnum.COLOR_RED));
-					else arr.push(getColorStr("需要等级：" + needLv,TipsEnum.COLOR_GREEN));
+					if(f){
+						if (MyInfoManager.getInstance().level < needLv)
+							arr.push(getColorStr("需要等级：" + needLv, TipsEnum.COLOR_RED));
+						else
+							arr.push(getColorStr("需要等级：" + needLv, TipsEnum.COLOR_GREEN));
+					}
+					else arr.push(getColorStr("需要等级：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 1:
-					if(MyInfoManager.getInstance().baseInfo.DC>needLv)
-						arr.push(getColorStr("需要攻击力：" + needLv,TipsEnum.COLOR_RED));
-					else arr.push(getColorStr("需要攻击力：" + needLv,TipsEnum.COLOR_GREEN));
+					if(f){
+						num=HexUtil.HiWord(MyInfoManager.getInstance().baseInfo.DC);
+						if ( num< needLv)
+							arr.push(getColorStr("需要攻击力：" + needLv, TipsEnum.COLOR_RED));
+						else
+							arr.push(getColorStr("需要攻击力：" + needLv, TipsEnum.COLOR_GREEN));
+					}
+					else arr.push(getColorStr("需要攻击力：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 2:
-					if(MyInfoManager.getInstance().baseInfo.MP>needLv)
-						arr.push(getColorStr("需要魔法力：" + needLv,TipsEnum.COLOR_RED));
-					else arr.push(getColorStr("需要魔法力：" + needLv,TipsEnum.COLOR_GREEN));
+					if(f){
+						num=MyInfoManager.getInstance().baseInfo.MaxMP
+						if ( num< needLv)
+							arr.push(getColorStr("需要魔法力：" + needLv, TipsEnum.COLOR_RED));
+						else
+							arr.push(getColorStr("需要魔法力：" + needLv, TipsEnum.COLOR_GREEN));
+					}
+					else arr.push(getColorStr("需要魔法力：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 3:
-					if(MyInfoManager.getInstance().baseInfo.SC>needLv)
-						arr.push(getColorStr("需要道术：" + needLv,TipsEnum.COLOR_RED));
-					else arr.push(getColorStr("需要魔法力：" + needLv,TipsEnum.COLOR_GREEN));
+					if(f){
+						num=HexUtil.HiWord(MyInfoManager.getInstance().baseInfo.SC)
+						if (num < needLv)
+							arr.push(getColorStr("需要道术：" + needLv, TipsEnum.COLOR_RED));
+						else
+							arr.push(getColorStr("需要道术：" + needLv, TipsEnum.COLOR_GREEN));
+					}
+					else arr.push(getColorStr("需要道术：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 4:
-				//暂无转生等级吧？？？
-					arr.push(getColorStr("需要转生等级：" + needLv,TipsEnum.COLOR_RED));
+					if(f){
+						//暂无转生等级吧？？？
+						arr.push(getColorStr("需要转生等级：" + needLv, TipsEnum.COLOR_RED));
+					}
+					else //暂无转生等级吧？？？
+						arr.push(getColorStr("需要转生等级：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 5:
-					if(MyInfoManager.getInstance().baseInfo.creditValue>needLv)
-						arr.push(getColorStr("需要声望点：" + needLv,TipsEnum.COLOR_RED));
-					else arr.push(getColorStr("需要声望点：" + needLv,TipsEnum.COLOR_GREEN));
+					if(f){
+						if (MyInfoManager.getInstance().baseInfo.creditValue > needLv)
+							arr.push(getColorStr("需要声望点：" + needLv, TipsEnum.COLOR_RED));
+						else
+							arr.push(getColorStr("需要声望点：" + needLv, TipsEnum.COLOR_GREEN));
+					}
+					else arr.push(getColorStr("需要声望点：" + needLv, TipsEnum.COLOR_GREEN));
 					break;
 				case 6:
-					if(MyInfoManager.getInstance().hasGuild)
-						arr.push(getColorStr("佩戴条件：拥有行会",TipsEnum.COLOR_GREEN));
-					else arr.push(getColorStr("佩戴条件：拥有行会",TipsEnum.COLOR_RED));
+					if(f){
+						if (MyInfoManager.getInstance().hasGuild)
+							arr.push(getColorStr("佩戴条件：拥有行会", TipsEnum.COLOR_GREEN));
+						else
+							arr.push(getColorStr("佩戴条件：拥有行会", TipsEnum.COLOR_RED));
+					}
+					else arr.push(getColorStr("佩戴条件：拥有行会", TipsEnum.COLOR_RED));
 					break;
 				case 7:
-					//暂无沙城会员属性吧？？？？、
-					arr.push(getColorStr("佩戴条件：沙城会员",TipsEnum.COLOR_RED));
+					if(f){
+						//暂无沙城会员属性吧？？？？、
+						arr.push(getColorStr("佩戴条件：沙城会员", TipsEnum.COLOR_RED));
+					}
+					else arr.push(getColorStr("佩戴条件：沙城会员", TipsEnum.COLOR_GREEN));
 					break;
 				case 8:
-					//暂无会员属性 稍后做
-					if(MyInfoManager.getInstance().isMember)
-						arr.push(getColorStr("会员：" + needLv,TipsEnum.COLOR_GREEN));
-					else arr.push(getColorStr("会员：" + needLv,TipsEnum.COLOR_RED));
+					if(f){
+						//暂无会员属性 稍后做
+						if (MyInfoManager.getInstance().isMember)
+							arr.push(getColorStr("会员：" + needLv, TipsEnum.COLOR_GREEN));
+						else
+							arr.push(getColorStr("会员：" + needLv, TipsEnum.COLOR_RED));
+					}
+					else arr.push(getColorStr("会员：" + needLv, TipsEnum.COLOR_RED));
 					break;
 				case 10:
 					arr.push("需要职业：" + needLv);
@@ -304,40 +345,148 @@ package com.leyou.utils {
 		}
 
 		public static function getProperNum(info:TItemInfo):Array {
+			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.id);
 			var arr:Array=[];
-			if (info.type == 0) { //药品
-				if (info.ac != 0)
-					arr.push("HP回复：" + info.ac);
-				if (info.mac != 0)
-					arr.push("MP回复：" + info.mac);
-			} else if (info.type == 3 && info.shape == 12) { //如果是苹果
+			if (info.type == ItemEnum.ITEM_TYPE_DRUG) { //药品
+				if (info.ac != 0) 
+					arr.push(getProperKey(info.ac, tInfo.ac, "HP回复：", false));
+				if (info.mac != 0) 
+					arr.push(getProperKey(info.mac, tInfo.mac, "MP回复：", false));
+			} else if (info.type == ItemEnum.ITEM_TYPE_POTION_OR_SCROLL && info.shape == 12) { //如果是苹果
+				if (info.ac != 0) 
+					arr.push(getProperKey(info.ac, tInfo.ac, "HP增加：", false));
+				if (info.ac2 != 0) 
+					arr.push(getProperKey(info.ac2, tInfo.ac2, "攻速增加：", false));
+				if (info.mac != 0) 
+					arr.push(getProperKey(info.mac, tInfo.mac, "MP增加：", false));
+				if (info.dc != 0) 
+					arr.push(getProperKey(info.dc, tInfo.dc, "物攻增加：", false));
+				if (info.mc != 0) 
+					arr.push(getProperKey(info.mc, tInfo.mc, "魔攻增加：", false));
+				if (info.sc != 0) 
+					arr.push(getProperKey(info.sc, tInfo.sc, "道术增加：", false));
+			} else if (info.type == ItemEnum.ITEM_TYPE_WEAPON_I || info.type == ItemEnum.ITEM_TYPE_WEAPON_II) { //武器
+				if (info.dc != 0 || info.dc2 != 0)
+					arr.push(getProperBaseKey(info.dc, info.dc2, tInfo.dc2, "物攻："));
+				if (info.mc != 0 || info.mc2 != 0)
+					arr.push(getProperBaseKey(info.mc, info.mc2, tInfo.mc2, "魔攻："));
+				if (info.sc != 0 || info.sc2 != 0)
+					arr.push(getProperBaseKey(info.sc, info.sc2, tInfo.sc2, "道术："));
+				if (info.ac2 > 0)
+					arr.push(getProperKey(info.ac2, tInfo.ac2, "准确：", false));
+				if (info.ac > 0)
+					arr.push(getProperKey(info.ac, tInfo.ac, "幸运：", false));
+				if (info.mac > 0)
+					arr.push(getProperKey(info.mac, tInfo.mac, "诅咒：", false));
+				if (info.mac2 > 0)
+					arr.push(getColorStr("攻击速度：-" + info.mac2, TipsEnum.COLOR_GOLD));
+				if (info.source > 0)
+					arr.push(getColorStr("强度：+" + info.source, TipsEnum.COLOR_GOLD));
+				else if (info.source < 0)
+					arr.push(getColorStr("神圣：" + Math.abs(info.source), TipsEnum.COLOR_GOLD));				
+			} else if (info.type == ItemEnum.ITEM_TYPE_SHIELD) { //盾牌
+				if (info.dc != 0 || info.dc2 != 0)
+					arr.push(getProperBaseKey(info.dc, info.dc2, tInfo.dc2, "物攻："));
+				if (info.mc != 0 || info.mc2 != 0)
+					arr.push(getProperBaseKey(info.mc, info.mc2, tInfo.mc2, "魔攻："));
+				if (info.sc != 0 || info.sc2 != 0)
+					arr.push(getProperBaseKey(info.sc, info.sc2, tInfo.sc2, "道术："));
+				if (info.mac > 0)
+					arr.push(getProperKey(info.mac, tInfo.mac, "诅咒：", false));
+				if (info.mac2 > 0)
+					arr.push(getProperKey(info.mac2, tInfo.mac2, "幸运：", false));
+			} else if (info.type == ItemEnum.ITEM_TYPE_NECKLACE_I || info.type == ItemEnum.ITEM_TYPE_NECKLACE_II || info.type == ItemEnum.ITEM_TYPE_NECKLACE_III || info.type == ItemEnum.ITEM_TYPE_WRIST_I) { //19
+				if (info.dc != 0 || info.dc2 != 0) 
+					arr.push(getProperBaseKey(info.dc, info.dc2, tInfo.dc2, "物攻："));
+				if (info.mc != 0 || info.mc2 != 0) 
+					arr.push(getProperBaseKey(info.mc, info.mc2, tInfo.mc2, "魔攻："));
+				if (info.sc != 0 || info.sc2 != 0) 
+					arr.push(getProperBaseKey(info.mc, info.sc2, tInfo.sc2, "道术："));
+				if (info.type == ItemEnum.ITEM_TYPE_NECKLACE_I) {
+					if (info.mac2 > 0)
+						arr.push(getProperKey(info.mac2, tInfo.mac2, "幸运：", false));
+					if (info.mac > 0)
+						arr.push(getProperKey(info.mac, tInfo.mac, "诅咒：", false));
+					
+					if (info.ac2 > 0)
+						arr.push(getProperKey(info.ac2, tInfo.ac2, "魔法躲避：", true));
+				} else if (info.type == ItemEnum.ITEM_TYPE_NECKLACE_II || info.type == ItemEnum.ITEM_TYPE_WRIST_I) {
+					if (info.ac2 > 0)
+						arr.push(getProperKey(info.ac2, tInfo.ac2, "准确：", false));
+					if (info.mac2 > 0)
+						arr.push(getProperKey(info.mac2, tInfo.mac2, "敏捷：", false));
+				} else if (info.type == ItemEnum.ITEM_TYPE_NECKLACE_III) {
+					if (info.ac > 0)
+						arr.push(getColorStr("攻击速度：+" + info.ac, TipsEnum.COLOR_GOLD));
+					if (info.mac > 0)
+						arr.push(getColorStr("攻击速度：-" + info.mac, TipsEnum.COLOR_GOLD));
+					if (info.ac2 > 0)
+						arr.push(getProperKey(info.ac2, tInfo.ac2, "体力恢复：", true));
+					if (info.mac2 > 0)
+						arr.push(getProperKey(info.mac2, tInfo.mac2, "魔法恢复：", false));
+				}
+			} else if (info.type == ItemEnum.ITEM_TYPE_SHOE) { //鞋
 				if (info.ac != 0 || info.ac2 != 0)
-					arr.push("HP增加：" + info.ac);
-				if (info.ac2 != 0)
-					arr.push("攻速增加：" + info.ac2);
-				if (info.mac != 0)
-					arr.push("MP增加：" + info.mac);
-				if (info.dc != 0)
-					arr.push("物攻增加：" + info.dc);
-				if (info.mc != 0)
-					arr.push("魔攻增加：" + info.mc);
-				if (info.sc != 0)
-					arr.push("道术增加：" + info.sc);
+					arr.push(getProperBaseKey(info.ac, info.ac2, tInfo.ac2, "防御："));
+				if (info.mac != 0 || info.mac2 != 0)
+					arr.push(getProperBaseKey(info.mac, info.mac2, tInfo.mac2, "魔防："));
+				if (info.dc >= 0)
+					arr.push(getProperKey(info.dc, tInfo.dc, "准确：", false));
+				if (info.mc >= 0)
+					arr.push(getProperKey(info.mc, tInfo.mc, "敏捷：", false));
+				if (info.sc >= 0)
+					arr.push(getProperKey(info.sc, tInfo.sc, "魔法躲避：", true));
+			} else if (info.type == ItemEnum.ITEM_TYPE_BELT) { //腰带
+				if (info.ac != 0 || info.ac2 != 0)
+					arr.push(getProperBaseKey(info.ac, info.ac2, tInfo.ac2, "防御："));
+				if (info.mac != 0 || info.mac2 != 0)
+					arr.push(getProperBaseKey(info.mac, info.mac2, tInfo.mac2, "魔防："));
+				if (info.dc >= 0)
+					arr.push(getProperKey(info.dc, tInfo.dc, "体力恢复：", true));
+				if (info.mc >= 0)
+					arr.push(getProperKey(info.mc, tInfo.mc, "魔法恢复：", true));
+				if (info.sc >= 0)
+					arr.push(getProperKey(info.sc, tInfo.sc, "中毒恢复：", true));
 			} else {
 				if (info.ac != 0 || info.ac2 != 0)
-					arr.push("防御：" + info.ac + "-" + info.ac2);
+					arr.push(getProperBaseKey(info.ac, info.ac2, tInfo.ac2, "防御："));
 				if (info.mac != 0 || info.mac2 != 0)
-					arr.push("魔防：" + info.mac + "-" + info.mac2);
+					arr.push(getProperBaseKey(info.mac, info.mac2, tInfo.mac2, "魔防："));
 				if (info.dc != 0 || info.dc2 != 0)
-					arr.push("物攻：" + info.dc + "-" + info.dc2);
+					arr.push(getProperBaseKey(info.dc, info.dc2, tInfo.dc2, "物攻："));
 				if (info.mc != 0 || info.mc2 != 0)
-					arr.push("魔攻：" + info.mc + "-" + info.mc2);
+					arr.push(getProperBaseKey(info.mc, info.mc2, tInfo.mc2, "魔攻："));
 				if (info.sc != 0 || info.sc2 != 0)
-					arr.push("道术：" + info.sc + "-" + info.sc2);
+					arr.push(getProperBaseKey(info.sc, info.sc2, tInfo.sc2, "道术："));
 			}
 			return arr;
 		}
 
+		private static function getProperKey(cur:int, tkey:int, name:String, flag:Boolean=false):String {
+			var str:String;
+			if (cur > tkey) {
+				if (flag)
+					str=getColorStr(name + tkey + "0%", TipsEnum.COLOR_GOLD) + getColorStr("+" + (cur - tkey) + "0%", TipsEnum.COLOR_PINK);
+				else
+					str=getColorStr(name + tkey, TipsEnum.COLOR_GOLD) + getColorStr("+" + (cur - tkey), TipsEnum.COLOR_PINK);
+			} else {
+				if (flag)
+					str=getColorStr(name + tkey + "0%", TipsEnum.COLOR_GOLD);
+				else
+					str=getColorStr(name + tkey, TipsEnum.COLOR_GOLD);
+			}
+			return str;
+		}
+
+		private static function getProperBaseKey(key:int, key2:int, tKey:int, name:String):String {
+			var str:String;
+			if (key2 > tKey)
+				str=getColorStr(name + key + "-" + tKey, TipsEnum.COLOR_GOLD) + getColorStr("+" + (key2 - tKey), TipsEnum.COLOR_PINK);
+			else
+				str=getColorStr(name + key + "-" + key2, TipsEnum.COLOR_GOLD);
+			return str;
+		}
+		
 		public static function getTipsType(type:int):int {
 			var f:int;
 			switch (type) {
@@ -399,17 +548,17 @@ package com.leyou.utils {
 			}
 			return false;
 		}
-		
-		public static function getBookNameByRace(i:int):String{
+
+		public static function getBookNameByRace(i:int):String {
 //			0	战士秘籍
 //			1	法师秘籍
 //			2	道士秘籍
 
-			if(i==0)
+			if (i == 0)
 				return "战士秘籍";
-			if(i==1)
+			if (i == 1)
 				return "法师秘籍";
-			if(i==2)
+			if (i == 2)
 				return "道士秘籍";
 			return null;
 		}

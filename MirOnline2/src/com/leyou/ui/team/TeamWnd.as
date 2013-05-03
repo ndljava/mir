@@ -14,7 +14,7 @@ package com.leyou.ui.team {
 	import com.leyou.net.protocol.Cmd_Team;
 	import com.leyou.ui.team.child.TeamListRender;
 	import com.leyou.utils.PlayerUtil;
-	
+
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
@@ -87,12 +87,22 @@ package com.leyou.ui.team {
 			return null;
 		}
 
+		/**
+		 * 判断玩家是否存在
+		 * @param id
+		 * @return
+		 *
+		 */
+		public function getPlayInTeam(id:int):Boolean {
+			return (this.getTeamInfoByID(id) == null ? false : true);
+		}
+
 		public function updata(arr:Vector.<TeamInfo>):void {
-			if (arr == null){
+			if (arr == null) {
 				MyInfoManager.getInstance().hasTeam=false;
 				return;
 			}
-				
+
 			MyInfoManager.getInstance().hasTeam=true;
 			var render:TeamListRender;
 
@@ -101,6 +111,7 @@ package com.leyou.ui.team {
 			}
 
 			this.renderArr.length=0;
+
 			for (var i:int=0; i < arr.length; i++) {
 
 				if (MyInfoManager.getInstance().name == arr[i].name)
@@ -145,7 +156,11 @@ package com.leyou.ui.team {
 		 *
 		 */
 		public function setTeamState(b:Boolean):void {
-			this.openTeamChBox.turnOn(b);
+			if (b)
+				this.openTeamChBox.turnOn(true);
+			else
+				this.openTeamChBox.turnOff(true);
+
 			Cmd_Team.cm_groupMode((b ? 1 : 0));
 		}
 
@@ -253,6 +268,14 @@ package com.leyou.ui.team {
 			}
 
 			UIManager.getInstance().teamAddWnd.updata();
+		}
+
+		/**
+		 * 更新组队信息 
+		 * 
+		 */		
+		public function updateTeamInfo():void {
+			this.updata(teamerInfo);
 		}
 
 		/**

@@ -10,9 +10,11 @@ package com.leyou.game.scene.player {
 	import com.ace.gameData.table.TActsInfo;
 	import com.ace.gameData.table.TPnfInfo;
 	import com.ace.utils.DebugUtil;
+	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.ServerFunDic;
+	import com.leyou.net.protocol.Cmd_Role;
 	import com.leyou.net.protocol.Cmd_Stall;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_backPack;
@@ -79,9 +81,10 @@ package com.leyou.game.scene.player {
 			super.actAttack(pt, dir, skillId);
 			if (this._info.moveLocked)
 				return;
-			if (skillId == 0)
+			if (skillId == 0) {
+				trace("发送攻击协议：位置-" + this.nowTilePt() + "方向-" + dir);
 				CmdScene.cm_Attack(MirProtocol.CM_HIT, this.nowTilePt().x, this.nowTilePt().y, dir);
-			else if (skillId == PlayerEnum.SKILL_FIRHIT)
+			} else if (skillId == PlayerEnum.SKILL_FIRHIT)
 				CmdScene.cm_Attack(MirProtocol.CM_FIREHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
 			else if (skillId == PlayerEnum.SKILL_LONGHIT)
 				CmdScene.cm_Attack(MirProtocol.CM_LONGHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
@@ -173,6 +176,10 @@ package com.leyou.game.scene.player {
 			Cmd_Stall.cm_clickhuman(id);
 		}
 
+		override protected function lookPlayer(id:int, ps:Point):void {
+			Cmd_Role.cm_queryUserState(id, ps);
+		}
+
 		override protected function onClickNpc(id:int):void {
 			Cmd_Task.cm_clickNpc(id);
 		}
@@ -180,6 +187,11 @@ package com.leyou.game.scene.player {
 		override protected function onActSpell(v1:int, v2:int, magicId:int, v3:int):void {
 			CmdScene.cm_spell(v1, v2, magicId, v3);
 		}
+
+		override protected function sysNotic(str:String):void {
+			UIManager.getInstance().noticeMidDownUproll.setNoticeStr(str, SystemNoticeEnum.IMG_WARN);
+		}
+
 	}
 }
 

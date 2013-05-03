@@ -45,7 +45,7 @@ package com.leyou.ui.storage.child {
 
 		override public function switchHandler(fromItem:GridBase):void {
 
-			UIManager.getInstance().storageWnd.showDragGlowFilter(false);
+			UIManager.getInstance().backPackWnd.showDragGlowFilter(false);
 			UIManager.getInstance().toolsWnd.showDragGlowFilter(false);
 
 			super.switchHandler(fromItem);
@@ -58,7 +58,7 @@ package com.leyou.ui.storage.child {
 						return;
 
 					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从背包
-					MyInfoManager.getInstance().waitItemToId=this.dataId; //到仓库
+					MyInfoManager.getInstance().waitItemToId=this.initId; //到仓库
 					Cmd_backPack.cm_userStorageItem(MyInfoManager.getInstance().talkNpcId, MyInfoManager.getInstance().backpackItems[fromItem.dataId]);
 					return ;
 				}

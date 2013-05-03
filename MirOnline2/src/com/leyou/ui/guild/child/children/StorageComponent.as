@@ -2,21 +2,20 @@ package com.leyou.ui.guild.child.children
 {
 	import com.ace.ICommon.IMenu;
 	import com.ace.gameData.backPack.TClientItem;
-	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.menu.data.MenuInfo;
-	import com.ace.ui.window.children.ConfirmInputWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.enum.GuildEnum;
 	import com.leyou.manager.MenuManager;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Guild;
 	
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
-	import flash.ui.Mouse;
 
 	public class StorageComponent extends AutoSprite implements IMenu
 	{
@@ -117,7 +116,7 @@ package com.leyou.ui.guild.child.children
 			switch (i)
 			{
 				case 0:
-					ConfirmInputWindow.showWin("请输入领取此物品所需要的贡献度:", function(i:int):void
+					PopupManager.showConfirmInput("请输入领取此物品所需要的贡献度:", function(i:int):void
 					{
 						if (i > 0)
 						{
@@ -131,7 +130,7 @@ package com.leyou.ui.guild.child.children
 					});
 					break;
 				case 1:
-					ConfirmInputWindow.showWin("请输入领取此物品所需要的行会编号:", function(i:int):void
+					PopupManager.showConfirmInput("请输入领取此物品所需要的行会编号:", function(i:int):void
 					{
 						if (i > 0)
 						{
@@ -153,7 +152,7 @@ package com.leyou.ui.guild.child.children
 					Cmd_Guild.cm_guildStroage(5);
 					break;
 				case 3:
-					ConfirmInputWindow.showWin("请输入领取此物品玩家名称:", function(str:String):void
+					PopupManager.showConfirmInput("请输入领取此物品玩家名称:", function(str:String):void
 					{
 						if (str != "")
 						{

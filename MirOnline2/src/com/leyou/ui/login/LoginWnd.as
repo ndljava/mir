@@ -1,9 +1,12 @@
 package com.leyou.ui.login {
+	import com.ace.enum.UIEnum;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.CheckBox;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.input.children.HideInput;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.config.Core;
 	import com.leyou.manager.ShareObjManage;
 	import com.leyou.net.NetGate;
@@ -48,13 +51,19 @@ package com.leyou.ui.login {
 		}
 
 		private function onLogin():void {
+			if (this.userNameTinput.text == "") {
+				PopWindow.showWnd(UIEnum.WND_TYPE_ALERT, WindInfo.getAlertInfo("请输入用户名！"), "login_Alert");
+				return;
+			}
+			if (this.userPwdTinput.text == "") {
+				PopWindow.showWnd(UIEnum.WND_TYPE_ALERT, WindInfo.getAlertInfo("请输入密码！"), "login_Alert");
+				return;
+			}
 			NetGate.getInstance().Connect(Core.serverIp, Core.loginPort, onConnect);
 			this.saveName();
 		}
 
 		private function onConnect():void {
-			if (Core.selectInfo == null)
-				Core.selectInfo=new SelectUserInfo();
 			Core.selectInfo.account=this.userNameTinput.text;
 			Cmd_Login.cm_Login(this.userNameTinput.text, this.userPwdTinput.text);
 		}

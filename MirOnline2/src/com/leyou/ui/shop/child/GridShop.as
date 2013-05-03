@@ -1,6 +1,7 @@
 package com.leyou.ui.shop.child {
 	import com.ace.enum.FontEnum;
 	import com.ace.enum.ItemEnum;
+	import com.ace.enum.UIEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
@@ -8,6 +9,8 @@ package com.leyou.ui.shop.child {
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.backpack.child.ItemTip;
@@ -60,7 +63,7 @@ package com.leyou.ui.shop.child {
 			this.addChild(this.moneyKindLbl);
 
 			this.priceLbl=new Label();
-			this.priceLbl.x=100 - 3;
+			this.priceLbl.x=100 - 3 - 20;
 			this.priceLbl.y=24 - 3;
 			this.addChild(this.priceLbl);
 		}
@@ -96,17 +99,26 @@ package com.leyou.ui.shop.child {
 			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 				if (fromItem) {
 					var tc:TClientItem=MyInfoManager.getInstance().backpackItems[fromItem.dataId] as TClientItem;
-					if (tc == null)
+					if (tc == null || tc.s == null)
 						return;
 
-					ConfirmWindow.showWin("确认卖出?", function():void {
-						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
-						//协议
-						UIManager.getInstance().shopWnd.sellItem(tc.MakeIndex, tc.s.name);
-					});
+					var win:WindInfo=WindInfo.getAlertInfo("确认卖出?");
+					win.okFun=okFun;
+					win.showClose=true;
+					PopWindow.showWnd(UIEnum.WND_TYPE_ALERT, win, "sell_alert");
+//					WindInfo.getConfirmInfo("确认卖出?", function():void {
+//						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
+//						//协议
+//						UIManager.getInstance().shopWnd.sellItem(tc.MakeIndex, tc.s.name);
+//					});
 
 				}
 			} else {
+			}
+			function okFun():void {
+				MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
+				//协议
+				UIManager.getInstance().shopWnd.sellItem(tc.MakeIndex, tc.s.name);
 			}
 		}
 

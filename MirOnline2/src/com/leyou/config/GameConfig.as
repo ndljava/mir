@@ -354,10 +354,10 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/guild/child/MemberRender.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/guild/AddContributPage.xml"));
 
-
 			//任务面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/TaskWnd.xml"));
-
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/ForgeWnd.xml"));
+			
 			//摆摊面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/StallWnd.xml"));
 
@@ -376,6 +376,9 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/warn.png"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/prompt.png"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/wrong.png"));
+			
+			//其他玩家属性面板
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/OtherRoleWnd.xml"));
 		}
 	}
 }

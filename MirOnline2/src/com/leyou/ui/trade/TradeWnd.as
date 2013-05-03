@@ -18,7 +18,7 @@ package com.leyou.ui.trade {
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.ui.trade.child.TradeRender;
 	import com.leyou.utils.PlayerUtil;
-	
+
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
@@ -62,9 +62,9 @@ package com.leyou.ui.trade {
 			this.playerNameLbl=this.getUIbyID("playerNameLbl") as Label;
 			this.raceLbl=this.getUIbyID("raceLbl") as Label;
 			this.lvLbl=this.getUIbyID("lvLbl") as Label;
-			this.gameMoneyLbl=this.getUIbyID("gameMoneyLbl") as TextInput;
+//			this.gameMoneyLbl=this.getUIbyID("gameMoneyLbl") as TextInput;
 			this.gameGoldLbl=this.getUIbyID("gameGoldLbl") as TextInput;
-			this.gameMoneyILbl=this.getUIbyID("gameMoneyILbl") as TextInput;
+//			this.gameMoneyILbl=this.getUIbyID("gameMoneyILbl") as TextInput;
 			this.gameGoldILbl=this.getUIbyID("gameGoldILbl") as TextInput;
 			this.shelvesBtn=this.getUIbyID("shelvesBtn") as NormalButton;
 			this.sureBtn=this.getUIbyID("sureBtn") as NormalButton;
@@ -76,12 +76,12 @@ package com.leyou.ui.trade {
 
 			this.gameGoldILbl.text="";
 			this.gameGoldLbl.text="";
-			this.gameMoneyILbl.text="";
-			this.gameMoneyLbl.text="";
+			//this.gameMoneyILbl.text="";
+			//this.gameMoneyLbl.text="";
 			this.gameGoldILbl.restrict="0-9";
 
-			this.gameMoneyILbl.visible=false;
-			this.gameMoneyLbl.visible=false;
+			//this.gameMoneyILbl.visible=false;
+			//this.gameMoneyLbl.visible=false;
 			this.gameGoldLbl.mouseEnabled=false;
 			this.gameGoldLbl.enable=false;
 
@@ -112,7 +112,6 @@ package com.leyou.ui.trade {
 					render.x=168;
 
 				render.name="traderender_" + i;
-
 				this.renderArr.push(render);
 			}
 
@@ -157,7 +156,6 @@ package com.leyou.ui.trade {
 			Cmd_Trade.cm_dealCancel();
 		}
 
-
 		/**
 		 * 打开面板
 		 *
@@ -172,7 +170,7 @@ package com.leyou.ui.trade {
 			//清空数据
 			for (var i:int=0; i < renderArr.length; i++) {
 				this.renderArr[i].updataInfo(null);
-				if (i >=10)
+				if (i >= 10)
 					this.renderArr[i].itemGrid.isLock=false;
 			}
 
@@ -206,7 +204,6 @@ package com.leyou.ui.trade {
 		 *
 		 */
 		private function onBtnClick(evt:MouseEvent):void {
-			//trace(evt.currentTarget.name, "====");
 			if (evt.currentTarget.name == "shelvesBtn") { //上架按钮
 
 				if (NormalButton(evt.currentTarget).text.indexOf("取消上架") > -1) {
@@ -231,8 +228,6 @@ package com.leyou.ui.trade {
 
 		}
 
-
-
 		private function onInputChange(evt:Event):void {
 //			if (evt.currentTarget.name == "gameMoneyLbl") { //别人的游戏币
 //				trace("gameMoneyLbl");
@@ -250,11 +245,10 @@ package com.leyou.ui.trade {
 				}
 			}
 		}
-		
-		public function serv_showPanel(body:String):void
-		{
+
+		public function serv_showPanel(body:String):void {
 			this.show();
-			
+
 			//改变对方昵称;
 			var selectPlay:LivingModel=UIManager.getInstance().mirScene.getPlayerByName(body);
 			this.playerNameLbl.text="" + selectPlay.infoB.name;
@@ -268,16 +262,18 @@ package com.leyou.ui.trade {
 		 *
 		 */
 		public function serv_UpdataSelfItem():void {
-
 			var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
 			this.renderArr[this.waitIndex].updataInfo(g.data);
 			this.waitIndex=-1;
-			
-			g.enable=false;
+
 			//记录
 			this.selfItemArr.push(g);
 			this.sureBtn.setActive(true);
 			MyInfoManager.getInstance().resetWaitItem();
+
+			UIManager.getInstance().backPackWnd.setNeatenState(false);
+			
+			g.enable=false;
 		}
 
 		/**
@@ -308,7 +304,7 @@ package com.leyou.ui.trade {
 			this.gameGoldILbl.enable=false;
 			this.gameGoldILbl.mouseEnabled=false;
 			this.gameGoldILbl.mouseChildren=false;
-			
+
 			this.sureBtn.setActive(true);
 		}
 
@@ -319,7 +315,7 @@ package com.leyou.ui.trade {
 		 */
 		public function serv_setPlayGold($i:int=0):void {
 			this.gameGoldLbl.text="" + $i;
-			
+
 			this.sureBtn.setActive(true);
 		}
 
@@ -354,6 +350,7 @@ package com.leyou.ui.trade {
 
 			//刷新背包
 			UIManager.getInstance().backPackWnd.refresh();
+			UIManager.getInstance().backPackWnd.setNeatenState(true);
 			this.clearData();
 		}
 

@@ -2,17 +2,16 @@ package com.leyou.ui.task {
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
-	import com.ace.ui.input.children.TextInput;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.ConfirmInputWindow;
-	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.ui.tips.TipsEquipsEmpty;
 	import com.leyou.utils.TaskUtils;
 	
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
-	import flash.text.TextFieldAutoSize;
+	import flash.text.StyleSheet;
 	import flash.text.TextFormat;
 
 	public class TaskWnd extends AutoWindow {
@@ -23,13 +22,8 @@ package com.leyou.ui.task {
 
 		public var npcId:int=0;
 
-		/**
-		 * 是否是从本模块显示
-		 */
-		public var isShow:Boolean=false;
-
 		private var tips:TipsEquipsEmpty;
-
+		 
 		public function TaskWnd() {
 			super(LibManager.getInstance().getXML("config/ui/TaskWnd.xml"));
 			this.init();
@@ -41,18 +35,27 @@ package com.leyou.ui.task {
 			this.returnBtn=this.getUIbyID("returnBtn") as NormalButton;
 
 			this.contentTxt=new Label;
+			
 			//this.contentTxt.border=true;
 //			this.contentTxt.wordWrap=true;
 //			this.contentTxt.multiline=true;
+			
 			this.contentTxt.width=420;
 			this.contentTxt.height=110;
+			
 			this.contentTxt.x=30;
 			this.contentTxt.y=50;
+			
 			this.contentTxt.addEventListener(TextEvent.LINK, onClickLink);
 			this.contentTxt.addEventListener(MouseEvent.MOUSE_MOVE, onshowTips)
 			this.contentTxt.mouseEnabled=true;
 
 			this.contentTxt.defaultTextFormat=new TextFormat("",12,null,false,false);
+			
+			var css:StyleSheet=new StyleSheet();
+			css.setStyle("a:hover", {textDecoration:'underline'});
+			
+			this.contentTxt.styleSheet=css;
 			
 			this.addToPane(this.contentTxt);
 
@@ -83,12 +86,12 @@ package com.leyou.ui.task {
 			var eve:String=arr[1];
 
 			if (eve.indexOf("@@@") > -1) {
-				ConfirmWindow.showWin(arr[2], function():void {
+				PopupManager.showConfirm(arr[2], function():void {
 					Cmd_Task.cm_merchantDlgSelect(npcId, eve.substr(2));
 				});
 
 			} else if (eve.indexOf("@@") > -1) {
-				ConfirmInputWindow.showWin(arr[2], function(i:String):void {
+				PopupManager.showConfirm(arr[2], function(i:String):void {
 					if (i == null || i == "" || i == "0" || i == " ")
 						return;
 
@@ -136,6 +139,9 @@ package com.leyou.ui.task {
 
 			var arr:Array=content.split("|")
 			this.titleLbl.text=arr[0];
+			
+			
+			
 			this.contentTxt.htmlText=arr[1];
 		}
 

@@ -1,19 +1,16 @@
-package com.leyou.utils
-{
+package com.leyou.utils {
 	import com.ace.gameData.backPack.TClientItem;
 
 	import flash.sampler.getMasterString;
 	import flash.utils.Dictionary;
 
-	public class GuildUtils
-	{
+	public class GuildUtils {
 
 		public static var MemeberType:Array=[];
 
 		public static var memeberArr:Array=[];
 
-		public function GuildUtils()
-		{
+		public function GuildUtils() {
 
 		}
 
@@ -23,8 +20,7 @@ package com.leyou.utils
 		 * @return
 		 * [呵呵呵呵, ,1,<Notice>ddddddddddddddddddddddddd,<KillGuilds>,<AllyGuilds>,<GuildItem>太阳水         可获得贡献度:1];
 		 */
-		public static function getHomeContent(str:String):Array
-		{
+		public static function getHomeContent(str:String):Array {
 			if (str == null)
 				return null;
 
@@ -34,15 +30,14 @@ package com.leyou.utils
 
 			/**
 			 * <Notice>
-set好的身体好的人和第二大软件突然放大多提意见若犯同样惊人3463456用$%^$#%^&$%17
-<KillGuilds>
-<AllyGuilds>
-<GuildItem>
-	 *
-		  */
+				set好的身体好的人和第二大软件突然放大多提意见若犯同样惊人3463456用$%^$#%^&$%17
+				<KillGuilds>
+				<AllyGuilds>
+					<GuildItem>
+			*
+			*/
 
-			for (var stc:String in arr)
-			{
+			for (var stc:String in arr) {
 				arr[stc]=String(arr[stc].replace(/\r*/g, "")).replace("<Notice>", "").replace("<KillGuilds>", "")..replace("<AllyGuilds>", "").replace("<GuildItem>", "");
 			}
 
@@ -59,8 +54,7 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 *      [#99,*行会成员,face101]
 		 * ]
 		 */
-		public static function getMemberContent(str:String):Array
-		{
+		public static function getMemberContent(str:String):Array {
 			if (str == null)
 				return null;
 
@@ -73,12 +67,11 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 			var tmpStr:String;
 			var tmpTypeIndex:int=-1;
 
-			for (var j:int=0; j < arr.length; j++)
-			{
+			for (var j:int=0; j < arr.length; j++) {
 				tmpStr=arr[j];
 				arr[j]=[];
-				
-				tmpStr=tmpStr.replace(/\**/g,"");
+
+				tmpStr=tmpStr.replace(/\**/g, "");
 				if (tmpStr.lastIndexOf("/") == tmpStr.length - 1)
 					tmpStr=tmpStr.substr(0, tmpStr.length - 1)
 
@@ -98,17 +91,14 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getTopRankToMemberType():int
-		{
+		public static function getTopRankToMemberType():int {
 			var typeArr:Array=GuildUtils.MemeberType;
 			typeArr.sortOn("0", Array.CASEINSENSITIVE);
 
 			var i:int=0;
 			var arr:Array;
-			for each (arr in typeArr)
-			{
-				if (arr != null && arr[0] != "99")
-				{
+			for each (arr in typeArr) {
+				if (arr != null && arr[0] != "99") {
 					i=arr[0];
 				}
 			}
@@ -122,15 +112,13 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getMemberCount(memArr:Array):int
-		{
+		public static function getMemberCount(memArr:Array):int {
 			if (memArr == null || memArr.length == 0)
 				return 0;
 
 			var count:int=0;
 			var arr:Array;
-			for each (arr in memArr)
-			{
+			for each (arr in memArr) {
 				if (arr.length > 0)
 					count+=arr.length - 2;
 			}
@@ -146,12 +134,10 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function removeAllByType(oldMemberArr:Array, type:String):void
-		{
+		public static function removeAllByType(oldMemberArr:Array, type:String):void {
 			var arr:Array=oldMemberArr;
 
-			for (var i:int=0; i < arr.length; i++)
-			{
+			for (var i:int=0; i < arr.length; i++) {
 				if (arr[i][0] == type)
 					arr.splice(i, 1);
 			}
@@ -164,14 +150,11 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getArrayToString(arr:Array):String
-		{
+		public static function getArrayToString(arr:Array):String {
 			var k:Array=arr.map(callback1);
 
-			function callback1(item:Array, i:int, arr:Array):String
-			{
-				if (item != null)
-				{
+			function callback1(item:Array, i:int, arr:Array):String {
+				if (item != null) {
 					return item.join("/");
 				}
 
@@ -187,18 +170,15 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getMemberArrToServerString(mArr:Array):String
-		{
+		public static function getMemberArrToServerString(mArr:Array):String {
 			if (mArr == null || mArr.length == 0)
 				return "";
 
 			var str:String="";
-			for (var i:int=0; i < mArr.length; i++)
-			{
+			for (var i:int=0; i < mArr.length; i++) {
 				str+="#" + mArr[i][0] + " <" + mArr[i][1] + ">\r\n";
 
-				for (var j:int=2; j < mArr[i].length; j++)
-				{
+				for (var j:int=2; j < mArr[i].length; j++) {
 					str+=mArr[i][j] + "\r\n";
 				}
 			}
@@ -213,8 +193,7 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getMemberByType(arr:Array, type:String):Array
-		{
+		public static function getMemberByType(arr:Array, type:String):Array {
 			if (arr == null || arr.length == 0)
 				return null;
 
@@ -224,8 +203,7 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 			//其他类别
 			var typ1Arr:Array=[];
 
-			for each (tmpArr in arr)
-			{
+			for each (tmpArr in arr) {
 				if (tmpArr[0] == type)
 					typeArr.push(tmpArr);
 				else
@@ -242,16 +220,14 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @param mName
 		 *
 		 */
-		public static function delMemberByName(memArr:Array, mName:String):void
-		{
+		public static function delMemberByName(memArr:Array, mName:String):void {
 
 			if (mName == null || mName == "")
 				return;
 
 			var swapArr:Array=[];
 			var arr:Array;
-			for each (arr in memArr)
-			{
+			for each (arr in memArr) {
 				if (arr.indexOf(mName) > -1)
 					arr.splice(arr.indexOf(mName), 1);
 			}
@@ -263,15 +239,13 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @param mName
 		 *
 		 */
-		public static function changeMemberToCommon(memArr:Array, mName:String, mType:String="99"):Array
-		{
+		public static function changeMemberToCommon(memArr:Array, mName:String, mType:String="99"):Array {
 			if (mName == null || mName == "")
 				return null;
 
 			var swapArr:Array=[];
 			var arr:Array;
-			for each (arr in memArr)
-			{
+			for each (arr in memArr) {
 				if (arr.indexOf(mName) > -1)
 					swapArr.push(arr.splice(arr.indexOf(mName), 1)[0]);
 			}
@@ -289,8 +263,7 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return [0,1] 0是上线 1是下线
 		 *
 		 */
-		public static function getMemberTopAndLowerByName(arr:Array, mName:String):Array
-		{
+		public static function getMemberTopAndLowerByName(arr:Array, mName:String):Array {
 			if (arr == null || arr.length == 0)
 				return null;
 
@@ -299,12 +272,9 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 				return null;
 
 			var lower:int=getTopRankToMemberType();
-			if (typeArr[0] == "99")
-			{
+			if (typeArr[0] == "99") {
 				return [lower, 99];
-			}
-			else
-			{
+			} else {
 				if (typeArr[0] == "1")
 					return [1, int(typeArr[0]) + 1];
 				else if (int(typeArr[0]) == lower)
@@ -322,15 +292,13 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getMemberByName(arr:Array, mName:String):Array
-		{
+		public static function getMemberByName(arr:Array, mName:String):Array {
 			if (arr == null || arr.length == 0)
 				return null;
 
 			var typeArr:Array=[];
 			var tmpArr:Array;
-			for each (tmpArr in arr)
-			{
+			for each (tmpArr in arr) {
 				if (tmpArr.indexOf(mName) > -1)
 					return tmpArr;
 			}
@@ -344,23 +312,19 @@ set好的身体好的人和第二大软件突然放大多提意见若犯同样�
 		 * @return
 		 *
 		 */
-		public static function getStoreTypeByItem(arr:Vector.<Vector.<Vector.<TClientItem>>>, item:TClientItem):int
-		{
-			for (var x1:int=0; x1 < arr.length; x1++)
-			{
+		public static function getStoreTypeByItem(arr:Vector.<Vector.<Vector.<TClientItem>>>, item:TClientItem):int {
+			for (var x1:int=0; x1 < arr.length; x1++) {
 				if (x1 == 5 || x1 == 0)
 					continue;
 
-				for (var x2:int=0; x2 < arr[x1].length; x2++)
-				{
-					for (var x3:int=0; x3 < arr[x1][x2].length; x3++)
-					{
+				for (var x2:int=0; x2 < arr[x1].length; x2++) {
+					for (var x3:int=0; x3 < arr[x1][x2].length; x3++) {
 						if (arr[x1][x2][x3] == item)
 							return x1;
 					}
 				}
 			}
-			
+
 			return 0;
 		}
 

@@ -16,6 +16,13 @@ package com.leyou.game.scene.player {
 			super($info);
 		}
 
+		override public function updataHealth(hp:int, maxHp:int):void {
+			super.updataHealth(hp, maxHp);
+			if (UIManager.getInstance().teamWnd.getPlayInTeam(this.id)) {
+				UIManager.getInstance().teamWnd.updateTeamInfo();
+			}
+		}
+
 		//=======================================
 		override protected function getCmd():Boolean {
 			if (this._info.isMoveing)

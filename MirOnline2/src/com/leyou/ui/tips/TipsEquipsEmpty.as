@@ -41,9 +41,11 @@ package com.leyou.ui.tips {
 			var str:String=new String();
 			switch (id) {
 				case ItemEnum.U_HELMET: //头盔
+				case ItemEnum.U_ZHULI:
 					str="此栏只能佩戴头盔";
 					break;
 				case ItemEnum.U_DRESS: //衣服
+				case ItemEnum.U_ITEM:
 					str="此栏只能佩戴衣服";
 					break;
 				case ItemEnum.U_ARMRINGL: //左手镯
@@ -59,6 +61,7 @@ package com.leyou.ui.tips {
 					str="此栏只能佩戴项链";
 					break;
 				case ItemEnum.U_RIGHTHAND: //勋章 马牌
+				case ItemEnum.U_HORSE:
 					str="此栏只能佩戴马牌";
 					break;
 				case ItemEnum.U_ARMRINGR: //右手镯

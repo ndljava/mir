@@ -1,6 +1,7 @@
 package com.leyou.ui.backpack.child {
 	import com.ace.ICommon.IMenu;
 	import com.ace.enum.ItemEnum;
+	import com.ace.enum.UIEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.game.manager.DragManager;
 	import com.ace.gameData.backPack.TClientItem;
@@ -11,15 +12,20 @@ package com.leyou.ui.backpack.child {
 	import com.ace.ui.menu.data.MenuInfo;
 	import com.ace.ui.window.children.AlertWindow;
 	import com.ace.ui.window.children.ConfirmWindow;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.MenuManager;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
+	import com.leyou.net.protocol.Cmd_Forge;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Role;
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.scene.CmdScene;
+	import com.leyou.ui.UiTester;
 	import com.leyou.ui.cdTimer.CDTimer;
 	import com.leyou.ui.storage.child.StorageGrid;
 	import com.leyou.utils.FilterUtil;
@@ -95,6 +101,8 @@ package com.leyou.ui.backpack.child {
 
 			ItemTip.getInstance().show(dataId, this.gridType);
 			ItemTip.getInstance().updataPs($x, $y);
+
+			MenuManager.getInstance().visible(false);
 		}
 
 		override public function mouseDownHandler($x:Number, $y:Number):void {
@@ -113,15 +121,16 @@ package com.leyou.ui.backpack.child {
 				if (data == null || data.s == null)
 					return;
 
-				ConfirmWindow.showWin("确认卖出?", function():void {
+				PopupManager.showConfirm("确认卖出?", function():void {
 					MyInfoManager.getInstance().waitItemFromId=this.dataId;
 					UIManager.getInstance().shopWnd.sellItem(data.MakeIndex, data.s.name);
 				});
-
 				return;
 			}
 
-			if (menuState == 2) {
+			MenuManager.getInstance().visible(false);
+
+//			if (menuState == 2) {
 //				if (MyInfoManager.getInstance().waitItemFromId != -1) {
 //
 //					var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
@@ -154,8 +163,8 @@ package com.leyou.ui.backpack.child {
 //					MyInfoManager.getInstance().waitItemFromId=this.gridId;
 //
 //					//trace(MyInfoManager.getInstance().waitItemFromId, "====11111",this.data.s.name);
-			} else
-				MyInfoManager.getInstance().resetWaitItem();
+//			} //else
+				//MyInfoManager.getInstance().resetWaitItem();
 		}
 
 		public function onMenuClick(index:int):void {
@@ -212,12 +221,7 @@ package com.leyou.ui.backpack.child {
 			if (this.data == null || this.data.s == null)
 				return;
 
-			ConfirmWindow.showWin("你确定要丢弃该物品么?", dropcallback);
-		}
-
-		private function dropcallback():void {
-			if (this.data != null && this.data.s != null)
-				Cmd_backPack.cm_dropItem(this.data.MakeIndex, this.data.s.name);
+			UIManager.getInstance().backPackDropWnd.showPanel(data);
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
@@ -247,12 +251,18 @@ package com.leyou.ui.backpack.child {
 						g.updataInfo(this.data);
 						this.updataInfo(info1);
 
+						var gid:int=g.gridId;
+						g.gridId=this.gridId;
+						this.gridId=gid;
+
 						g.enable=true;
+
+						//super.switchHandler(fromItem);
 						//强制刷新
 						MyInfoManager.getInstance().resetWaitItem();
 
 					} else {
-						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从仓库
+						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
 						Cmd_backPack.cm_bothItem(info1.MakeIndex, this.data.MakeIndex);
 						return;
 					}
@@ -269,7 +279,7 @@ package com.leyou.ui.backpack.child {
 						return;
 
 					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从仓库
-					MyInfoManager.getInstance().waitItemToId=this.dataId; //到背包
+					MyInfoManager.getInstance().waitItemToId=this.initId; //到背包
 					Cmd_backPack.cm_userTakeBackStorageItem(MyInfoManager.getInstance().talkNpcId, MyInfoManager.getInstance().backpackItems[fromItem.dataId]);
 				}
 
@@ -303,13 +313,52 @@ package com.leyou.ui.backpack.child {
 
 				//角色
 				if (fromItem.gridType == ItemEnum.TYPE_GRID_EQUIP) {
+					var equip:TClientItem;
+					//多个物品id当到一个格子的问题
+					if (fromItem.dataId == 2 || fromItem.dataId == 0 || fromItem.dataId == 4) {
+						equip=MyInfoManager.getInstance().equips[fromItem.dataId];
+						if (equip == null || equip.s == null) {
 
-					var equip:TClientItem=MyInfoManager.getInstance().equips[fromItem.dataId];
-					if (equip == null)
+							var i:int;
+							if (fromItem.dataId == 2)
+								i=14;
+							else if (fromItem.dataId == 4)
+								i=13;
+							else if (fromItem.dataId == 0)
+								i=15;
+
+							equip=MyInfoManager.getInstance().equips[i];
+							if (equip == null || equip.s == null)
+								return;
+							else {
+								UIManager.getInstance().roleWnd.takeOffEquipId=i;
+								Cmd_Role.cm_takeOffItem(equip.MakeIndex, fromItem.dataId, equip.s.name);
+							}
+
+						} else {
+							UIManager.getInstance().roleWnd.takeOffEquipId=fromItem.dataId;
+							Cmd_Role.cm_takeOffItem(equip.MakeIndex, fromItem.dataId, equip.s.name);
+						}
+					} else {
+						equip=MyInfoManager.getInstance().equips[fromItem.dataId];
+						if (equip == null || equip.s == null)
+							return;
+
+						UIManager.getInstance().roleWnd.takeOffEquipId=fromItem.dataId;
+						Cmd_Role.cm_takeOffItem(equip.MakeIndex, fromItem.dataId, equip.s.name);
+					}
+				}
+
+				//装备合成
+				if (fromItem.gridType == ItemEnum.TYPE_GRID_FORGE) {
+					var tc1:TClientItem=fromItem.data;
+					if (tc1 == null || tc1.s == null)
 						return;
 
-					UIManager.getInstance().roleWnd.takeOffEquipId=fromItem.dataId;
-					Cmd_Role.cm_takeOffItem(equip.MakeIndex, fromItem.dataId, equip.s.name);
+					Cmd_Forge.cm_delfIfitem(tc1.MakeIndex);
+					MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK,tc1);
+					this.updataInfo(tc1);
+					UIManager.getInstance().forgeWnd.dropOneGrid(tc1.MakeIndex);
 				}
 			}
 
@@ -343,7 +392,8 @@ package com.leyou.ui.backpack.child {
 				menuArr.push(new MenuInfo("丢弃", 5));
 
 			MenuManager.getInstance().show(menuArr, this, new Point($x, $y));
-			MyInfoManager.getInstance().resetWaitItem();
+//			MyInfoManager.getInstance().resetWaitItem();
+
 		}
 
 		override public function set enable(value:Boolean):void {
@@ -376,6 +426,7 @@ package com.leyou.ui.backpack.child {
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr("请在聊天中的 世界频道 使用千里传音卷轴 ", SystemNoticeEnum.IMG_WRONG);
 				return;
 			}
+
 			if (info.s.type == 4) { //技能书
 				if (MyInfoManager.getInstance().level < info.s.durableMax) {
 					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您的等级不足 " + info.s.durableMax + "，不能使用此书", SystemNoticeEnum.IMG_PROMPT);
@@ -387,7 +438,6 @@ package com.leyou.ui.backpack.child {
 
 			//装备类型道具
 			if (ItemUtil.EQUIP_TYPE.concat(tt).indexOf(info.s.type) != -1) {
-
 				print("使用物品：" + info.MakeIndex);
 				var pos:int=this.checkPos(ItemUtil.getTakeOnPosition(info.s.type));
 				CmdScene.cm_sendDefaultMsgII(MirProtocol.CM_TAKEONITEM, info.MakeIndex, pos, 0, 0, info.s.name);

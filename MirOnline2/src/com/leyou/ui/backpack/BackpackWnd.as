@@ -95,6 +95,10 @@ package com.leyou.ui.backpack {
 		}
 
 
+		public function setNeatenState(b:Boolean):void {
+			this.neatenBtn.mouseChildren=this.neatenBtn.mouseEnabled=b;
+		}
+
 		/**
 		 * tab 选项
 		 * @param evt
@@ -104,7 +108,7 @@ package com.leyou.ui.backpack {
 		}
 
 		private function updateTab():void {
-			DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_BACKPACK);
+			//DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_BACKPACK);
 			switch (this.bagTabBar.turnOnIndex) {
 				case -1:
 					this.initData(MyInfoManager.getInstance().backpackItems);
@@ -135,7 +139,6 @@ package com.leyou.ui.backpack {
 			if (v) {
 				tw=FilterUtil.showGlowFilter(this.bgGlow);
 			} else {
-
 				if (tw)
 					tw.kill();
 				this.bgGlow.filters=[];
@@ -195,9 +198,23 @@ package com.leyou.ui.backpack {
 					break;
 				case "neatenBtn":
 					Cmd_backPack.cm_queryBagItems();
-					this.mouseChildren=false;
+					if (getEnableLen() > 0)
+						this.mouseChildren=false;
 					break;
 			}
+		}
+
+		private function getEnableLen():int {
+
+			var l:int=0;
+			var g:GridBase;
+			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
+				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
+				if (g.enable && g.dataId!=-1 && g.data!=null && g.data.s!=null)
+					l++;
+			}
+
+			return l;
 		}
 
 		//填充数据
@@ -239,19 +256,34 @@ package com.leyou.ui.backpack {
 		 */
 		public function updatOneGrid(id:int):void {
 
-//			var info:TClientItem=MyInfoManager.getInstance().backpackItems[id];
-//
-//			var g:GridBase;
-//			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id);
-//			if ((this.bagTabBar.turnOnIndex > 0) && (info == null || info.s == null))
-//				g.visible=false;
-//			else {
-//				g.updataInfo(info); //有数据则填充，无数据则开锁
-//				g.visible=true;
-//			}
+			var info:TClientItem=MyInfoManager.getInstance().backpackItems[id];
 
-			updateTab();
+			var g:GridBase;
+			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, getDragIdByDataID(id));
+			if ((this.bagTabBar.turnOnIndex > 0) && (info == null || info.s == null))
+				g.visible=false;
+			else {
+				g.updataInfo(info); //有数据则填充，无数据则开锁
+				g.visible=true;
+			}
 
+			//updateTab();
+
+		}
+
+		private function getDragIdByDataID(id:int):int {
+			var g:GridBase;
+			var did:int=-1;
+			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
+				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
+				if (g.dataId == id)
+					return g.gridId;
+
+				if (did == -1 && g.dataId == -1)
+					did=g.gridId;
+			}
+
+			return did;
 		}
 
 		/**
@@ -276,6 +308,7 @@ package com.leyou.ui.backpack {
 			MyInfoManager.getInstance().resetItem(id)
 			updatOneGrid(id);
 			updateTab();
+			UIManager.getInstance().toolsWnd.updataShortcutGrid(info.s.id);
 		}
 
 		/**
@@ -295,6 +328,7 @@ package com.leyou.ui.backpack {
 			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_OPEN; i++) {
 				info=MyInfoManager.getInstance().backpackItems[i];
 				if (info.s && (info.s.id == itemId)) {
+					MyInfoManager.getInstance().waitItemUse=i;
 					Cmd_backPack.cm_eat(info);
 					return;
 				}

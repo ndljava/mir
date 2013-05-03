@@ -1,6 +1,7 @@
 package com.leyou.ui.backpack.child {
 	import com.ace.enum.ItemEnum;
 	import com.ace.gameData.backPack.TClientItem;
+	import com.ace.gameData.backPack.TSClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.tools.SpriteNoEvt;
 	import com.leyou.data.net.market.TShopInfo;
@@ -64,8 +65,7 @@ package com.leyou.ui.backpack.child {
 		public function show(id:int, grid:String):void {
 			if (id == -1)
 				return
-
-					this.itemId=id;
+			this.itemId=id;
 			this.stg.addChild(this);
 			this.visible=true;
 			var type:int;
@@ -141,6 +141,21 @@ package com.leyou.ui.backpack.child {
 					break;
 				case ItemEnum.TYPE_GRID_EQUIP: //人物面板
 					info=MyInfoManager.getInstance().equips[this.itemId];
+					if((info as TClientItem).s==null&&this.itemId==2){
+						this.itemId=14;
+						info=MyInfoManager.getInstance().equips[this.itemId];
+					}
+					if((info as TClientItem).s==null&&this.itemId==4){
+						this.itemId=13;
+						info=MyInfoManager.getInstance().equips[this.itemId];
+					}
+					if((info as TClientItem).s==null&&this.itemId==0){
+						
+						if(MyInfoManager.getInstance().equips.length>15){
+							this.itemId=15;
+							info=MyInfoManager.getInstance().equips[this.itemId];
+						}	
+					}
 					if (info == null|| (info as TClientItem).s == null){
 						this.tipsEquipEmpty.equipEmptyTips(itemId);
 						this.tipsEquipEmpty.visible=true;
@@ -149,6 +164,15 @@ package com.leyou.ui.backpack.child {
 						this.tipsEquip.bagTip(info);
 						this.tipsEquip.visible=true;
 					}
+					break;
+				case ItemEnum.TYPE_GRID_OTHER_EQUIP:
+					if(this.itemId>=UIManager.getInstance().otherRoleWnd.equipInfo.length)
+						return;
+					info=UIManager.getInstance().otherRoleWnd.equipInfo[this.itemId];
+					if(info==null||(info as TSClientItem).wIndex<=0)
+						return;
+					this.tipsEquip.otherRoleTip(info);
+					this.tipsEquip.visible=true;
 					break;
 			}
 		}

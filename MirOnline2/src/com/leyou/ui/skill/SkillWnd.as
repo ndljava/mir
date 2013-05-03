@@ -1,6 +1,8 @@
 package com.leyou.ui.skill {
+	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.playerSkill.TClientMagic;
+	import com.ace.gameData.table.TSkillInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.lable.Label;
@@ -46,10 +48,10 @@ package com.leyou.ui.skill {
 				var render:SkillListRender;
 				for (i=0; i < arr.length; i++) {
 					render=new SkillListRender();
-					render.updata(arr[i]);
 					render.y=i * SkillListRender.RENDER_WIDTH;
 					this.renderArr.push(render);
 					this.gridList.addToPane(render);
+					render.updata(arr[i]);
 					if(arr[i].isLearn)
 						num++;
 				}
@@ -122,7 +124,23 @@ package com.leyou.ui.skill {
 				this.updata(MyInfoManager.getInstance().skills, true);
 			}
 		}
-
+		/**
+		 * 技能的熟练度更新
+		 * @param id 
+		 * @param exp
+		 * 
+		 */
+		public function skillExpChange(id:int,exp:int,lv:int):void{
+			for(var i:int=0;i<MyInfoManager.getInstance().skills.length;i++){
+				if(MyInfoManager.getInstance().skills[i].skillId==id){
+					MyInfoManager.getInstance().skills[i].curTrain=exp;
+					MyInfoManager.getInstance().skills[i].level=lv;
+					this.renderArr[i].updata(MyInfoManager.getInstance().skills[i]);
+					break;
+				}
+			}
+		}
+		
 		/**
 		 *设置技能格子的快捷键的显示
 		 * @param gridDate 格子的数据id

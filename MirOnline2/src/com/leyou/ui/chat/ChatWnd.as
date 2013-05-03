@@ -67,7 +67,7 @@ package com.leyou.ui.chat {
 		private var hornStr:String;
 
 		public function ChatWnd() {
-			super(super(LibManager.getInstance().getXML("config/ui/ChatWnd.xml")));
+			super(LibManager.getInstance().getXML("config/ui/ChatWnd.xml"));
 			this.mouseChildren=true;
 			this.init();
 		}
@@ -104,6 +104,7 @@ package com.leyou.ui.chat {
 			this.chatTabBar=this.getUIbyID("chatTabBar") as TabBar;
 			this.faceBtn=this.getUIbyID("faceBtn") as ImgButton;
 			this.systemGridList=this.getUIbyID("systemGridList") as ScrollPane;
+			this.chatInput.closeEvent();
 
 			this.bg=new ScaleBitmap(LibManager.getInstance().getImg(FontEnum.STYLE_NAME_DIC["PanelBgOut"]));
 			this.bg.scale9Grid=FontEnum.RECTANGLE_DIC["PanelBgOut"];
@@ -128,7 +129,7 @@ package com.leyou.ui.chat {
 			this.chatComBox.y=253; //253
 			this.chatComBox.onClickItemFun=this.onComBoxClick;
 			this.addChild(this.chatComBox);
-			this.chatComBox.setItem(["~", "!", "!!", "!~", "!~~", "/"], [ChatEnum.COLOR_COMPOSITE_UINT, ChatEnum.COLOR_AREA_UINT, ChatEnum.COLOR_TEAM_UINT, ChatEnum.COLOR_GUILD_UINT, ChatEnum.COLOR_UNION_UINT, ChatEnum.COLOR_PRIVATE_UINT]);
+			this.chatComBox.setItem(["~ 综合", "! 区域", "!! 组队", "!~ 行会", "!@ 千里", "/ 私聊"], [ChatEnum.COLOR_COMPOSITE_UINT, ChatEnum.COLOR_AREA_UINT, ChatEnum.COLOR_TEAM_UINT, ChatEnum.COLOR_GUILD_UINT, ChatEnum.COLOR_UNION_UINT, ChatEnum.COLOR_PRIVATE_UINT]);
 
 			this.messageTxtArea=new RichTextFiled(294, 184);
 			this.messageTxtArea.onTextClick=this.onClickPlayerName;
@@ -165,17 +166,17 @@ package com.leyou.ui.chat {
 						this.chatInput.text="";
 						evt.stopImmediatePropagation();
 						return;
-					} else if (this.currentChannelIdx == ChatEnum.CHANNEL_UNION) {
-						if (this.chatInput.text.length > ChatEnum.MESSAGE_HORN_LONG) {
-							this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_HORN_LONG);
-						}
-					} else if (this.chatInput.text.length > ChatEnum.MESSAGE_LONG) {
-						this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_LONG);
 					}
-
 					break;
 				default:
 					break;
+			}
+			if (this.currentChannelIdx == ChatEnum.CHANNEL_UNION) {
+				if (this.chatInput.text.length > ChatEnum.MESSAGE_HORN_LONG) {
+					this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_HORN_LONG);
+				}
+			} else if (this.chatInput.text.length > ChatEnum.MESSAGE_LONG) {
+				this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_LONG);
 			}
 			evt.stopImmediatePropagation();
 		}
@@ -252,7 +253,6 @@ package com.leyou.ui.chat {
 			this.chatTabBar.turnToTab(idx);
 			this.onTabBarChangeIndex();
 		}
-		private var f:int;
 
 		private function onClick(evt:MouseEvent):void {
 			var contain:Array;
@@ -312,15 +312,18 @@ package com.leyou.ui.chat {
 //						this.servOnChat(ChatEnum.CHANNEL_GUILD, "您发言速度过快，请稍后再试");
 //						this.chatInput.text="";
 //						return;
-//					} else {
-					if (MyInfoManager.getInstance().hasGuild)
-						str=ChatEnum.FLAG_GUILD + str;
-					else {
-//						servOnChat(ChatEnum.CHANNEL_GUILD, "请加入行会后再在行会频道发言");
-						this.messageTxtArea.appendHtmlText(this.getColorStr("请加入行会后再在行会频道发言", ChatEnum.COLOR_SYSYTEM));
+//					} else {\
+//					if(!MyInfoManager.getInstance().hasGuild){
+////						servOnChat(ChatEnum.CHANNEL_GUILD, "请加入行会后再在行会频道发言");
+//						this.messageTxtArea.appendHtmlText(this.getColorStr("请加入行会后再在行会频道发言", ChatEnum.COLOR_SYSYTEM));
+//						this.chatInput.text="";
+//						return;
+//					}else 
+					if (UIManager.getInstance().settingWnd.settingInfo.groupChat == 0) { //设置面板中禁止行会聊天
+						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置禁止行会聊天", SystemNoticeEnum.IMG_PROMPT);
 						this.chatInput.text="";
-						return;
-					}
+					} else
+						str=ChatEnum.FLAG_GUILD + str;
 //						this.channelTime[ChatEnum.FLAG_GUILD]=getTimer();
 //					}
 					break;
@@ -329,9 +332,13 @@ package com.leyou.ui.chat {
 						this.servOnChat(ChatEnum.CHANNEL_PRIVATE, "您发言速度过快，请稍后再试");
 						this.chatInput.text="";
 						return;
+					} else if (UIManager.getInstance().settingWnd.settingInfo.privateChat == 0) {
+						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置禁止私聊!", SystemNoticeEnum.IMG_PROMPT);
+						this.chatInput.text == "";
 					} else {
 						if (this.privateChatRender.chatPlayerName == "") {
-							//私聊人的名字问空 弹提示 暂无
+							UIManager.getInstance().noticeMidDownUproll.setNoticeStr("请输入密聊玩家名字", SystemNoticeEnum.IMG_WRONG); //私聊人的名字问空 弹提示 暂无
+							this.chatInput.text="";
 							return;
 						}
 						this.privateChatRender.checkPrivatePlayerName();
@@ -346,16 +353,19 @@ package com.leyou.ui.chat {
 //						this.chatInput.text="";
 //						return;
 //					} else {
-					if (MyInfoManager.getInstance().hasTeam)
-						str=ChatEnum.FLAG_TEAM + str;
-					else {
-						this.messageTxtArea.appendHtmlText(this.getColorStr("请加入队伍后再在组队频道发言", ChatEnum.COLOR_SYSYTEM));
+					if (!MyInfoManager.getInstance().hasTeam) {
+						this.messageTxtArea.appendHtmlText(this.getColorStr("请加入队伍后再在组队频道发言!", ChatEnum.COLOR_SYSYTEM));
 //						servOnChat(ChatEnum.CHANNEL_TEAM, "请加入队伍后再在组队频道发言");
 						this.chatInput.text="";
 						return;
-					}
+					} else if (UIManager.getInstance().settingWnd.settingInfo.groupChat == 0) {
+						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置组队聊天!", SystemNoticeEnum.IMG_PROMPT);
+						this.chatInput.text == "";
+					} else
+						str=ChatEnum.FLAG_TEAM + str;
 //						this.channelTime[ChatEnum.CHANNEL_TEAM]=getTimer();
 //					}
+
 					break;
 				case ChatEnum.CHANNEL_UNION:
 //					if (getTimer() - this.channelTime[ChatEnum.CHANNEL_UNION] < ChatEnum.TIME_UINT) {
@@ -401,10 +411,18 @@ package com.leyou.ui.chat {
 					channel=ChatEnum.CHANNEL_AREA;
 			}
 			this.addMessage(channel, str);
-			if (channel != ChatEnum.CHANNEL_SYSTEM && this.currentChannelIdx != channel && channel != ChatEnum.CHANNEL_SYSTEM_ALL) {
-				//不是当前频道的信息 显示有新消息特效
-			} else
+			if (channel == ChatEnum.CHANNEL_SYSTEM) //系统频道
 				this.showMessage(channel);
+			else if (channel == this.currentChannelIdx || channel == ChatEnum.CHANNEL_SYSTEM_ALL || this.currentChannelIdx == ChatEnum.CHANNEL_COMPOSITE)
+				this.showMessage(channel);
+			else {
+				//不是当前频道的信息 显示有新消息特效
+			}
+//			if (channel != ChatEnum.CHANNEL_SYSTEM && this.currentChannelIdx != channel && channel != ChatEnum.CHANNEL_SYSTEM_ALL&&this.currentChannelIdx!=ChatEnum.CHANNEL_COMPOSITE) {
+//				
+//			} else if(this.currentChannelIdx==ChatEnum.CHANNEL_COMPOSITE)
+//				this.showMessage(this.currentChannelIdx);
+//			else this.showMessage(channel);
 		}
 
 		/**

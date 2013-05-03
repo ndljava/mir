@@ -1,5 +1,6 @@
 package com.leyou.ui.creatUser {
 	import com.ace.enum.PlayerEnum;
+	import com.ace.enum.UIEnum;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.ImgButton;
@@ -7,6 +8,8 @@ package com.leyou.ui.creatUser {
 	import com.ace.ui.img.child.Image;
 	import com.ace.ui.input.children.TextInput;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.PopWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.config.Core;
 	import com.leyou.net.protocol.login.Cmd_Login;
 	import com.leyou.ui.creatUser.child.UserBtn;
@@ -118,7 +121,7 @@ package com.leyou.ui.creatUser {
 		//登陆发协议
 		private function onLogin():void {
 			if (this.nameInput.text == "") {
-				AlertWindow.showWin("请输入您的名字");//提示输入名字
+				PopWindow.showWnd(UIEnum.WND_TYPE_CONFIRM,WindInfo.getInputInfo("请输入用户名!"),"creatUserAlset");//提示输入名字
 				return;
 			}
 			//创建角色【账号 + '/' + 角色名称 + '/' + 头发 + '/' + 职业 + '/' + 性别】

@@ -7,8 +7,10 @@ package com.leyou.net.protocol {
 	import com.ace.gameData.table.TItemInfo;
 	import com.ace.tools.print;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.HexUtil;
 	import com.leyou.enum.ChatEnum;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
@@ -24,7 +26,7 @@ package com.leyou.net.protocol {
 		private static var bagUseItem:TClientItem;
 
 		private static var isstore:Boolean=false;
-		
+
 		//存放道具到背包包括仓库的
 		static public function pushBackpackItem(type:String, td:TDefaultMessage, body:String):void {
 			var arr:Array=body.split("/");
@@ -57,23 +59,104 @@ package com.leyou.net.protocol {
 			var cu:TClientItem;
 			scu=new TSClientItem(NetEncode.getInstance().DecodeBuffer(str));
 			var info:TItemInfo=TableManager.getInstance().getItemInfo(scu.wIndex - 1);
-			//				GetItemAddValue(scu, StdItem);    
+			var tInfo:TItemInfo=GetItemAddValue(scu, info);
 			cu=new TClientItem();
-			cu.s=info;
+			cu.s=tInfo;
 			cu.copyScu(scu, isStall);
 			return cu;
 		}
 
 		//获取高级属性
-		static public function GetItemAddValue(scu:TSClientItem, info:TItemInfo):void {
+		static public function GetItemAddValue(scu:TSClientItem, info:TItemInfo,addV:Array=null):TItemInfo {
+			var add:Array;
+			if(scu!=null)
+				add=scu.btValue;
+			else add=addV;
 			//应该返回copy的数据，否则本地配置文件被修改
+			var tInfo:TItemInfo=info.cloneSelf();
 			switch (info.type) {
-				case 5:
-				case 6:
+				case ItemEnum.ITEM_TYPE_WEAPON_I:
+				case ItemEnum.ITEM_TYPE_WEAPON_II:
+					tInfo.dc2=info.dc2 + add[0];
+					tInfo.mc2=info.mc2 + add[1];
+					tInfo.sc2=info.sc2 + add[2];
+					tInfo.ac=info.ac + add[3];
+					tInfo.ac2=info.ac2 + add[5]
+					tInfo.mac=info.mac + add[4];
+					tInfo.mac2=info.mac2 + add[6];
+					if(addV==null)
+						if (add[7] - 1 < 10)
+							tInfo.source=add[7];
+					if (add[10] != 0) {
+						tInfo.reserved=info.reserved | 1;
+					}
+					break;
+				case ItemEnum.ITEM_TYPE_CLOTH_MEN:
+				case ItemEnum.ITEM_TYPE_CLOTH_WOMEN:
+					tInfo.ac2=info.ac2 + add[0];
+					tInfo.mac2=info.mac2 + add[1];
+					tInfo.dc2=info.dc2 + add[2];
+					tInfo.mc2=info.mc2 + add[3];
+					tInfo.sc2=info.sc2 + add[4];
+					break;
+				case 15:
+				case 16:
+				case 19:
+				case 20:
+				case 21:
+				case 22:
+				case 23:
+				case 24:
+				case 26:
+				case 51:
+				case 52:
+				case 53:
+				case 54:
+				case 62:
+				case 63:
+				case 64:
+				case 30:
+					tInfo.ac2=info.ac2 + add[0];
+					tInfo.mac2=info.mac2 + add[1];
+					tInfo.dc2=info.dc2 + add[2];
+					tInfo.mc2=info.mc2 + add[3];
+					tInfo.sc2=info.sc2 + add[4];
+					if (add[5] > 0) {
+						tInfo.limitType=add[5];
+					}
+					if (add[6] > 0)
+						tInfo.limitLevle=add[6];
+
 					break;
 				default:
 					break;
 			}
+			if (add[20] > 0 || info.source > 0) {
+				switch (info.type) { //头盔,项链,戒指,手镯,鞋子,腰带,勋章
+					case 15:
+					case 16:
+					case 19:
+					case 24:
+					case 26:
+					case 30:
+					case 52:
+					case 54:
+					case 62:
+					case 64:
+//						if info.shape = 188{140}
+						if (info.shape == 188) {
+							tInfo.source=info.source + add[20];
+							if (info.source > 100) {
+								tInfo.source=100;
+								tInfo.reserved=info.reserved + add[9];
+								if (info.reserved > 5)
+									tInfo.reserved=5; //吸伤装备等级 20080816
+							}
+						}
+						break;
+				}
+			}
+			return tInfo;
 		}
 
 		//查询包裹物品 背包
@@ -89,17 +172,16 @@ package com.leyou.net.protocol {
 
 		//背包添加物品
 		static public function sm_addItem(td:TDefaultMessage, body:String):void {
-
 			var cu:TClientItem=analysisItem(body);
 			var ps:int;
 
 			//如果正在使用
-			if (MyInfoManager.getInstance().waitItemUse != -1 && bagUseItem==null) {
+			if (MyInfoManager.getInstance().waitItemUse != -1 && bagUseItem == null) {
 				bagUseItem=cu;
 				return;
 			}
 
-			if ((MyInfoManager.getInstance().waitItemToId == -1)) {
+			if (MyInfoManager.getInstance().waitItemToId == -1) {
 				ps=MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK, cu); //如果背包不为空，查找位置放置（没有交换功能）
 			} else if (MyInfoManager.getInstance().itemIsJustFill(MyInfoManager.getInstance().waitItemToId)) {
 				ps=MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK, cu, MyInfoManager.getInstance().waitItemToId); //如果背包为空，直接添加到该位置
@@ -110,10 +192,17 @@ package com.leyou.net.protocol {
 			//叠加
 			if (MyInfoManager.getInstance().waitItemFromId != -1 && !isstore) {
 				MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
+				UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
 				MyInfoManager.getInstance().resetWaitItem();
 			}
-			
-			UIManager.getInstance().backPackWnd.refresh();
+
+			//装备合成
+			if (UIManager.getInstance().forgeWnd.forgeItem){
+				UIManager.getInstance().forgeWnd.updateOneGridByID(ps);
+				UIManager.getInstance().forgeWnd.forgeItem=false;
+			}else
+				UIManager.getInstance().backPackWnd.updatOneGrid(ps);
+
 			UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, cu.s.name + "被发现");
 		}
 
@@ -174,6 +263,7 @@ package com.leyou.net.protocol {
 			trace("丢弃道具" + body);
 
 			UIManager.getInstance().backPackWnd.dropOneGridByMakeIndex(td.Recog);
+			
 		}
 
 		//丢弃道具-fail
@@ -310,7 +400,7 @@ package com.leyou.net.protocol {
 		//穿衣失败
 		static public function sm_takeOn_fail(td:TDefaultMessage, body:String):void {
 			var info:TClientItem=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemUse];
-			AlertWindow.showWin(info.s.name + "使用失败");
+			PopupManager.showAlert(info.s.name + "使用失败");
 			MyInfoManager.getInstance().waitItemUse=-1;
 			UIManager.getInstance().roleWnd.resetDragPos();
 		}
@@ -325,32 +415,32 @@ package com.leyou.net.protocol {
 			trace("吃药成功");
 			//if (MyInfoManager.getInstance().waitItemUse != -1)
 			//	UIManager.getInstance().backPackWnd.delOneGridByID(MyInfoManager.getInstance().waitItemUse);
-			
-			//为了使工具栏与背包同步显示
-			var wait:int=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemUse].s.id;
-			
+
+			var wait:int=-1; //为了使工具栏与背包同步显示
+			if (MyInfoManager.getInstance().waitItemUse >= 0)
+				wait=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemUse].s.id;
+
 			if (bagUseItem != null)
 				MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK, bagUseItem, MyInfoManager.getInstance().waitItemUse);
-			else
+			else if (MyInfoManager.getInstance().waitItemUse > 0)
 				MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemUse);
-			
+
 			UIManager.getInstance().backPackWnd.refresh();
 			bagUseItem=null;
 			MyInfoManager.getInstance().resetWaitUse();
 			//更新工具栏
-			UIManager.getInstance().toolsWnd.updataShortcutGrid(wait);
+			if (wait > 0)
+				UIManager.getInstance().toolsWnd.updataShortcutGrid(wait);
 		}
 
 		//吃药失败
 		static public function sm_eat_fail(td:TDefaultMessage, body:String):void {
 			trace("吃药失败");
-			//AlertWindow.showWin("吃药失败");
 			MyInfoManager.getInstance().resetWaitUse()
 		}
 
 		//向客户端发送游戏币,游戏点,金刚石,灵符数量
 		static public function sm_gameGoldName(td:TDefaultMessage, body:String):void {
-//			MyInfoManager.getInstance().exInfo.gameGold=td.Recog;
 			Cmd_Task.updataMoney(-1, td.Recog, td.Series);
 		}
 

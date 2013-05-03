@@ -91,6 +91,8 @@ package com.leyou.ui.trade.child {
 			if (g == null)
 				return;
 
+			g.enable=false;
+			
 			var tc:TClientItem=g.data as TClientItem;
 			if (this.dataId != -1 || tc == null || tc.s == null || g.gridType != ItemEnum.TYPE_GRID_BACKPACK)
 				return;
@@ -103,7 +105,7 @@ package com.leyou.ui.trade.child {
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
-			super.switchHandler(fromItem);
+			//super.switchHandler(fromItem);
 
 			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 				//send_DragdealAddItem();

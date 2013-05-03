@@ -2,7 +2,9 @@ package com.leyou.net.protocol {
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.HexUtil;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.protocol.scene.CmdScene;
@@ -152,7 +154,7 @@ package com.leyou.net.protocol {
 
 		static public function sm_menu_ok(td:TDefaultMessage, body:String):void {
 			//无返回值
-			AlertWindow.showWin(body);
+			PopupManager.showAlert(body);
 		}
 
 	}

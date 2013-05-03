@@ -48,9 +48,6 @@ package com.leyou.ui.setting {
 
 			this.settingTabBar.addToTab(settingGamePanel, 0);
 			this.settingTabBar.addToTab(settingVideoPanel, 1);
-
-//			this.getClientData();
-			
 		}
 
 		override public function show(toTop:Boolean=true, toCenter:Boolean=true):void {
@@ -60,7 +57,7 @@ package com.leyou.ui.setting {
 		}
 
 		private function initSettingGameInfo():void {
-			if(this.settingGameInfo==null)
+			if (this.settingGameInfo == null)
 				this.settingGameInfo=new SettingGameInfo();
 			this.settingGameInfo.drug=1;
 			this.settingGameInfo.autoPickup=1;
@@ -115,7 +112,7 @@ package com.leyou.ui.setting {
 				this.restormSettingVideo();
 				this.settingVideoPanel.updataInfo(this.settingVideoInfo);
 			}
-			saveClientData();
+			this.saveClientData();
 		}
 
 		private function restornSetting():void {
@@ -160,7 +157,7 @@ package com.leyou.ui.setting {
 		}
 
 		private function restormSettingVideo():void {
-			if(this.settingVideoInfo==null)
+			if (this.settingVideoInfo == null)
 				this.settingVideoInfo=new SettingVideoInfo();
 			this.settingVideoInfo.bgMusic=1;
 			this.settingVideoInfo.interfaceSound=1;
@@ -172,48 +169,67 @@ package com.leyou.ui.setting {
 
 		private function getClientData():void {
 			var id:String=MyInfoManager.getInstance().name;
-			 var shareObj:Object=ShareObjManage.getInstance().readFile(id + "setting");
-			if (shareObj!=null&&shareObj.gameInfo != null) {
-				settingGameInfo.autoPickup=shareObj.gameInfo.autoPickup;
-				settingGameInfo.complexName=shareObj.gameInfo.complexName;
-				settingGameInfo.coupleTransfer=shareObj.gameInfo.coupleTransfer;
-				settingGameInfo.drug=shareObj.gameInfo.drug;
-				settingGameInfo.groupChat=shareObj.gameInfo.groupChat;
-				settingGameInfo.gruop=shareObj.gameInfo.gruop;
-				settingGameInfo.guildAnd=shareObj.gameInfo.guildAnd;
-				settingGameInfo.guildChat=shareObj.gameInfo.guildChat;
-				settingGameInfo.joinGuild=shareObj.gameInfo.joinGuild;
-				settingGameInfo.loginLock=shareObj.gameInfo.loginLock;
-				settingGameInfo.monster=shareObj.gameInfo.monster;
-				settingGameInfo.natureHuman=shareObj.gameInfo.natureHuman;
-				settingGameInfo.npc=shareObj.gameInfo.npc;
-				settingGameInfo.onlyDrug=shareObj.gameInfo.onlyDrug;
-				settingGameInfo.privateChat=shareObj.gameInfo.privateChat;
-				settingGameInfo.shiftAttack=shareObj.gameInfo.shiftAttack;
-				settingGameInfo.snow=shareObj.gameInfo.snow;
-				settingGameInfo.simpleName=shareObj.gameInfo.simpleName;
-				settingGameInfo.teacherPuilTransfer=shareObj.gameInfo.teacherPuilTransfer;
-				settingGameInfo.trade=shareObj.gameInfo.trade;
-				settingGameInfo.warehouseLock=shareObj.gameInfo.warehouseLock;
-			}
-			else initSettingGameInfo();
-			if(shareObj!=null&&shareObj.videoInfo!=null){
-				settingVideoInfo.bgMusic=shareObj.videoInfo.bgMusic;
-				settingVideoInfo.interfaceSound=shareObj.videoInfo.interfaceSound;
-				settingVideoInfo.sceneMusicRepeat=shareObj.videoInfo.sceneMusicRepeat;
-				settingVideoInfo.skillSound=shareObj.videoInfo.skillSound;
-				settingVideoInfo.turnOffMusic=shareObj.videoInfo.turnOffMusic;
-				settingVideoInfo.windowMode=shareObj.videoInfo.windowMode;
+			var shareObj:Object=ShareObjManage.getInstance().readFile(id + "setting");
+			if (shareObj != null && shareObj.gameInfo != null) {
+				this.settingGameInfo.autoPickup=shareObj.gameInfo.autoPickup;
+				this.settingGameInfo.complexName=shareObj.gameInfo.complexName;
+				this.settingGameInfo.coupleTransfer=shareObj.gameInfo.coupleTransfer;
+				this.settingGameInfo.drug=shareObj.gameInfo.drug;
+				this.settingGameInfo.groupChat=shareObj.gameInfo.groupChat;
+				this.settingGameInfo.gruop=shareObj.gameInfo.gruop;
+				this.settingGameInfo.guildAnd=shareObj.gameInfo.guildAnd;
+				this.settingGameInfo.guildChat=shareObj.gameInfo.guildChat;
+				this.settingGameInfo.joinGuild=shareObj.gameInfo.joinGuild;
+				this.settingGameInfo.loginLock=shareObj.gameInfo.loginLock;
+				this.settingGameInfo.monster=shareObj.gameInfo.monster;
+				this.settingGameInfo.natureHuman=shareObj.gameInfo.natureHuman;
+				this.settingGameInfo.npc=shareObj.gameInfo.npc;
+				this.settingGameInfo.onlyDrug=shareObj.gameInfo.onlyDrug;
+				this.settingGameInfo.privateChat=shareObj.gameInfo.privateChat;
+				this.settingGameInfo.shiftAttack=shareObj.gameInfo.shiftAttack;
+				this.settingGameInfo.snow=shareObj.gameInfo.snow;
+				this.settingGameInfo.simpleName=shareObj.gameInfo.simpleName;
+				this.settingGameInfo.teacherPuilTransfer=shareObj.gameInfo.teacherPuilTransfer;
+				this.settingGameInfo.trade=shareObj.gameInfo.trade;
+				this.settingGameInfo.warehouseLock=shareObj.gameInfo.warehouseLock;
 			} else
-				restormSettingVideo();
-			
+				this.initSettingGameInfo();
+			if (shareObj != null && shareObj.videoInfo != null) {
+				this.settingVideoInfo.bgMusic=shareObj.videoInfo.bgMusic;
+				this.settingVideoInfo.interfaceSound=shareObj.videoInfo.interfaceSound;
+				this.settingVideoInfo.sceneMusicRepeat=shareObj.videoInfo.sceneMusicRepeat;
+				this.settingVideoInfo.skillSound=shareObj.videoInfo.skillSound;
+				this.settingVideoInfo.turnOffMusic=shareObj.videoInfo.turnOffMusic;
+				this.settingVideoInfo.windowMode=shareObj.videoInfo.windowMode;
+			} else
+				this.restormSettingVideo();
+
 		}
 
 		public function saveClientData():void {
 			var obj:Object=new Object();
 			obj.gameInfo=this.settingGameInfo;
 			obj.videoInfo=this.settingVideoInfo;
-			ShareObjManage.getInstance().saveFile(MyInfoManager.getInstance().name+"setting",obj);
+			ShareObjManage.getInstance().saveFile(MyInfoManager.getInstance().name + "setting", obj);
+		}
+
+		/**
+		 *返回设置面板中第一个板上的信息
+		 * @return
+		 *
+		 */
+		public function get settingInfo():SettingGameInfo {
+			if (this.settingGamePanel.settingInfo == null)
+				return this.settingGameInfo;
+			else
+				return this.settingGamePanel.settingInfo;
+		}
+
+		public function get videoInfo():SettingVideoInfo {
+			if (this.settingVideoPanel.settingVideoInfo == null)
+				return this.settingVideoInfo;
+			else
+				return this.settingVideoPanel.settingVideoInfo;
 		}
 	}
 }

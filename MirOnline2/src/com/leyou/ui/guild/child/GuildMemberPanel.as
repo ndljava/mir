@@ -1,7 +1,5 @@
-package com.leyou.ui.guild.child
-{
+package com.leyou.ui.guild.child {
 	import com.ace.ICommon.IMenu;
-	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
@@ -9,22 +7,20 @@ package com.leyou.ui.guild.child
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.menu.data.MenuInfo;
 	import com.ace.ui.scrollPane.children.ScrollPane;
-	import com.ace.ui.window.children.ConfirmInputWindow;
+	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.manager.MenuManager;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Guild;
-	import com.leyou.ui.chat.child.MenuButton;
 	import com.leyou.ui.guild.child.children.MemberRender;
 	import com.leyou.utils.GuildUtils;
-	
+
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
-	import flash.ui.Mouse;
 
-	public class GuildMemberPanel extends AutoSprite implements IMenu
-	{
+	public class GuildMemberPanel extends AutoSprite implements IMenu {
 		private var btnArr:Vector.<NormalButton>;
 		private var gridList:ScrollPane;
 		private var offLineCheckBox:CheckBox;
@@ -33,15 +29,13 @@ package com.leyou.ui.guild.child
 		private var selectRenderId:int=-1;
 		private var overRenderId:int=-1;
 
-		public function GuildMemberPanel()
-		{
+		public function GuildMemberPanel() {
 			super(LibManager.getInstance().getXML("config/ui/guild/GuildMemberPage.xml"));
 			this.mouseChildren=true;
 			this.init();
 		}
 
-		private function init():void
-		{
+		private function init():void {
 			this.btnArr=new Vector.<NormalButton>;
 			//this.btnArr.push(this.getUIbyID("nameBtn") as NormalButton);
 			//this.btnArr.push(this.getUIbyID("lvBtn") as NormalButton);
@@ -54,8 +48,7 @@ package com.leyou.ui.guild.child
 			this.gridList=this.getUIbyID("gridList") as ScrollPane;
 			this.offLineCheckBox=this.getUIbyID("offLineCheckBox") as CheckBox;
 
-			for (var i:int=0; i < this.btnArr.length; i++)
-			{
+			for (var i:int=0; i < this.btnArr.length; i++) {
 				this.btnArr[i].addEventListener(MouseEvent.CLICK, onBtnClick);
 			}
 
@@ -68,15 +61,13 @@ package com.leyou.ui.guild.child
 			this.offLineCheckBox.addEventListener(MouseEvent.CLICK, onOffLineClick);
 
 			this.renderArr=[];
- 
+
 		}
- 
 
-		public function updateList():void
-		{
 
-			while (this.renderArr.length)
-			{
+		public function updateList():void {
+
+			while (this.renderArr.length) {
 				this.gridList.delFromPane(this.renderArr[0]);
 				this.renderArr.splice(0, 1);
 			}
@@ -85,10 +76,8 @@ package com.leyou.ui.guild.child
 			var render:MemberRender;
 
 			var arr:Array;
-			for each (arr in vec)
-			{
-				for (var j:int=2; j < arr.length; j++)
-				{
+			for each (arr in vec) {
+				for (var j:int=2; j < arr.length; j++) {
 					render=new MemberRender();
 					render.id=this.renderArr.length;
 					render.y=this.renderArr.length * 23;
@@ -107,13 +96,11 @@ package com.leyou.ui.guild.child
 		 * 排序
 		 *
 		 */
-		private function sortMemeber(sortType:String, sortOptions:int=2):void
-		{
+		private function sortMemeber(sortType:String, sortOptions:int=2):void {
 			this.renderArr.sortOn(sortType, sortOptions);
 
 			var render:MemberRender;
-			for (var i:int=0; i < this.renderArr.length; i++)
-			{
+			for (var i:int=0; i < this.renderArr.length; i++) {
 				render=this.renderArr[i];
 				render.id=i;
 				render.y=i * 23;
@@ -126,15 +113,11 @@ package com.leyou.ui.guild.child
 		 * @param e
 		 *
 		 */
-		private function onSortNameClick(e:MouseEvent):void
-		{
-			if (String(e.target.name).split("_")[1] == 1)
-			{
+		private function onSortNameClick(e:MouseEvent):void {
+			if (String(e.target.name).split("_")[1] == 1) {
 				sortMemeber("memberName", Array.CASEINSENSITIVE)
 				e.target.name="n_0";
-			}
-			else
-			{
+			} else {
 				sortMemeber("memberName", Array.DESCENDING);
 				e.target.name="n_1";
 			}
@@ -145,24 +128,18 @@ package com.leyou.ui.guild.child
 		 * @param e
 		 *
 		 */
-		private function onSorLvtClick(e:MouseEvent):void
-		{
-			if (String(e.target.name).split("_")[1] == 1)
-			{
+		private function onSorLvtClick(e:MouseEvent):void {
+			if (String(e.target.name).split("_")[1] == 1) {
 				sortMemeber("memberLv", Array.CASEINSENSITIVE)
 				e.target.name="l_0";
-			}
-			else
-			{
+			} else {
 				sortMemeber("memberLv", Array.DESCENDING)
 				e.target.name="l_1";
 			}
 		}
 
-		private function onBtnClick(evt:MouseEvent):void
-		{
-			switch (evt.target.name)
-			{
+		private function onBtnClick(evt:MouseEvent):void {
+			switch (evt.target.name) {
 				case "nameBtn": //名字
 
 					break;
@@ -193,23 +170,20 @@ package com.leyou.ui.guild.child
 		 * 添加好友
 		 *
 		 */
-		private function addMemberFunc():void
-		{
+		private function addMemberFunc():void {
 			var arr:Array=GuildUtils.getMemberByName(UIManager.getInstance().guildWnd.memberArr, MyInfoManager.getInstance().name);
 			if (arr == null || arr[0] != "1")
 				return;
-			
-			ConfirmInputWindow.showWin("请输入好友名字:", inputOk);
 
-			function inputOk(s:String):void
-			{
-				if (s != null && s != "")
-				{
+			PopupManager.showConfirmInput("请输入好友名字:", inputOk);
+
+			function inputOk(s:String):void {
+				if (s != null && s != "") {
 					Cmd_Guild.cm_guildAddMember(s);
 				}
 			}
 		}
- 
+
 
 		/**
 		 * ["提升职务", "降低职务", "开除公会 "];
@@ -217,11 +191,9 @@ package com.leyou.ui.guild.child
 		 * @param e
 		 *
 		 */
-		public function onMenuClick(index:int):void
-		{
+		public function onMenuClick(index:int):void {
 
-			switch (index)
-			{
+			switch (index) {
 				case 1: //提升职务
 					changeMemeberFunc();
 					break;
@@ -234,8 +206,7 @@ package com.leyou.ui.guild.child
 			}
 		}
 
-		public function changeMemeberFunc(i:int=0):void
-		{
+		public function changeMemeberFunc(i:int=0):void {
 			var mN:String=this.renderArr[this.selectRenderId].memberName;
 
 			var arr:Array=UIManager.getInstance().guildWnd.memberArr;
@@ -255,22 +226,19 @@ package com.leyou.ui.guild.child
 		 * @param evt
 		 *
 		 */
-		private function onGridListClick(evt:MouseEvent):void
-		{
+		private function onGridListClick(evt:MouseEvent):void {
 			var arr:Array=GuildUtils.getMemberByName(UIManager.getInstance().guildWnd.memberArr, MyInfoManager.getInstance().name);
 
-			if (arr[0] == "1")
-			{
+			if (arr[0] == "1") {
 				var menuarr:Vector.<MenuInfo>=new Vector.<MenuInfo>();
-				menuarr.push(new MenuInfo("提升职务",1));
-				menuarr.push(new MenuInfo("降低职务",2));
-				menuarr.push(new MenuInfo("开除公会",3));
-				
-				MenuManager.getInstance().show(menuarr,this,new Point(evt.stageX,evt.stageY));
+				menuarr.push(new MenuInfo("提升职务", 1));
+				menuarr.push(new MenuInfo("降低职务", 2));
+				menuarr.push(new MenuInfo("开除公会", 3));
+
+				MenuManager.getInstance().show(menuarr, this, new Point(evt.stageX, evt.stageY));
 			}
 
-			if (evt.target is MemberRender)
-			{
+			if (evt.target is MemberRender) {
 				var id:int=(evt.target as MemberRender).id;
 				if (id == this.selectRenderId)
 					return;
@@ -283,10 +251,8 @@ package com.leyou.ui.guild.child
 			}
 		}
 
-		private function onGridListOver(evt:MouseEvent):void
-		{
-			if (evt.target is MemberRender)
-			{
+		private function onGridListOver(evt:MouseEvent):void {
+			if (evt.target is MemberRender) {
 				var id:int=(evt.target as MemberRender).id;
 				if (id == this.selectRenderId || id == this.overRenderId)
 					return;
@@ -297,32 +263,24 @@ package com.leyou.ui.guild.child
 			}
 		}
 
-		private function onGridListOut(evt:MouseEvent):void
-		{
+		private function onGridListOut(evt:MouseEvent):void {
 			if (this.overRenderId != -1 && this.selectRenderId != this.overRenderId)
 				this.renderArr[this.getIdxById(this.overRenderId)].selectSta=false;
 			this.overRenderId=-1;
 		}
 
-		private function onOffLineClick(evt:Event):void
-		{
-			if (this.offLineCheckBox.isOn)
-			{
+		private function onOffLineClick(evt:Event):void {
+			if (this.offLineCheckBox.isOn) {
 
-			}
-			else
-			{
+			} else {
 
 			}
 		}
 
-		private function getIdxById(id:int):int
-		{
+		private function getIdxById(id:int):int {
 			var idx:int;
-			for (var i:int=0; i < this.renderArr.length; i++)
-			{
-				if (this.renderArr[i].id == id)
-				{
+			for (var i:int=0; i < this.renderArr.length; i++) {
+				if (this.renderArr[i].id == id) {
 					idx=i;
 					break;
 				}

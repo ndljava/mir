@@ -12,11 +12,13 @@ package com.leyou.ui.stall {
 	import com.ace.ui.input.children.TextInput;
 	import com.ace.ui.scrollPane.children.ScrollPane;
 	import com.ace.ui.window.children.AlertWindow;
+	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Stall;
 	import com.leyou.ui.stall.child.StallListRender;
-
+	
 	import flash.events.MouseEvent;
 
 	public class StallWnd extends AutoWindow {
@@ -81,14 +83,19 @@ package com.leyou.ui.stall {
 			if (evt.target.name == "confirmBtn") { //确定按钮
 				if (this.stallInput.text != null && this.stallInput.text != "") {
 					if (this.itemSelfDataArr.length == 0) {
-						AlertWindow.showWin("你没有物品!");
+						PopupManager.showAlert("你没有物品!");
 						return;
 					}
+					
+					if (MyInfoManager.getInstance().isOnMount) {
+						Cmd_Chat.cm_say("@下马");
+					}
+					
 					Cmd_Stall.cm_btItem_confirm(this.stallInput.text);
 					UIManager.getInstance().backPackWnd.hide();
 					this.confirmBtn.setActive(false);
 				} else
-					AlertWindow.showWin("请输入名字!");
+					PopupManager.showAlert("请输入名字!");
 			}
 		}
 
@@ -146,9 +153,6 @@ package com.leyou.ui.stall {
 		 *	显示panel
 		 */
 		public function serv_showStall():void {
-			if (MyInfoManager.getInstance().isOnMount) {
-				Cmd_Chat.cm_say("@下马");
-			}
 
 			super.show();
 			UIManager.getInstance().backPackWnd.show();

@@ -1,11 +1,21 @@
 package com.leyou.net.protocol {
-	import com.ace.tools.print;
+	import com.leyou.config.Core;
 	import com.leyou.enum.ChatEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.protocol.scene.CmdScene;
 
 	public class Cmd_Chat {
+
+		static public function upAndDownHorse():void {
+			if(Core.me.info.isStall)
+				return;
+			if (Core.me.info.isOnMount)
+				Cmd_Chat.cm_say("@下马");
+			else
+				Cmd_Chat.cm_say("@骑马");
+		}
+
 		//说话【!区域 、	!!组队、 	!~行会 、 /私聊】
 		static public function cm_say(text:String):void {
 			CmdScene.cm_sendDefaultMsgII(MirProtocol.CM_SAY, 0, 0, 0, 0, text);
@@ -56,8 +66,8 @@ package com.leyou.net.protocol {
 			if (td.Series == 4) { //
 				UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, body);
 			}
-			if(td.Series==2){//倒计时
-				UIManager.getInstance().noticeCountDown.ser_CountDown(td,body);//tag 秒
+			if (td.Series == 2) { //倒计时
+				UIManager.getInstance().noticeCountDown.ser_CountDown(td, body); //tag 秒
 			}
 		}
 

@@ -23,12 +23,12 @@ package com.leyou.ui.storage {
 	import com.leyou.ui.storage.child.StorageGrid;
 	import com.leyou.utils.FilterUtil;
 	import com.leyou.utils.ItemUtil;
-	
+
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
 	public class StorageWnd extends AutoWindow {
-	 
+
 		private var gridList:ScrollPane;
 		private var neatenBtn:NormalButton;
 		private var getMoneyBtn:NormalButton;
@@ -65,7 +65,7 @@ package com.leyou.ui.storage {
 			this.moneyLbl=this.getUIbyID("moneyLbl") as Label;
 			this.storageTabBar=this.getUIbyID("storageTabBar") as TabBar;
 			this.glowBg=this.getUIbyID("glowBg") as ScaleBitmap;
-			
+
 			this.neatenBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.getMoneyBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.storageBtn.addEventListener(MouseEvent.CLICK, onClick);
@@ -106,7 +106,7 @@ package com.leyou.ui.storage {
 		}
 
 		private function updateTab():void {
-			DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_STORAGE);
+			//DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_STORAGE);
 
 			switch (this.storageTabBar.turnOnIndex) {
 				case -1:
@@ -125,9 +125,9 @@ package com.leyou.ui.storage {
 					changeTab(ItemUtil.EQUIP_TYPE.concat([0, 1, 2, 3]), true);
 					break;
 			}
-			
+
 			var len:int=MyInfoManager.getInstance().getBagNum(ItemEnum.TYPE_GRID_STORAGE);
-			this.bagCapacity.text=len+"/70";
+			this.bagCapacity.text=len + "/70";
 			this.moneyLbl.text="0";
 		}
 
@@ -196,14 +196,18 @@ package com.leyou.ui.storage {
 					this.mouseChildren=false;
 					break;
 				case "getMoneyBtn":
-					 
+
 					break;
 				case "storageBtn":
-					 
+
 					break;
 				case "batchSaveBtn":
 					UIManager.getInstance().backPackWnd.show();
 					isbatchSave=!isbatchSave;
+					if (isbatchSave)
+						this.batchSaveBtn.text="取消批量存取";
+					else
+						this.batchSaveBtn.text="批量存取";
 					break;
 			}
 		}

@@ -1,4 +1,5 @@
 package com.leyou.net.protocol {
+	import com.ace.game.scene.part.LivingModel;
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.FeatureInfo;
 	import com.ace.gameData.player.MyInfoManager;
@@ -8,13 +9,17 @@ package com.leyou.net.protocol {
 	import com.leyou.config.Core;
 	import com.leyou.data.net.role.TAbility;
 	import com.leyou.data.net.role.TNakedAbility;
+	import com.leyou.data.net.role.TUserStateInfo;
 	import com.leyou.data.net.scene.TFeature;
+	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
 	import com.leyou.net.NetGate;
 	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.ui.role.RoleWnd;
+	
+	import flash.geom.Point;
 
 	public class Cmd_Role {
 		//基本属性
@@ -138,7 +143,7 @@ package com.leyou.net.protocol {
 				info.readBr(NetEncode.getInstance().DecodeBuffer(arr[i]));
 				infoArr.push(info);
 			}
-			UIManager.getInstance().propertyPointWnd.updatePointInfo(td.Recog,infoArr);
+			UIManager.getInstance().propertyPointWnd.updatePointInfo(td.Recog, infoArr);
 //			td.Recog+infoArr//需要的数据
 		}
 
@@ -147,6 +152,19 @@ package com.leyou.net.protocol {
 			var t_msg:TDefaultMessage=new TDefaultMessage();
 			t_msg.MakeDefaultMsg(MirProtocol.CM_ADJUST_BONUS, remain, 0, 0, 0, NetGate.getInstance().certification);
 			CmdScene.SendSocketStr((NetEncode.getInstance().EncodeMessage(t_msg) + NetEncode.getInstance().EncodeBuffer(info.writeBr(), info.length)), 1);
+		}
+		
+		//查看其它玩家
+		static public function cm_queryUserState(id:int, ps:Point):void {
+			CmdScene.cm_sendDefaultMsg(MirProtocol.CM_QUERYUSERSTATE, id, ps.x, ps.y, 0);
+		}
+
+		//查看其它玩家--返回
+		static public function sm_sendUserState(td:TDefaultMessage, body:String):void {
+			var player:LivingModel=UIManager.getInstance().mirScene.getPlayer(td.Recog);
+			var info:TUserStateInfo=new TUserStateInfo(NetEncode.getInstance().DecodeBuffer(body));
+			UIManager.getInstance().otherRoleWnd.updateInfo(info);
+			UIManager.getInstance().otherRoleWnd.show(true,true);
 		}
 
 	}

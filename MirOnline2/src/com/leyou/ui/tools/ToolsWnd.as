@@ -19,10 +19,11 @@ package com.leyou.ui.tools {
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Trade;
+	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.ui.tools.child.ShortcutsGrid;
 	import com.leyou.utils.FilterUtil;
-	
+
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
@@ -55,6 +56,7 @@ package com.leyou.ui.tools {
 		public function ToolsWnd() {
 			super(LibManager.getInstance().getXML("config/ui/ToolsWnd.xml"));
 			this.mouseChildren=true;
+			this.mouseEnabled=true;
 			this.init();
 		}
 
@@ -80,9 +82,11 @@ package com.leyou.ui.tools {
 			this.expScaleBitMap.scale9Grid=new Rectangle(2, 2, 715, 6);
 			this.expScaleBitMap.x=110.5;
 			this.expScaleBitMap.y=93;
-			this.addChild(this.expScaleBitMap);
+			this.addChildAt(this.expScaleBitMap, this.numChildren - 7);
 			this.expWidth=717;
 			this.expHight=8;
+
+
 //			this.expScaleBitMap.setSize(this.expImg.width, this.expImg.height);
 
 			this.gridBg=new Sprite;
@@ -104,6 +108,11 @@ package com.leyou.ui.tools {
 			this.memberBtn.addEventListener(MouseEvent.CLICK, onClick);
 
 			this.addShoruCutKey();
+			this.addEventListener(MouseEvent.CLICK, onThisCLick);
+		}
+
+		private function onThisCLick(evt:MouseEvent):void {
+			evt.stopPropagation();
 		}
 
 		//添加快捷键
@@ -130,7 +139,7 @@ package com.leyou.ui.tools {
 
 			switch (evt.target.name) {
 				case "memberBtn":
-					CmdScene.cm_sendDefaultMsg(MirProtocol.CM_ADDSTARITEM, 0, NetEnum.NPC_STORAGE, 0, 0);
+					Cmd_backPack.cm_addStarItem();
 					break;
 				case "sendBtn":
 					Cmd_Task.cm_clickNpc(NetEnum.NPC_STORAGE);
@@ -161,14 +170,10 @@ package com.leyou.ui.tools {
 					Cmd_Trade.cm_dealTry();
 					break;
 				case "mountBtn":
-					if (Core.me.info.isOnMount)
-						Cmd_Chat.cm_say("@下马");
-					else
-						Cmd_Chat.cm_say("@骑马");
+					Cmd_Chat.upAndDownHorse();
 					break;
 				case "guildBtn":
 					Cmd_Guild.cm_openGuildDlg();
-//					UIManager.getInstance().backPackWnd.cdTest();
 					break;
 			}
 			evt.stopImmediatePropagation();
@@ -256,7 +261,7 @@ package com.leyou.ui.tools {
 			for (var i:* in this.shortCutDic) {
 				if ((this.shortCutDic[i] as ShortcutsGrid).dataId == id) {
 					if (deleteF) {
-						if ((this.shortCutDic[i] as ShortcutsGrid).dataId >= 0&&(this.shortCutDic[i] as ShortcutsGrid).cloneGridType==ItemEnum.TYPE_GRID_SKILL)
+						if ((this.shortCutDic[i] as ShortcutsGrid).dataId >= 0 && (this.shortCutDic[i] as ShortcutsGrid).cloneGridType == ItemEnum.TYPE_GRID_SKILL)
 							UIManager.getInstance().skillWnd.setSkillGridShortCut((this.shortCutDic[i] as ShortcutsGrid).dataId, -1);
 						(this.shortCutDic[i] as ShortcutsGrid).dropHandler();
 					}
@@ -279,8 +284,9 @@ package com.leyou.ui.tools {
 			if (w > this.expWidth)
 				w=this.expWidth;
 			this.expScaleBitMap.setSize(w, this.expHight);
+//			this.expScaleBitMap.setSize(0.1, this.expHight);
 		}
-		
+
 		public function resize():void {
 			this.x=(UIEnum.WIDTH - 934) / 2;
 			this.y=UIEnum.HEIGHT - 105;
