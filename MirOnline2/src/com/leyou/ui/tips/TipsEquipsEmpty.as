@@ -6,7 +6,7 @@ package com.leyou.ui.tips {
 	import com.ace.ui.lable.Label;
 	import com.leyou.enum.TipsEnum;
 	import com.leyou.utils.TipsUtil;
-	
+
 	import flash.display.Sprite;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -22,19 +22,21 @@ package com.leyou.ui.tips {
 		private function init():void {
 			this.bg=new ScaleBitmap(LibManager.getInstance().getImg(FontEnum.STYLE_NAME_DIC["PanelBgOut"]));
 			this.bg.scale9Grid=FontEnum.RECTANGLE_DIC["PanelBgOut"];
-			this.bg.alpha=.8;
+			this.bg.alpha=.6;
 			this.addChildAt(this.bg, 0);
 			this.lbl=new Label();
 			this.lbl.autoSize=TextFieldAutoSize.LEFT;
 			this.addChild(this.lbl);
+			
 			var format:TextFormat=new TextFormat();
 			format.size=12;
 			this.lbl.defaultTextFormat=format;
 		}
 
 		private function updateInfo(str:String):void {
+			//			this.lbl.htmlText=str;
 			this.lbl.htmlText=TipsUtil.getColorStr(str, TipsEnum.COLOR_YELLOW);
-			this.bg.setSize(this.lbl.width, this.lbl.height)
+			this.bg.setSize(this.lbl.width, this.lbl.height);
 		}
 
 		public function equipEmptyTips(id:int):void {
@@ -85,17 +87,25 @@ package com.leyou.ui.tips {
 			}
 			this.updateInfo(str);
 		}
-		
+
+		public function showString(str:String):void {
+			this.updateInfo(str);
+		}
+
+		public function showBuffTips(str:String):void {
+			this.lbl.htmlText=str;
+			this.bg.setSize(this.lbl.width, this.lbl.height);
+		}
+
 		/**
 		 * 任务tips
 		 * @param str
-		 * 
-		 */		
-		public function showTaskTips(str:String):void
-		{
+		 *
+		 */
+		public function showTaskTips(str:String):void {
 			this.lbl.htmlText=TipsUtil.getColorStr(str, TipsEnum.COLOR_WHITE);
 			this.bg.setSize(this.lbl.width, this.lbl.height)
 		}
-		
+
 	}
 }

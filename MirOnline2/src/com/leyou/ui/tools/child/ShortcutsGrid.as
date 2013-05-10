@@ -11,7 +11,7 @@ package com.leyou.ui.tools.child {
 	import com.leyou.ui.backpack.child.ItemTip;
 	import com.leyou.ui.cdTimer.CDTimer;
 	import com.leyou.utils.ItemUtil;
-
+	
 	import flash.display.Shape;
 
 	/**
@@ -27,7 +27,9 @@ package com.leyou.ui.tools.child {
 		private var shortcutKeyLbl:Label;
 
 		private var _cloneGridType:String; //克隆的格子类型：技能、背包
-		private var isCD:Boolean;
+		public var isCD:Boolean;
+		private var cd:CDTimer;
+		private var cdRemaindTime:int;
 
 		public function ShortcutsGrid(id:int=-1) {
 			super(id);
@@ -48,9 +50,13 @@ package com.leyou.ui.tools.child {
 			shortcutKeyLbl.x=2;
 			shortcutKeyLbl.y=2;
 			this.addChild(shortcutKeyLbl);
-
 			this.bgBmp.bitmapData=LibManager.getInstance().getImg("ui/mainUI/icon_skill.png");
-
+			
+			this.cd=new CDTimer(this.width, this.height);
+			this.cd.cdEndFun=this.cdEnd;
+			this.cd.enterFrameFun=this.cdEnterFrame;
+			this.addChild(this.cd);
+			this.cd.visible=false;
 		}
 
 		override public function set gridId(value:int):void {
@@ -186,6 +192,7 @@ package com.leyou.ui.tools.child {
 
 		//使用
 		public function onUse():void {
+//			cdTimer();
 			if (this.dataId == -1)
 				return;
 			//如果是药品
@@ -194,8 +201,12 @@ package com.leyou.ui.tools.child {
 			}
 			//如果是技能
 			if (this._cloneGridType == ItemEnum.TYPE_GRID_SKILL) {
-				UIManager.getInstance().mirScene.useMagic(MyInfoManager.getInstance().skills[this.dataId].def.wMagicId);
+				
+				if (UIManager.getInstance().mirScene.useMagic(MyInfoManager.getInstance().skills[this.dataId].def.wMagicId))
+//					this.cdTimer(10000);
+				UIManager.getInstance().toolsWnd.setCD(this);
 			}
+
 		}
 
 		//使用道具后，更新数量
@@ -212,20 +223,31 @@ package com.leyou.ui.tools.child {
 			return this._cloneGridType;
 		}
 
-		private function cdTimer(time:int=5000):void {
-			if (this.isCD == true)
+		public function cdTimer(time:int=2000):void {
+			if (this.isCD == true){
+				if(this.cdRemaindTime<time){
+					this.cd.stop();
+					this.cd.start(time);
+					this.cd.visible=true;
+					this.isCD=true;
+					this.mouseEnabled=false;
+				}
 				return;
-			var cd:CDTimer=new CDTimer(this.width, this.height, time);
-			cd.cdEndFun=this.cdEnd;
-			this.addChild(cd);
-			cd.start();
+			}
+			this.cd.start(time);
 			this.isCD=true;
 			this.mouseEnabled=false;
+			this.cd.visible=true;
 		}
 
-		private function cdEnd():void {
+		public function cdEnd():void {
 			this.isCD=false;
 			this.mouseEnabled=true;
+			this.cd.visible=false;
+		}
+		
+		private function cdEnterFrame(t:int):void{
+			this.cdRemaindTime=t;
 		}
 	}
 }

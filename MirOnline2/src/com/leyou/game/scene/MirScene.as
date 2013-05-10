@@ -1,14 +1,19 @@
 package com.leyou.game.scene {
+	import com.ace.astarII.child.INode;
 	import com.ace.enum.KeysEnum;
+	import com.ace.enum.NodeEnum;
 	import com.ace.enum.PlayerEnum;
 	import com.ace.enum.SceneEnum;
 	import com.ace.game.core.SceneCore;
+	import com.ace.game.manager.TableManager;
 	import com.ace.game.scene.SceneModel;
 	import com.ace.game.scene.part.LivingAvatar;
 	import com.ace.game.scene.part.LivingModel;
 	import com.ace.game.utils.SceneUtil;
 	import com.ace.gameData.player.LivingInfo;
 	import com.ace.gameData.player.PlayerInfo;
+	import com.ace.gameData.scene.MapInfoManager;
+	import com.ace.gameData.table.TTransInfo;
 	import com.ace.loader.LoaderManager;
 	import com.ace.loaderSync.SyncLoader;
 	import com.ace.manager.KeysManager;
@@ -70,12 +75,21 @@ package com.leyou.game.scene {
 			}
 		}
 
+		//切换地图时的操作
+		private function onGotoMap():void {
+			UIManager.getInstance().addLoadingWnd();
+			LayerManager.getInstance().windowLayer.hideAllWnd();
+		}
+
 		//传送到x地图
 		override public function gotoMap($mapName:String, pt:Point):void {
+			this.onGotoMap();
 			super.gotoMap($mapName, pt);
 		}
 
 		override protected function _gotoMap(br:ByteArray, bmd:BitmapData):void {
+//			UIManager.getInstance().hideLoadingWnd();
+			Core.me && Core.me.sendCacheCmdWalk();
 			super._gotoMap(br, bmd);
 			UIManager.getInstance().mapWnd.updataImg();
 			if (Core.me) {
@@ -84,9 +98,9 @@ package com.leyou.game.scene {
 			}
 		}
 
-		public function useMagic(magicId:int):void {
+		public function useMagic(magicId:int):Boolean {
 			var pt:Point=SceneUtil.screenToTile(this.stage.mouseX - this.x, this.stage.mouseY - this.y);
-			Core.me.useMagic(pt, magicId, this.overPlayer);
+			return Core.me.useMagic(pt, magicId, this.overPlayer);
 		}
 
 		public function getOtherPlayers():Vector.<LivingModel> {
@@ -145,6 +159,7 @@ package com.leyou.game.scene {
 				case 50:
 					info.currentDir=(info.currentDir) % 3;
 					info.livingType=PlayerEnum.RACE_NPC;
+					MapInfoManager.getInstance().updataTile(info.nextTile.x, info.nextTile.y, NodeEnum.NODE_BLOCK);
 					break;
 				default:
 					info.livingType=PlayerEnum.RACE_MONSTER;

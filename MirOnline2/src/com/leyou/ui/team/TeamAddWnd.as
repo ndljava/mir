@@ -11,7 +11,7 @@ package com.leyou.ui.team {
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Team;
 	import com.leyou.ui.team.child.TeamListRender;
-
+	
 	import flash.events.MouseEvent;
 	import flash.utils.describeType;
 
@@ -125,11 +125,21 @@ package com.leyou.ui.team {
 			if (selectName == null)
 				return;
 
+			this.inviteJoinTeam(selectName);
+//			if (UIManager.getInstance().teamWnd.teamerInfo.length > 0) {
+//				Cmd_Team.cm_addGroupMember(selectName);
+//			} else {
+//				Cmd_Team.cm_createGroup(null);
+//				Cmd_Team.cm_createGroup(selectName, true);
+//			}
+		}
+		
+		public function inviteJoinTeam(name:String):void{
 			if (UIManager.getInstance().teamWnd.teamerInfo.length > 0) {
-				Cmd_Team.cm_addGroupMember(selectName);
+				Cmd_Team.cm_addGroupMember(name);
 			} else {
 				Cmd_Team.cm_createGroup(null);
-				Cmd_Team.cm_createGroup(selectName, true);
+				Cmd_Team.cm_createGroup(name, true);
 			}
 		}
 	}

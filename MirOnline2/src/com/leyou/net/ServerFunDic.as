@@ -2,6 +2,7 @@ package com.leyou.net {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.tools.print;
 	import com.leyou.config.Core;
+	import com.leyou.net.protocol.Cmd_Buffer;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Forge;
 	import com.leyou.net.protocol.Cmd_Guild;
@@ -146,8 +147,6 @@ package com.leyou.net {
 				dict[MirProtocol.SM_MOVEMESSAGE]=Cmd_Chat.sm_moveMessage;
 				dict[MirProtocol.SM_SYSMESSAGE]=Cmd_Chat.sm_sysMessage;
 
-
-
 				//角色面板
 				dict[MirProtocol.SM_ABILITY]=Cmd_Role.sm_ability;
 				dict[MirProtocol.SM_SUBABILITY]=Cmd_Role.sm_subAbility;
@@ -189,7 +188,12 @@ package com.leyou.net {
 				dict[MirProtocol.SM_USERSELLITEM_FAIL]=Cmd_Task.sm_userSellItem_fail;
 				dict[MirProtocol.SM_MERCHANTDLGCLOSE]=Cmd_Task.sm_merchantdlgclose;
 				dict[MirProtocol.SM_CloseBigDialogBox]=Cmd_Task.sm_closeBigDialogBox;
-
+				dict[MirProtocol.SM_USERLOSTITEM_FAIL]=Cmd_Task.sm_userSellItem_fail;
+				
+				//失物招领
+				dict[MirProtocol.SM_SENDLOSTITEMLIST]=Cmd_Task.sm_sendLostItemList;
+				dict[MirProtocol.SM_QUERYLOSTITEM]=Cmd_Task.sm_queryLostItem;
+				
 				//组队
 				dict[MirProtocol.SM_CREATEGROUP_FAIL]=Cmd_Team.sm_createGroup_fail;
 				dict[MirProtocol.SM_CREATEGROUP_OK]=Cmd_Team.sm_createGroup_ok;
@@ -240,7 +244,8 @@ package com.leyou.net {
 				dict[MirProtocol.SM_FIFITEM_SUCC]=Cmd_Forge.sm_fifItem_succ;
 				dict[MirProtocol.SM_FIFITEM_FAIL]=Cmd_Forge.sm_fifItem_fail;
 				
-
+				//buffer
+				dict[MirProtocol.SM_BUFF]=Cmd_Buffer.sm_buff;
 			}
 		}
 
@@ -253,7 +258,8 @@ package com.leyou.net {
 			MirProtocol.SM_DEALREMOTEADDITEM, MirProtocol.SM_DEALREMOTEDELITEM, //交易
 			MirProtocol.SM_SENGSHOPITEMS, MirProtocol.SM_SENGSHOPSPECIALLYITEMS, //market
 			MirProtocol.SM_BTITEM, //摆摊
-			MirProtocol.SM_GUILDSTROAGE //行会
+			MirProtocol.SM_GUILDSTROAGE, //行会
+			MirProtocol.SM_BUFF//buffer
 			];
 
 

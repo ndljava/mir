@@ -6,7 +6,8 @@ package com.leyou.ui.chat.child {
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.button.children.ImgButton;
 	import com.ace.ui.input.children.HideInput;
-
+	import com.leyou.enum.ChatEnum;
+	
 	import flash.display.Sprite;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -28,10 +29,12 @@ package com.leyou.ui.chat.child {
 		private var itemContain:Sprite;
 		private var btnInput:HideInput;
 		private var maxChar:int;
+		private var type:String;
 
-		public function ChannelComboBox(w:Number, h:Number) {
+		public function ChannelComboBox(w:Number, h:Number, type:String="") {
 			this.comboxW=w;
 			this.comboxH=h;
+			this.type=type;
 			this.init();
 		}
 
@@ -77,8 +80,8 @@ package com.leyou.ui.chat.child {
 				btArr.length=maxChar * 2;
 				btArr.position=0;
 				this.btnInput.text=btArr.readMultiByte(maxChar * 2, "gb2312");
-				if(this.btnInput.text.indexOf("?")==this.btnInput.text.length-1)
-					this.btnInput.text=this.btnInput.text.replace("?","");
+				if (this.btnInput.text.indexOf("?") == this.btnInput.text.length - 1)
+					this.btnInput.text=this.btnInput.text.replace("?", "");
 			}
 		}
 
@@ -106,7 +109,10 @@ package com.leyou.ui.chat.child {
 			if (evt.target is MenuButton) {
 				var name:int=int((evt.target as MenuButton).name);
 				this.selectLabIdx=name;
-				this.btnInput.text=this.itemArr[this.selectLabIdx].text;
+				if (this.type == ChatEnum.COMBOX_CHAT_CHANNEL) {
+					this.btnInput.text=this.itemArr[this.selectLabIdx].text.substring(this.itemArr[this.selectLabIdx].text.length - 2);
+				} else
+					this.btnInput.text=this.itemArr[this.selectLabIdx].text;
 				this.btnInput.textColor=this.itemArr[this.selectLabIdx].labTextColor;
 				this.btnInput.htmlText=getBtnLabText(this.btnInput.htmlText);
 				if (onClickItemFun != null)
@@ -132,7 +138,11 @@ package com.leyou.ui.chat.child {
 		public function setItem(str:Array, lblColor:Array):void {
 			if (str == null)
 				return;
-			this.btnInput.htmlText=getBtnLabText(str[0]);
+			if (this.type == ChatEnum.COMBOX_CHAT_CHANNEL) {
+				this.btnInput.text=(str[0] as String).substring((str[0] as String).length - 2);
+				this.btnInput.htmlText=getBtnLabText(this.btnInput.text);
+			} else
+				this.btnInput.htmlText=getBtnLabText(str[0]);
 			var format:TextFormat=new TextFormat();
 			format.align=TextFormatAlign.LEFT;
 			for (var i:int=str.length - 1; i >= 0; i--) {
@@ -158,7 +168,11 @@ package com.leyou.ui.chat.child {
 		 */
 		public function setSelectTextByIdx(idx:int):void {
 			this.selectLabIdx=idx;
-			this.btnInput.text=this.itemArr[idx].text;
+			if (this.type == ChatEnum.COMBOX_CHAT_CHANNEL) {
+				this.btnInput.text=this.itemArr[idx].text.substring(this.itemArr[idx].text.length - 2);
+			} else
+				this.btnInput.text=this.itemArr[idx].text;
+//			this.btnInput.text=this.itemArr[idx].text;
 			this.btnInput.text=getBtnLabText(this.btnInput.text);
 			this.setBtnInputColor(this.itemArr[idx].labTextColor);
 		}

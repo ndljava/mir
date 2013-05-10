@@ -1,6 +1,7 @@
 package com.leyou.net.protocol {
 	import com.leyou.config.Core;
 	import com.leyou.enum.ChatEnum;
+	import com.leyou.enum.FriendEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.protocol.scene.CmdScene;
@@ -8,7 +9,7 @@ package com.leyou.net.protocol {
 	public class Cmd_Chat {
 
 		static public function upAndDownHorse():void {
-			if(Core.me.info.isStall)
+			if(Core.me.info.isStall||Core.me.info.isDead)
 				return;
 			if (Core.me.info.isOnMount)
 				Cmd_Chat.cm_say("@下马");
@@ -28,6 +29,11 @@ package com.leyou.net.protocol {
 
 		//系统移动消息【[99]诅咒的封印被释放，大量恶魔出现在猪洞七层！】
 		static public function sm_moveMessage(td:TDefaultMessage, body:String):void {
+			
+			if(body.indexOf(FriendEnum.RECEIVE_FRIENDLIST)>-1){
+				UIManager.getInstance().friendWnd.friendList(body);
+				return;
+			}
 			if (body.indexOf("####get") > -1) {
 				//trace(body)
 				UIManager.getInstance().teamWnd.setTeamInfo(body);
@@ -38,7 +44,7 @@ package com.leyou.net.protocol {
 				UIManager.getInstance().guildWnd.updateData(String(body.split("=")[1]).split(","));
 				return;
 			}
-
+			
 //			trace("td.Ident" +td.Ident+
 //				",td.nExValue "+td.nExValue+
 //				",td.nSessionID "+td.nSessionID+
@@ -69,6 +75,7 @@ package com.leyou.net.protocol {
 			if (td.Series == 2) { //倒计时
 				UIManager.getInstance().noticeCountDown.ser_CountDown(td, body); //tag 秒
 			}
+			else UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM,body);
 		}
 
 		//系统消息--【[100]〖组队〗face12: 组队说话】组队
@@ -87,7 +94,10 @@ package com.leyou.net.protocol {
 				UIManager.getInstance().tradeWnd.setLock(true, false);
 				return;
 			}
-
+			//[提示]与face32加为好友！】
+			if(body.indexOf("加为好友")>-1||body.indexOf("[提示]已删除好友")>-1||body.indexOf("已与您断绝好友关系")>-1){
+				UIManager.getInstance().friendWnd.requestFriendList();
+			}
 			UIManager.getInstance().settingWnd.checkServReturn(body);
 			if (body.indexOf("〖组队〗") != -1 && body.indexOf(":") != -1)
 				UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_TEAM, body);

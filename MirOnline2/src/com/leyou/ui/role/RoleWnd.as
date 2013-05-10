@@ -8,6 +8,7 @@ package com.leyou.ui.role {
 	import com.ace.ui.lable.Label;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
+	import com.leyou.ui.role.child.Avator;
 	import com.leyou.ui.role.child.EquipGrid;
 	import com.leyou.utils.ItemUtil;
 	import com.leyou.utils.PlayerUtil;
@@ -27,6 +28,7 @@ package com.leyou.ui.role {
 		private var wrisPos:int;
 		private var ringPos:int;
 		private var _waitPutPos:int; //发指令要放的位置
+		private var avator:Avator;
 
 		public function RoleWnd() {
 			super(LibManager.getInstance().getXML("config/ui/RoleWnd.xml"));
@@ -35,6 +37,10 @@ package com.leyou.ui.role {
 		}
 
 		private function init():void {
+			this.avator=new Avator();
+			this.avator.x=100+10;
+			this.avator.y=100+50+10;
+			this.addChild(this.avator);
 			this.nameLbl=this.getUIbyID("nameLbl") as Label;
 			this.lvLbl=this.getUIbyID("lvLbl") as Label;
 			this.raceLbl=this.getUIbyID("raceLbl") as Label;
@@ -86,6 +92,7 @@ package com.leyou.ui.role {
 			} else {
 				(this.gridArr[i] as EquipGrid).updataInfo(Info);
 			}
+			this.updateAvator(i, Info);
 		}
 
 		/**
@@ -102,6 +109,7 @@ package com.leyou.ui.role {
 			this.lvLbl.text=MyInfoManager.getInstance().level + "级";
 			this.raceLbl.text=PlayerUtil.getPlayerRaceByIdx(MyInfoManager.getInstance().race);
 			super.show(toTop, toCenter);
+			this.updateBody();
 		}
 
 		public function set takeOffEquipId(id:int):void {
@@ -114,13 +122,15 @@ package com.leyou.ui.role {
 			var i:int;
 			if (f) { //成功
 				MyInfoManager.getInstance().equips[this._takeOffEquipId].s=null;
-				if(this._takeOffEquipId==ItemEnum.U_HORSE)
+				this.updateAvator(this._takeOffEquipId,MyInfoManager.getInstance().equips[this._takeOffEquipId]);
+				if (this._takeOffEquipId == ItemEnum.U_HORSE)
 					i=ItemEnum.U_RIGHTHAND;
-				else if(this._takeOffEquipId==ItemEnum.U_ZHULI)
+				else if (this._takeOffEquipId == ItemEnum.U_ZHULI)
 					i=ItemEnum.U_HELMET;
-				else if(this._takeOffEquipId==ItemEnum.U_ITEM)
+				else if (this._takeOffEquipId == ItemEnum.U_ITEM)
 					i=ItemEnum.U_DRESS;
-				else i=this._takeOffEquipId;
+				else
+					i=this._takeOffEquipId;
 				(this.gridArr[i] as EquipGrid).clearMe();
 			} else { //失败
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr(MyInfoManager.getInstance().equips[this._takeOffEquipId].s.name + " 脱装备失败", SystemNoticeEnum.IMG_WARN);
@@ -219,10 +229,10 @@ package com.leyou.ui.role {
 		}
 
 		/**
-		 *删除某个道具 
+		 *删除某个道具
 		 * @param info
-		 * 
-		 */		
+		 *
+		 */
 		public function serv_removeItem(info:TClientItem):void {
 			if (info == null)
 				return;
@@ -230,13 +240,37 @@ package com.leyou.ui.role {
 			for (var i:int=0; i < e.length; i++) {
 				if (info.MakeIndex == e[i].MakeIndex && e[i].s != null) {
 					MyInfoManager.getInstance().equips[i].s=null;
-					if(this.gridArr[i]!=null){
+					this.updateAvator(i,MyInfoManager.getInstance().equips[i]);
+					if (this.gridArr[i] != null) {
 						(this.gridArr[i] as EquipGrid).clearMe();
 					}
 				}
 			}
 		}
 
-		
+		//更新人物形象
+		private function updateAvator(i:int, info:TClientItem):void {
+			if (i == ItemEnum.U_DRESS) { //衣服
+				if(info.s!==null)
+					this.avator.updateCloth(info.s.appr);
+				else this.avator.updateCloth(0);
+			}
+			if (i == ItemEnum.U_HELMET || i == ItemEnum.U_ZHULI) { //头盔 斗笠
+				if(info.s!=null)
+					this.avator.updateHat(info.s.appr);
+				else this.avator.updateHat(0);
+			}
+			if(i==ItemEnum.U_WEAPON){//武器
+				if(info.s!=null)
+					this.avator.updateWeapon(info.s.appr);
+				else this.avator.updateWeapon(0);
+			}
+		}
+
+		private function updateBody():void {
+			var sex:int=MyInfoManager.getInstance().sex;
+			this.avator.updateBody(sex);
+		}
+
 	}
 }

@@ -1,7 +1,6 @@
 package com.leyou.ui.backpack.child {
 	import com.ace.ICommon.IMenu;
 	import com.ace.enum.ItemEnum;
-	import com.ace.enum.UIEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.game.manager.DragManager;
 	import com.ace.gameData.backPack.TClientItem;
@@ -10,10 +9,8 @@ package com.leyou.ui.backpack.child {
 	import com.ace.tools.print;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.menu.data.MenuInfo;
-	import com.ace.ui.window.children.AlertWindow;
-	import com.ace.ui.window.children.ConfirmWindow;
-	import com.ace.ui.window.children.PopWindow;
-	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.data.net.lostAndFind.TLostItemBind;
+	import com.leyou.data.net.lostAndFind.TUserItem;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.PopupManager;
@@ -22,11 +19,12 @@ package com.leyou.ui.backpack.child {
 	import com.leyou.net.protocol.Cmd_Forge;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Role;
+	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.scene.CmdScene;
-	import com.leyou.ui.UiTester;
 	import com.leyou.ui.cdTimer.CDTimer;
+	import com.leyou.ui.lost.child.LostRender;
 	import com.leyou.ui.storage.child.StorageGrid;
 	import com.leyou.utils.FilterUtil;
 	import com.leyou.utils.GuildUtils;
@@ -40,6 +38,7 @@ package com.leyou.ui.backpack.child {
 		private var numLbl:Label;
 		private var isCDIng:Boolean;
 
+		private var ilbl:Label;
 		public static var menuState:int=-1;
 
 		public function BackpackGrid(id:int) {
@@ -57,6 +56,11 @@ package com.leyou.ui.backpack.child {
 			this.numLbl.y=24;
 			this.addChild(this.numLbl);
 
+			this.ilbl=new Label();
+			//			this.numLbl.x=22;
+			//			this.numLbl.y=24;
+			this.addChild(this.ilbl);
+
 			this.bgBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/bg.png");
 			this.iconBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/lock.png");
 			this.selectBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/select.png");
@@ -73,6 +77,8 @@ package com.leyou.ui.backpack.child {
 				return;
 			}
 
+			//trace("ooo", this.dataId,info.s.name,TClientItem(info).MakeIndex,TClientItem(info).s.appr);
+
 			super.updataInfo(info);
 
 			if (TClientItem(info).Addvalue[0] > 1) {
@@ -85,12 +91,15 @@ package com.leyou.ui.backpack.child {
 			this.iconBmp.x=this.iconBmp.y=(ItemEnum.ITEM_BG_WIDTH - ItemEnum.ITEM_ICO_WIDTH) / 2;
 
 			this.dataId=MyInfoManager.getInstance().backpackItems.indexOf(info);
+			 
 		}
 
 		override protected function reset():void {
 			super.reset();
+			super.updataInfo(null);
 			this.numLbl.text="";
 			this.dataId=-1;
+			//this.gridId=this.initId;
 		}
 
 		//经过事件
@@ -110,9 +119,12 @@ package com.leyou.ui.backpack.child {
 
 			//仓库批量存取
 			if (UIManager.getInstance().storageWnd.visible && UIManager.getInstance().storageWnd.isbatchSave) {
+				if (data == null || data.s == null || MyInfoManager.getInstance().waitItemFromId != -1)
+					return;
 
 				MyInfoManager.getInstance().waitItemFromId=this.dataId; //从背包
 				MyInfoManager.getInstance().waitItemToId=MyInfoManager.getInstance().findEmptyPs(ItemEnum.TYPE_GRID_STORAGE);
+
 				Cmd_backPack.cm_userStorageItem(MyInfoManager.getInstance().talkNpcId, data);
 				UIManager.getInstance().backPackWnd.mouseChildren=false;
 				return;
@@ -126,45 +138,57 @@ package com.leyou.ui.backpack.child {
 					UIManager.getInstance().shopWnd.sellItem(data.MakeIndex, data.s.name);
 				});
 				return;
+			} else if (UIManager.getInstance().tradeWnd.visible && UIManager.getInstance().tradeWnd.isshelves) { //交易上架
+
+				var tc:TClientItem=this.data as TClientItem;
+				if (this.dataId == -1 || tc == null || tc.s == null)
+					return;
+
+				MyInfoManager.getInstance().waitItemFromId=this.initId;
+				UIManager.getInstance().tradeWnd.waitIndex=10;
+				//协议
+				Cmd_Trade.cm_dealAddItem(tc);
+				this.mouseChildren=false;
+				return;
 			}
 
 			MenuManager.getInstance().visible(false);
 
-//			if (menuState == 2) {
-//				if (MyInfoManager.getInstance().waitItemFromId != -1) {
-//
-//					var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
-//					var info1:TClientItem=g.data;
-//
-//					if (info1 == null || info1.s == null)
-//						return;
-//
-//					//trace(MyInfoManager.getInstance().waitItemFromId, "====", this.gridId, this.dataId,info1.s.name,this.data.s.name);
-//
-//					if (this.dataId != -1) {
-//						//相等叠加-----------不相等替换
-//						if (info1.s.id != this.data.s.id) {
-//							g.updataInfo(this.data);
-//							this.updataInfo(info1);
-//
-//							g.enable=true;
-//						} else if (info1.s.stackNum > 1) {
-//							MyInfoManager.getInstance().waitItemFromId=g.dataId;
-//							Cmd_backPack.cm_bothItem(info1.MakeIndex, this.data.MakeIndex);
-//							return;
-//						}
-//					} else {
-//						this.updataInfo(info1);
-//					}
-//
-//					MyInfoManager.getInstance().resetWaitItem();
-//
-//				} else
-//					MyInfoManager.getInstance().waitItemFromId=this.gridId;
-//
-//					//trace(MyInfoManager.getInstance().waitItemFromId, "====11111",this.data.s.name);
-//			} //else
-				//MyInfoManager.getInstance().resetWaitItem();
+			//			if (menuState == 2) {
+			//				if (MyInfoManager.getInstance().waitItemFromId != -1) {
+			//
+			//					var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
+			//					var info1:TClientItem=g.data;
+			//
+			//					if (info1 == null || info1.s == null)
+			//						return;
+			//
+			//					//trace(MyInfoManager.getInstance().waitItemFromId, "====", this.gridId, this.dataId,info1.s.name,this.data.s.name);
+			//
+			//					if (this.dataId != -1) {
+			//						//相等叠加-----------不相等替换
+			//						if (info1.s.id != this.data.s.id) {
+			//							g.updataInfo(this.data);
+			//							this.updataInfo(info1);
+			//
+			//							g.enable=true;
+			//						} else if (info1.s.stackNum > 1) {
+			//							MyInfoManager.getInstance().waitItemFromId=g.dataId;
+			//							Cmd_backPack.cm_bothItem(info1.MakeIndex, this.data.MakeIndex);
+			//							return;
+			//						}
+			//					} else {
+			//						this.updataInfo(info1);
+			//					}
+			//
+			//					MyInfoManager.getInstance().resetWaitItem();
+			//
+			//				} else
+			//					MyInfoManager.getInstance().waitItemFromId=this.gridId;
+			//
+			//					//trace(MyInfoManager.getInstance().waitItemFromId, "====11111",this.data.s.name);
+			//			} //else
+			//MyInfoManager.getInstance().resetWaitItem();
 		}
 
 		public function onMenuClick(index:int):void {
@@ -195,7 +219,7 @@ package com.leyou.ui.backpack.child {
 		override public function mouseOutHandler():void {
 			super.mouseOutHandler();
 			ItemTip.getInstance().hide();
-
+			
 			if (DragManager.getInstance().grid != null && this.dataId != -1 && this.data.s != null) {
 				UIManager.getInstance().storageWnd.showDragGlowFilter(true);
 				if (ItemUtil.EQUIP_TYPE.concat(ItemUtil.ITEM_TOOL).indexOf(this.data.s.type) > -1)
@@ -234,10 +258,10 @@ package com.leyou.ui.backpack.child {
 
 				var g:GridBase=fromItem;
 
-//				if (menuState == 2 && MyInfoManager.getInstance().waitItemFromId != -1) {
-//					g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
-//				} else
-//					g=fromItem;
+				//				if (menuState == 2 && MyInfoManager.getInstance().waitItemFromId != -1) {
+				//					g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
+				//				} else
+				//					g=fromItem;
 
 				var info1:TClientItem=g.data;
 
@@ -247,22 +271,25 @@ package com.leyou.ui.backpack.child {
 				//物品叠加
 				if (this.dataId != -1) {
 
+					var gid:int=g.initId;
+					g.gridId=this.initId;
+					this.gridId=gid;
+
+					//交换
 					if (info1.s.id != this.data.s.id || info1.s.stackNum <= 1) {
+
 						g.updataInfo(this.data);
 						this.updataInfo(info1);
-
-						var gid:int=g.gridId;
-						g.gridId=this.gridId;
-						this.gridId=gid;
 
 						g.enable=true;
 
 						//super.switchHandler(fromItem);
+
 						//强制刷新
 						MyInfoManager.getInstance().resetWaitItem();
 
-					} else {
-						MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;
+					} else { //叠加
+						MyInfoManager.getInstance().waitItemFromId=g.dataId;
 						Cmd_backPack.cm_bothItem(info1.MakeIndex, this.data.MakeIndex);
 						return;
 					}
@@ -279,7 +306,11 @@ package com.leyou.ui.backpack.child {
 						return;
 
 					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从仓库
-					MyInfoManager.getInstance().waitItemToId=this.initId; //到背包
+					MyInfoManager.getInstance().waitItemToId=this.gridId; //到背包
+
+					if (fromItem.dataId == -1)
+						return;
+
 					Cmd_backPack.cm_userTakeBackStorageItem(MyInfoManager.getInstance().talkNpcId, MyInfoManager.getInstance().backpackItems[fromItem.dataId]);
 				}
 
@@ -318,7 +349,6 @@ package com.leyou.ui.backpack.child {
 					if (fromItem.dataId == 2 || fromItem.dataId == 0 || fromItem.dataId == 4) {
 						equip=MyInfoManager.getInstance().equips[fromItem.dataId];
 						if (equip == null || equip.s == null) {
-
 							var i:int;
 							if (fromItem.dataId == 2)
 								i=14;
@@ -356,9 +386,22 @@ package com.leyou.ui.backpack.child {
 						return;
 
 					Cmd_Forge.cm_delfIfitem(tc1.MakeIndex);
-					MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK,tc1);
+					MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK, tc1);
 					this.updataInfo(tc1);
 					UIManager.getInstance().forgeWnd.dropOneGrid(tc1.MakeIndex);
+				}
+
+				if (fromItem.gridType == ItemEnum.TYPE_GRID_LOST) {
+					var tinfo:TLostItemBind=UIManager.getInstance().lostWnd.itemData[UIManager.getInstance().lostWnd.getRenderToIndex(fromItem.parent as LostRender)];
+					if (tinfo == null)
+						return;
+
+					if(tinfo.sBindName!=MyInfoManager.getInstance().name){
+						PopupManager.showAlert("非装备主人不能取回");
+						return ;
+					}
+					
+					Cmd_Task.cm_userGetBackLostItem(UIManager.getInstance().taskWnd.npcId, tinfo.UserItem.MakeIndex, tinfo.UserItem.toTClientItem().s.name, 1);
 				}
 			}
 
@@ -370,10 +413,19 @@ package com.leyou.ui.backpack.child {
 		}
 
 		override public function mouseUpHandler($x:Number, $y:Number):void {
-
-			if (data == null || data.s == null)
+			if (data == null || data.s == null || !UIManager.getInstance().backPackWnd.visible)
 				return;
 
+			if (UIManager.getInstance().lostWnd.visible) {
+				
+				PopupManager.showConfirm("确定提交" + data.s.name + "么?", okfunc);
+
+				function okfunc():void {
+					Cmd_Task.cm_userLostItem(UIManager.getInstance().taskWnd.npcId, data.MakeIndex, data.s.name);
+				}
+				return;
+			}
+			
 			var menuArr:Vector.<MenuInfo>=new Vector.<MenuInfo>;
 
 			if (ItemUtil.EQUIP_TYPE.indexOf(data.s.type) > -1)
@@ -392,12 +444,12 @@ package com.leyou.ui.backpack.child {
 				menuArr.push(new MenuInfo("丢弃", 5));
 
 			MenuManager.getInstance().show(menuArr, this, new Point($x, $y));
-//			MyInfoManager.getInstance().resetWaitItem();
-
+			//MyInfoManager.getInstance().resetWaitItem();
 		}
 
 		override public function set enable(value:Boolean):void {
 			super.enable=value;
+
 			if (!value) {
 				this.iconBmp.filters=[FilterUtil.enablefilter];
 			} else {
@@ -414,15 +466,20 @@ package com.leyou.ui.backpack.child {
 
 		override public function doubleClickHandler():void {
 			super.doubleClickHandler();
-			this.onUse();
+
+			if (MyInfoManager.getInstance().waitItemUse == -1)
+				this.onUse();
 		}
 
 		private var tt:Array=[5, 6, 10, 11, 15, 16, 19, 20, 21, 22, 23, 24, 26, 30, 25, 52, 62, 53, 63, 54, 64, 42, 41, 29, 7];
 
 		public function onUse():void {
 			var info:TClientItem=data;
+			if (info == null || info.s == null)
+				return;
+
 			if (info.s.name == "千里传音卷轴") {
-//				AlertWindow.showWin("请在聊天中的 世界频道 使用千里传音 ");
+				//				AlertWindow.showWin("请在聊天中的 世界频道 使用千里传音 ");
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr("请在聊天中的 世界频道 使用千里传音卷轴 ", SystemNoticeEnum.IMG_WRONG);
 				return;
 			}
@@ -463,25 +520,20 @@ package com.leyou.ui.backpack.child {
 			}
 		}
 
-		private function cdTimer(time:int=5000):void {
-			if (this.isCDIng == true)
-				return;
-
-			var cd:CDTimer=new CDTimer(this.width, this.height, time);
-			cd.cdEndFun=this.cdEnd;
-			this.addChild(cd);
-			this.mouseEnabled=false;
-			cd.start();
-			this.isCDIng=true;
-		}
+		//		private function cdTimer(time:int):void {
+		//			if (this.isCDIng == true)
+		//				return;
+		//			var cd:CDTimer=new CDTimer(this.width, this.height);
+		//			cd.cdEndFun=this.cdEnd;
+		//			cd.start(time);
+		//			this.addChild(cd);
+		//			this.mouseEnabled=false;
+		//			this.isCDIng=true;
+		//		}
 
 		private function cdEnd():void {
 			this.isCDIng=false;
 			this.mouseEnabled=true;
-		}
-
-		public function startCD():void {
-			this.cdTimer();
 		}
 
 		//如果是手镯 或者项链 计算其位置

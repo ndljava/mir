@@ -4,13 +4,13 @@ package com.leyou.config {
 	import com.ace.manager.LibManager;
 	import com.ace.tools.print;
 	import com.ace.utils.LoadUtil;
-	
+
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.Rectangle;
 	import flash.net.SharedObject;
 	import flash.net.SharedObjectFlushStatus;
-	
+
 	import mx.utils.LoaderUtil;
 
 	//修改配置的
@@ -169,6 +169,7 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/table/monSpeciesTable.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/table/itemTable.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/table/mapTable.xml"));
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/table/transTable.xml"));
 
 
 			//默认avatar
@@ -192,6 +193,7 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("scene/0/map.jpg"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("scene/3/map.jpg"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("scene/6/map.jpg"));
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("scene/0122/map.jpg"));
 
 			/*	//怪物
 				LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("monster/70200.pnf"));
@@ -200,7 +202,7 @@ package com.leyou.config {
 				LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("monster/70703.pnf"));
 				LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("monster/71800.pnf"));
 				LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("monster/71801.pnf"));
-			
+
 				var i:int=0;
 				for (i=100; i < 130; i++) {
 					LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("magic/" + i + ".pnf"));
@@ -213,7 +215,7 @@ package com.leyou.config {
 				for (i=300; i < 310; i++) {
 					LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("magic/" + i + ".pnf"));
 				}
-			*/	
+			*/
 			//登陆+选择角色
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/LoginWnd.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/SelectUserWnd.xml"));
@@ -253,7 +255,9 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/creatUser/playName_femalename.txt"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/creatUser/playName_malename.txt"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/creatUser/playName_surname.txt"));
-
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/roleHead_01.png"));
+			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/roleHead_02.png"));
+			
 			//聊天面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/ChatWnd.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/chat/chat_button_small_3.png"));
@@ -261,8 +265,8 @@ package com.leyou.config {
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/chat/chat_button_emosion_3.png"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/chat/ChatSecret.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/button_font.png"));
-			for(var i:int=0;i<40;i++){
-				var url:String="ui/chat/face/"+i+".png";
+			for (var i:int=0; i < 40; i++) {
+				var url:String="ui/chat/face/" + i + ".png";
 				LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach(url));
 			}
 
@@ -357,7 +361,7 @@ package com.leyou.config {
 			//任务面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/TaskWnd.xml"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/ForgeWnd.xml"));
-			
+
 			//摆摊面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/StallWnd.xml"));
 
@@ -371,12 +375,12 @@ package com.leyou.config {
 
 			//加载面板 进度条
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/LoadingWnd.xml"));
-			
+
 			//系统提示
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/warn.png"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/prompt.png"));
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("ui/other/wrong.png"));
-			
+
 			//其他玩家属性面板
 			LoadUtil.preLoadFiles.push(LoadUtil.lib2Cach("config/ui/OtherRoleWnd.xml"));
 		}

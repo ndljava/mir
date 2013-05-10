@@ -36,10 +36,6 @@ package com.leyou.ui.task {
 
 			this.contentTxt=new Label;
 			
-			//this.contentTxt.border=true;
-//			this.contentTxt.wordWrap=true;
-//			this.contentTxt.multiline=true;
-			
 			this.contentTxt.width=420;
 			this.contentTxt.height=110;
 			
@@ -53,7 +49,9 @@ package com.leyou.ui.task {
 			this.contentTxt.defaultTextFormat=new TextFormat("",12,null,false,false);
 			
 			var css:StyleSheet=new StyleSheet();
-			css.setStyle("a:hover", {textDecoration:'underline'});
+			//css.setStyle("a:hover", {textDecoration:'underline'});
+			css.setStyle(".c", {textDecoration:'underline'});
+			css.setStyle(".b", {textDecoration:'none'});
 			
 			this.contentTxt.styleSheet=css;
 			
@@ -136,12 +134,8 @@ package com.leyou.ui.task {
 
 		public function updateInfo(content:String):void {
 			content=TaskUtils.getTaskContent(content);
-
 			var arr:Array=content.split("|")
 			this.titleLbl.text=arr[0];
-			
-			
-			
 			this.contentTxt.htmlText=arr[1];
 		}
 

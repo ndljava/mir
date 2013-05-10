@@ -18,7 +18,7 @@ package com.leyou.game.scene.player {
 
 		override public function updataHealth(hp:int, maxHp:int):void {
 			super.updataHealth(hp, maxHp);
-			if (UIManager.getInstance().teamWnd.getPlayInTeam(this.id)) {
+			if (UIManager.getInstance().teamWnd.getPlayInTeam(this.infoB.name)) {
 				UIManager.getInstance().teamWnd.updateTeamInfo();
 			}
 		}

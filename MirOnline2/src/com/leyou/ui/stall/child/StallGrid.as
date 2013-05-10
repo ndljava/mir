@@ -76,7 +76,6 @@ package com.leyou.ui.stall.child {
 
 		override public function switchHandler(fromItem:GridBase):void {
 			super.switchHandler(fromItem);
-
 			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 
 
@@ -133,7 +132,7 @@ package com.leyou.ui.stall.child {
 					return;
 				}
 
-				MyInfoManager.getInstance().waitItemFromId=g.gridId;
+				MyInfoManager.getInstance().waitItemFromId=g.initId;
 
 				Cmd_Stall.cm_btItem_add(tc.MakeIndex, int(i));
 				tc.nPrice=int(i);

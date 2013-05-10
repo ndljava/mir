@@ -10,9 +10,14 @@ package com.leyou.ui.skill.child {
 	import com.ace.ui.lable.Label;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.backpack.child.ItemTip;
+	import com.leyou.ui.cdTimer.CDTimer;
 
 	public class SkillGrid extends GridBase {
 		private var numLbl:Label;
+		
+		private var cd:CDTimer;
+		private var isCD:Boolean;
+		private var cdRemaindTime:int;
 
 		public function SkillGrid() {
 			super();
@@ -33,6 +38,12 @@ package com.leyou.ui.skill.child {
 			this.addChild(this.numLbl);
 
 			this.bgBmp.bitmapData=LibManager.getInstance().getImg("ui/mainUI/icon_skill.png");
+			
+			this.cd=new CDTimer(this.width,this.height);
+			this.cd.cdEndFun=this.cdEnd;
+			this.cd.enterFrameFun=this.cdEnterFrame;
+			this.addChild(this.cd);
+			this.cd.visible=false;
 		}
 
 		override public function updataInfo(info:*):void {
@@ -78,6 +89,33 @@ package com.leyou.ui.skill.child {
 			if(num>=0)
 				this.numLbl.text=String(num);
 			else this.numLbl.text="";
+		}
+		
+		public function cdTime(time:int=2000):void {
+			if (this.isCD == true){
+				if(this.cdRemaindTime<time){
+					this.cd.stop();
+					this.cd.start(time);
+					this.cd.visible=true;
+					this.isCD=true;
+					this.mouseEnabled=false;
+				}
+				return;
+			}
+			this.cd.start(time);
+			this.isCD=true;
+			this.mouseEnabled=false;
+			this.cd.visible=true;
+		}
+		
+		public function cdEnd():void {
+			this.isCD=false;
+			this.mouseEnabled=true;
+			this.cd.visible=false;
+		}
+		
+		private function cdEnterFrame(t:int):void{
+			this.cdRemaindTime=t;
 		}
 	}
 }

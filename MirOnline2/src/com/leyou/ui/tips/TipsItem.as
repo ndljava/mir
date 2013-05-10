@@ -6,17 +6,25 @@ package com.leyou.ui.tips {
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.lable.Label;
+	import com.leyou.data.net.lostAndFind.TLostItemBind;
 	import com.leyou.data.net.market.TShopInfo;
 	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.data.tips.ItemTipsInfo;
+	import com.leyou.enum.LostEnum;
 	import com.leyou.enum.MarketEnum;
 	import com.leyou.enum.TipsEnum;
+	import com.leyou.manager.TimerManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.tips.child.TipsGrid;
+	import com.leyou.utils.TaskUtils;
+	import com.leyou.utils.TimeUtil;
 	import com.leyou.utils.TipsUtil;
 
 	import flash.display.Sprite;
+	import flash.events.TimerEvent;
+	import flash.globalization.DateTimeFormatter;
 	import flash.text.TextFormat;
+	import flash.utils.Timer;
 
 	public class TipsItem extends Sprite {
 		private var lbl:Label;
@@ -25,6 +33,9 @@ package com.leyou.ui.tips {
 		private var grid:TipsGrid;
 		private var info:ItemTipsInfo;
 		private var lbll:Label;
+
+		private var time:Number=0;
+		private var timestr:String="";
 
 		public function TipsItem() {
 			super();
@@ -85,7 +96,7 @@ package com.leyou.ui.tips {
 
 			if (info.instruct1 != "" && info.instruct1 != null)
 				this.lbll.htmlText=TipsUtil.getColorStr(info.instruct1, TipsEnum.COLOR_BLUE);
-//				this.lbl.htmlText+=TipsUtil.getColorStr(info.instruct1, TipsEnum.COLOR_BLUE);
+			//				this.lbl.htmlText+=TipsUtil.getColorStr(info.instruct1, TipsEnum.COLOR_BLUE);
 			if (info.instruct2 != "" && info.instruct2 != null) {
 				if (info.instruct2.indexOf("属性") != -1) {
 					while (info.instruct2.indexOf("|") != -1)
@@ -99,7 +110,7 @@ package com.leyou.ui.tips {
 			}
 			if (info.price != "")
 				this.lbl.htmlText+=info.price;
-//				this.lbl.htmlText+=TipsUtil.getColorStr("售价：" + info.price, TipsEnum.COLOR_GOLD);
+			//				this.lbl.htmlText+=TipsUtil.getColorStr("售价：" + info.price, TipsEnum.COLOR_GOLD);
 			if (this.lbl.height + 2 < this.lbll.y + this.lbll.height + 2)
 				this.Bg.setSize(this.w + 2, this.lbll.y + this.lbll.height + 2);
 			else
@@ -115,29 +126,36 @@ package com.leyou.ui.tips {
 		public function bagTips(info:TClientItem):void {
 			this.info.clearMe();
 			this.info.name=info.s.name;
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type, info.s.shape)];
+
 			if (UIManager.getInstance().shopWnd.visible)
-				this.info.price=info.s.price*.5 + "金币";
+				this.info.price=info.s.price * .5 + "金币";
 			else
 				this.info.price="";
+
 			this.info.weight=info.s.weight;
 			this.info.instruct1=TipsUtil.getInstructionByFlag(info.s.limitCheck, TipsEnum.TYPE_TIPS_ITEM);
 			this.info.instruct2=info.s.note;
 			this.info.Looks=info.s.appr;
 			this.info.proper=TipsUtil.getProperNum(info.s);
+
 			if (info.s.type == 25) //毒药 和 符
 				this.info.numStr=info.Dura + "/" + info.DuraMax;
+
 			if (info.s.type == 4) { //书籍
+
 				if (info.s.shape == MyInfoManager.getInstance().race)
 					this.info.limit.push(TipsUtil.getColorStr(TipsUtil.getBookNameByRace(info.s.shape), TipsEnum.COLOR_GREEN));
 				else
 					this.info.limit.push(TipsUtil.getColorStr(TipsUtil.getBookNameByRace(info.s.shape), TipsEnum.COLOR_RED));
+
 				if (info.s.durableMax <= MyInfoManager.getInstance().level)
 					this.info.limit.push(TipsUtil.getColorStr("需要等级：" + info.s.durableMax, TipsEnum.COLOR_GREEN));
 				else
 					this.info.limit.push(TipsUtil.getColorStr("需要等级：" + info.s.durableMax, TipsEnum.COLOR_RED));
+
 			} else {
-//				this.info.limit=TipsUtil.getLimitStr(info.s.limitType, info.s.limitLevle);
+				//				this.info.limit=TipsUtil.getLimitStr(info.s.limitType, info.s.limitLevle);
 			}
 			this.updataInfo(this.info);
 		}
@@ -150,7 +168,7 @@ package com.leyou.ui.tips {
 		public function shopTip(shopInfo:TStdItem):void {
 			this.info.clearMe();
 			this.info.name=shopInfo.Name;
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(shopInfo.StdMode)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(shopInfo.StdMode, shopInfo.Shape)];
 			this.info.limit=TipsUtil.getLimitStr(shopInfo.Need, shopInfo.NeedLevel);
 			if (shopInfo.Price <= MyInfoManager.getInstance().baseInfo.gameCoin)
 				this.info.price=TipsUtil.getColorStr("售价：" + shopInfo.Price + "金币", TipsEnum.COLOR_GREEN);
@@ -170,25 +188,88 @@ package com.leyou.ui.tips {
 		public function marketTip(info:TShopInfo, btnIdx:int):void {
 			this.info.clearMe();
 			this.info.name=info.stdInfo.Name;
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.stdInfo.StdMode)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.stdInfo.StdMode, info.stdInfo.Shape)];
 			this.info.limit=TipsUtil.getLimitStr(info.stdInfo.Need, info.stdInfo.NeedLevel);
+
 			if (btnIdx != MarketEnum.BAR_FAIR) {
+
 				if (MyInfoManager.getInstance().baseInfo.gameGold >= info.stdInfo.Price / 100)
 					this.info.price=TipsUtil.getColorStr("售价：" + info.stdInfo.Price / 100 + "元宝", TipsEnum.COLOR_GREEN);
 				else
 					this.info.price=TipsUtil.getColorStr("售价：" + info.stdInfo.Price / 100 + "元宝", TipsEnum.COLOR_RED);
+
 			} else {
+
 				if (MyInfoManager.getInstance().baseInfo.gameScore >= info.stdInfo.Price / 100)
 					this.info.price=TipsUtil.getColorStr("售价：" + info.stdInfo.Price / 100 + "积分", TipsEnum.COLOR_GREEN);
 				else
 					this.info.price=TipsUtil.getColorStr("售价：" + info.stdInfo.Price / 100 + "积分", TipsEnum.COLOR_RED);
+
 			}
-//			this.info.price=String(info.stdInfo.Price / 100) + "元宝";
+
+			//			this.info.price=String(info.stdInfo.Price / 100) + "元宝";
+
 			this.info.weight=info.stdInfo.Weight;
 			this.info.instruct1=TipsUtil.getInstructionByFlag(info.stdInfo.LimitCheck, TipsEnum.TYPE_TIPS_ITEM);
 			this.info.instruct2=info.sIntroduce;
 			this.info.Looks=info.stdInfo.Looks;
 			this.updataInfo(this.info);
 		}
+
+		/**
+		 *
+		 * @param info
+		 * @param btnIdx
+		 *
+		 */
+		public function LostRenderTips(info:TLostItemBind):void {
+			this.lbl.htmlText+="";
+			timestr="";
+
+			var str:String="";
+			str+=TipsUtil.getColorStr(info.UserItem.toTClientItem().s.name, TipsEnum.COLOR_YELLOW) + "\n";
+			str+=TipsUtil.getColorStr("需充值余额" + LostEnum.getItemDicByID(info.UserItem.wIndex - 1) + "元", TipsEnum.COLOR_WHITE) + "\n";
+			str+=TipsUtil.getColorStr("(24小时内9折赎回)", TipsEnum.COLOR_WHITE) + "\n";
+			str+=TipsUtil.getColorStr("赎回到期:" + TimeUtil.getDateToString(TimeUtil.getDateTo2month(TimeUtil.getStringToDate(info.sTime))), TipsEnum.COLOR_WHITE) + "\n";
+
+			timestr=str;
+
+			var d:Date=new Date();
+			var st:Date=TimeUtil.getDateTo24hour(TimeUtil.getStringToDate(info.sTime));
+			if (d < st) {
+				d.month+=1;
+				time=(st.time - d.time) / 1000;
+				
+				if (info.sSendUserItem == MyInfoManager.getInstance().name)
+					str+=TipsUtil.getColorStr("获得赎金:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+				else if (info.sBindName == MyInfoManager.getInstance().name)
+					str+=TipsUtil.getColorStr("折扣时限:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+				
+				TimerManager.getInstance().add(lostTimer);
+			}
+
+			this.lbl.htmlText=str;
+
+			if (this.lbl.height + 2 < this.lbll.y + this.lbll.height + 2)
+				this.Bg.setSize(this.w + 2, this.lbll.y + this.lbll.height + 2);
+			else
+				this.Bg.setSize(this.w + 2, this.lbl.height + 2);
+
+			this.grid.visible=false;
+		}
+
+		private function lostTimer():void {
+			time--;
+
+			if (this.lbl.text.indexOf("折扣时限") < -1)
+				this.lbl.htmlText=timestr + TipsUtil.getColorStr("折扣时限:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+			else
+				this.lbl.htmlText=timestr + TipsUtil.getColorStr("获得赎金:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+
+			if (time <= 0) {
+				TimerManager.getInstance().remove(lostTimer);
+			}
+		}
+
 	}
 }

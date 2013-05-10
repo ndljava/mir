@@ -54,7 +54,7 @@ package com.leyou.manager {
 			if (evt.target is MenuButton) {
 				this.currentIMenu.onMenuClick(MenuButton(evt.target).index);
 			}
-
+			evt.stopImmediatePropagation()
 			this.stg.visible=false;
 		}
 

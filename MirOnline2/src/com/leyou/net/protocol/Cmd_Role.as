@@ -18,7 +18,7 @@ package com.leyou.net.protocol {
 	import com.leyou.net.NetGate;
 	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.ui.role.RoleWnd;
-	
+
 	import flash.geom.Point;
 
 	public class Cmd_Role {
@@ -75,6 +75,7 @@ package com.leyou.net.protocol {
 				MyInfoManager.getInstance().equips[itemIndex]=cu;
 			}
 
+			var a:*=MyInfoManager.getInstance().equips;
 			var info2:PlayerInfo=MyInfoManager.getInstance();
 			UIManager.getInstance().roleWnd.updata(MyInfoManager.getInstance().equips);
 		}
@@ -153,7 +154,7 @@ package com.leyou.net.protocol {
 			t_msg.MakeDefaultMsg(MirProtocol.CM_ADJUST_BONUS, remain, 0, 0, 0, NetGate.getInstance().certification);
 			CmdScene.SendSocketStr((NetEncode.getInstance().EncodeMessage(t_msg) + NetEncode.getInstance().EncodeBuffer(info.writeBr(), info.length)), 1);
 		}
-		
+
 		//查看其它玩家
 		static public function cm_queryUserState(id:int, ps:Point):void {
 			CmdScene.cm_sendDefaultMsg(MirProtocol.CM_QUERYUSERSTATE, id, ps.x, ps.y, 0);
@@ -164,7 +165,9 @@ package com.leyou.net.protocol {
 			var player:LivingModel=UIManager.getInstance().mirScene.getPlayer(td.Recog);
 			var info:TUserStateInfo=new TUserStateInfo(NetEncode.getInstance().DecodeBuffer(body));
 			UIManager.getInstance().otherRoleWnd.updateInfo(info);
-			UIManager.getInstance().otherRoleWnd.show(true,true);
+			UIManager.getInstance().otherRoleWnd.show(true, true);
+			UIManager.getInstance().otherRoleHeadWnd.updataInfo(info);
+
 		}
 
 	}

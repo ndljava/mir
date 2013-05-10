@@ -59,9 +59,9 @@ package com.leyou.ui.backpack.child {
 			this.newGrid.x=180;
 			this.newGrid.y=50;
 
-			this.currentGrid.mouseEnabled=false;
-			this.oldGrid.mouseEnabled=false;
-			this.newGrid.mouseEnabled=false;
+			this.currentGrid.enable=false;
+			this.oldGrid.enable=false;
+			this.newGrid.enable=false;
 		}
 
 		private function updateGrid(info:TClientItem):void {

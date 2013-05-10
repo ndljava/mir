@@ -43,5 +43,10 @@ package com.leyou.ui.trade.child {
 				this.itemNameLbl.text="";
 			}
 		}
+
+		public function getGrid():int {
+			return itemGrid.dataId;
+		}
+
 	}
 }

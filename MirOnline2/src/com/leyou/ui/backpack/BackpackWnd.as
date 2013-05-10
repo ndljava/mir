@@ -16,6 +16,7 @@ package com.leyou.ui.backpack {
 	import com.greensock.TweenMax;
 	import com.greensock.easing.Back;
 	import com.greensock.easing.Elastic;
+	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Stall;
 	import com.leyou.net.protocol.Cmd_backPack;
@@ -92,6 +93,13 @@ package com.leyou.ui.backpack {
 			this.BagcapacityLbl.text="0/60";
 			this.gridList.mouseEnabled=false;
 			this.fastShopBtn.setActive(false);
+
+			this.addEventListener(MouseEvent.MOUSE_OUT, onMouseOut);
+		}
+
+		private function onMouseOut(e:MouseEvent):void {
+			if (e.target is BackpackWnd)
+				MenuManager.getInstance().visible(false);
 		}
 
 
@@ -108,7 +116,6 @@ package com.leyou.ui.backpack {
 		}
 
 		private function updateTab():void {
-			//DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_BACKPACK);
 			switch (this.bagTabBar.turnOnIndex) {
 				case -1:
 					this.initData(MyInfoManager.getInstance().backpackItems);
@@ -210,7 +217,7 @@ package com.leyou.ui.backpack {
 			var g:GridBase;
 			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
 				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
-				if (g.enable && g.dataId!=-1 && g.data!=null && g.data.s!=null)
+				if (g.enable && g.dataId != -1 && g.data != null && g.data.s != null)
 					l++;
 			}
 
@@ -247,6 +254,7 @@ package com.leyou.ui.backpack {
 		 */
 		public function refresh():void {
 			this.initOK=true;
+			//DragManager.getInstance().resetGrid(ItemEnum.TYPE_GRID_BACKPACK);
 			this.updateTab();
 		}
 
@@ -254,33 +262,40 @@ package com.leyou.ui.backpack {
 		 *	更新一个格子 根据index
 		 * @param id
 		 */
-		public function updatOneGrid(id:int):void {
+		public function updatOneGrid(id:int, ps:int=-1):void {
 
 			var info:TClientItem=MyInfoManager.getInstance().backpackItems[id];
 
 			var g:GridBase;
-			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, getDragIdByDataID(id));
+			var i:int=ps == -1 ? getDragIdByDataID(id) : ps;
+
+			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
+
 			if ((this.bagTabBar.turnOnIndex > 0) && (info == null || info.s == null))
 				g.visible=false;
 			else {
 				g.updataInfo(info); //有数据则填充，无数据则开锁
 				g.visible=true;
 			}
+		}
 
-			//updateTab();
-
+		public function updateBackType():void {
+			if (this.bagTabBar.turnOnIndex>0)
+				this.updateTab();
 		}
 
 		private function getDragIdByDataID(id:int):int {
+			var i:int=0;
 			var g:GridBase;
+
 			var did:int=-1;
-			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
+			for (i=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
 				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
 				if (g.dataId == id)
-					return g.gridId;
+					return g.initId;
 
 				if (did == -1 && g.dataId == -1)
-					did=g.gridId;
+					did=g.initId;
 			}
 
 			return did;
@@ -304,6 +319,9 @@ package com.leyou.ui.backpack {
 		 */
 		public function dropOneGridByMakeIndex(mIndex:int):void {
 			var info:TClientItem=MyInfoManager.getInstance().getItemByMakeIndex(mIndex);
+			if (info == null)
+				return;
+
 			var id:int=MyInfoManager.getInstance().backpackItems.indexOf(info);
 			MyInfoManager.getInstance().resetItem(id)
 			updatOneGrid(id);
@@ -390,15 +408,18 @@ package com.leyou.ui.backpack {
 		override public function hide():void {
 			DragManager.getInstance().turnOff();
 			super.hide();
+			MenuManager.getInstance().visible(false);
 		}
 
+
 		public function cdTest():void {
-//			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
+			//			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
 			for (var i:int=0; i < 30; i++) {
 				var g:BackpackGrid;
 				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i) as BackpackGrid;
-				g.startCD();
+					//				g.startCD();
 			}
 		}
+
 	}
 }

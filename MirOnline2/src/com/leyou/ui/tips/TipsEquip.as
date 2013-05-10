@@ -18,7 +18,7 @@ package com.leyou.ui.tips {
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.tips.child.TipsGrid;
 	import com.leyou.utils.TipsUtil;
-	
+
 	import flash.display.Sprite;
 	import flash.text.TextFormat;
 
@@ -52,21 +52,21 @@ package com.leyou.ui.tips {
 			var format:TextFormat=new TextFormat();
 			format.size=12;
 			this.lbl.defaultTextFormat=format;
-			
+
 			this.grid=new TipsGrid();
 			this.grid.x=141;
 			this.grid.y=3;
 			this.addChild(this.grid);
-			
+
 			this.lbll=new Label();
 			this.lbll.width=60;
 			this.lbll.wordWrap=true;
 			this.lbll.multiline=true;
-			this.lbll.x=this.w-this.lbll.width;
-			this.lbll.y=this.grid.y+this.grid.height;
+			this.lbll.x=this.w - this.lbll.width;
+			this.lbll.y=this.grid.y + this.grid.height;
 			this.lbll.defaultTextFormat=format;
 			this.addChild(this.lbll);
-			
+
 		}
 
 		private function updateInfo(info:EquipTipsInfo):void {
@@ -75,7 +75,8 @@ package com.leyou.ui.tips {
 			this.lbl.htmlText=TipsUtil.getColorStr(info.name, TipsEnum.COLOR_YELLOW);
 //			this.lbl.htmlText+=TipsUtil.getColorStr("签名：" + info.sign, TipsEnum.COLOR_YELLOW);//签名暂时屏蔽掉
 			this.lbl.htmlText+=TipsUtil.getColorStr("类型：" + info.type, TipsEnum.COLOR_WHITE);
-			this.lbl.htmlText+=TipsUtil.getColorStr("耐久：" + info.durability, TipsEnum.COLOR_WHITE);
+			if (info.durability != "")
+				this.lbl.htmlText+=TipsUtil.getColorStr("耐久：" + info.durability, TipsEnum.COLOR_WHITE);
 			this.lbl.htmlText+=TipsUtil.getColorStr("重量：" + info.wight, TipsEnum.COLOR_WHITE);
 			if (info.numStr != null && info.numStr != "")
 				this.lbl.htmlText+=TipsUtil.getColorStr("数量：" + info.numStr, TipsEnum.COLOR_WHITE);
@@ -107,9 +108,10 @@ package com.leyou.ui.tips {
 			if (info.price != "")
 				this.lbl.htmlText+=info.price;
 //				this.lbl.htmlText+=TipsUtil.getColorStr("售价："+info.price,TipsEnum.COLOR_GOLD);
-			if(this.lbl.height+2<this.lbll.y+this.lbll.height+2)
-				this.bg.setSize(this.w + 2, this.lbll.y+this.lbll.height+2);
-			else this.bg.setSize(this.w + 2, this.lbl.height + 2);
+			if (this.lbl.height + 2 < this.lbll.y + this.lbll.height + 2)
+				this.bg.setSize(this.w + 2, this.lbll.y + this.lbll.height + 2);
+			else
+				this.bg.setSize(this.w + 2, this.lbl.height + 2);
 
 			this.grid.updataInfo(info);
 		}
@@ -128,13 +130,13 @@ package com.leyou.ui.tips {
 			this.info.instruction1=TipsUtil.getInstructionByFlag(info.s.limitCheck, TipsEnum.TYPE_TIPS_EQUIP);
 			this.info.instruction2=info.s.note;
 			this.info.limit=TipsUtil.getLimitStr(info.s.limitType, info.s.limitLevle);
-			if(UIManager.getInstance().shopWnd.visible)
-				this.info.price=info.s.price*.5 + "金币";
-			else 
+			if (UIManager.getInstance().shopWnd.visible)
+				this.info.price=info.s.price * .5 + "金币";
+			else
 				this.info.price="";
 //			var obj:Object=ItemEnum.itemNameDic;
 			this.info.wight=info.s.weight;
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type,info.s.shape)];
 			this.info.properArr=TipsUtil.getProperNum(info.s);
 			this.info.Looks=info.s.appr;
 			if (info.s.type == 25)
@@ -167,7 +169,7 @@ package com.leyou.ui.tips {
 					this.info.price=TipsUtil.getColorStr("售价：" + info.stdInfo.Price / 100 + "积分", TipsEnum.COLOR_RED);
 			}
 
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.stdInfo.StdMode)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.stdInfo.StdMode,info.stdInfo.Shape)];
 			this.info.Looks=info.stdInfo.Looks;
 			this.info.wight=info.stdInfo.Weight;
 //			this.info.numStr=info.
@@ -186,36 +188,39 @@ package com.leyou.ui.tips {
 			this.info.instruction1=TipsUtil.getInstructionByFlag(info.LimitCheck, TipsEnum.TYPE_TIPS_EQUIP);
 //			this.info.instruction2=info.n
 			this.info.price=info.Price + "金币";
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.StdMode)];
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.StdMode,info.Shape)];
 			this.info.Looks=info.Looks;
 			this.info.wight=info.Weight;
 //			this.info.properArr=//属性
 //			this.info.durability=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
 			this.updateInfo(this.info);
 		}
-		
+
 		/**
-		 *其他玩家的装备 
+		 *其他玩家的装备
 		 * @param info
-		 * 
-		 */		
-		public function otherRoleTip(info:TSClientItem):void{
-			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.wIndex-1);
+		 *
+		 */
+		public function otherRoleTip(info:TSClientItem):void {
+			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.wIndex - 1);
 //			tInfo.source=info.
-			if(tInfo==null)
+			if (tInfo == null)
 				return;
 			this.info.clearMe();
-			tInfo=Cmd_backPack.GetItemAddValue(null,tInfo,info.btValue);
+			tInfo=Cmd_backPack.GetItemAddValue(null, tInfo, info.btValue);
 			this.info.name=tInfo.name;
-			this.info.instruction1=TipsUtil.getInstructionByFlag(tInfo.limitCheck,TipsEnum.TYPE_TIPS_EQUIP);
-			this.info.limit=TipsUtil.getLimitStr(tInfo.limitType,tInfo.limitLevle,false);
-			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(tInfo.type)];
+			this.info.instruction1=TipsUtil.getInstructionByFlag(tInfo.limitCheck, TipsEnum.TYPE_TIPS_EQUIP);
+			this.info.limit=TipsUtil.getLimitStr(tInfo.limitType, tInfo.limitLevle, false);
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(tInfo.type,tInfo.shape)];
 			this.info.Looks=tInfo.appr;
-			this.info.durability=Math.ceil(info.Dura/1000)+"/"+Math.ceil(info.DuraMax/1000);
+			if (tInfo.type == 25) //毒药 和 符
+				this.info.numStr=info.Dura + "/" + info.DuraMax;
+			else
+				this.info.durability=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
 			this.info.properArr=TipsUtil.getProperNum(tInfo);
 			this.info.wight=tInfo.weight;
 			this.updateInfo(this.info);
-			
+
 		}
 	}
 }

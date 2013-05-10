@@ -86,8 +86,12 @@ package com.leyou.net.protocol.scene {
 		}
 
 
-		//切换地图
+		//切换地图 切换场景
 		static public function sm_changeMap(td:TDefaultMessage, body:String):void {
+			if (Core.me.cacheCmdWalk) {
+				Core.me.cacheCmdWalk=false;
+				return;
+			}
 			UIManager.getInstance().mirScene.gotoMap(body, new Point(td.Param, td.Tag));
 		}
 
@@ -305,7 +309,7 @@ package com.leyou.net.protocol.scene {
 		static public function sm_magicFire(td:TDefaultMessage, body:String):void {
 			var br:ByteArray=NetEncode.getInstance().DecodeBuffer(body);
 			var targetId:int=br.readInt();
-			trace("子弹释放者：" + td.Recog + " 目标：" + targetId + " 位置：[" + td.Param + "-" + td.Tag + "]" + " type:" + HexUtil.LoByte(td.Series) + " effNum:" + HexUtil.HiByte(td.Series))
+//			trace("子弹释放者：" + td.Recog + " 目标：" + targetId + " 位置：[" + td.Param + "-" + td.Tag + "]" + " type:" + HexUtil.LoByte(td.Series) + " effNum:" + HexUtil.HiByte(td.Series))
 			BulletManager.getInstance().addBullet(td.Recog, targetId, td.Param, td.Tag, HexUtil.LoByte(td.Series), HexUtil.HiByte(td.Series));
 		}
 

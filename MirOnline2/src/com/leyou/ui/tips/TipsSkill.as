@@ -82,11 +82,15 @@ package com.leyou.ui.tips {
 					this.lbl.htmlText+=TipsUtil.getColorStr("该技能最高可提升至3级",TipsEnum.COLOR_GREEN);
 				}
 				this.lbl.htmlText+=TipsUtil.getColorStr("使用条件：",TipsEnum.COLOR_BLUE);
-				var mp:int=MyInfoManager.getInstance().baseInfo.MP;//玩家魔法值
-				mp=HexUtil.LoWord(mp);
-				if(mp>=info.useMagic)
-					this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_GREEN);
-				else this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_RED);
+				if(info.name!="烈火剑法"&&info.name!="静寂圣剑"&&info.name!="半月弯刀"&&info.useMagic<=0)
+					this.lbl.htmlText+=TipsUtil.getColorStr("     被动技能",TipsEnum.COLOR_GREEN);
+				else{
+					var mp:int=MyInfoManager.getInstance().baseInfo.MP;//玩家魔法值
+					mp=HexUtil.LoWord(mp);
+					if(mp>=info.useMagic)
+						this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_GREEN);
+					else this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_RED);
+				}
 				if(TipsEnum.skill[info.name]!=null){
 					if(TipsUtil.checkItem(TipsEnum.skill[info.name].item,TipsEnum.skill[info.name].num)){
 						if((TipsEnum.skill[info.name].item as Array).length==2)
@@ -232,5 +236,9 @@ package com.leyou.ui.tips {
 				arr.push(TipsUtil.getColorStr("人物等级：" + needLv, TipsEnum.COLOR_RED));
 			return arr;
 		}
+		
+		
+		
+		
 	}
 }

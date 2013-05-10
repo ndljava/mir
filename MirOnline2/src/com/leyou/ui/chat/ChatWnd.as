@@ -13,7 +13,6 @@ package com.leyou.ui.chat {
 	import com.ace.ui.scrollPane.children.ScrollPane;
 	import com.ace.ui.tabbar.TabbarModel;
 	import com.ace.ui.tabbar.children.TabBar;
-	import com.ace.ui.window.children.AlertWindow;
 	import com.leyou.data.chat.ChatInfo;
 	import com.leyou.enum.ChatEnum;
 	import com.leyou.enum.SystemNoticeEnum;
@@ -26,11 +25,12 @@ package com.leyou.ui.chat {
 	import com.leyou.ui.chat.child.Horn;
 	import com.leyou.ui.chat.child.PrivateChatRender;
 	import com.leyou.ui.chat.child.RichTextFiled;
-
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 
 	public class ChatWnd extends AutoSprite {
@@ -65,6 +65,7 @@ package com.leyou.ui.chat {
 		private var hornArr:Vector.<String>; //喇叭信息
 		private var _hornFlag:Boolean;
 		private var hornStr:String;
+		private var focusFlag:Boolean;
 
 		public function ChatWnd() {
 			super(LibManager.getInstance().getXML("config/ui/ChatWnd.xml"));
@@ -124,7 +125,7 @@ package com.leyou.ui.chat {
 			this.systemMesTxtArea=new RichTextFiled(294, 51, false);
 			this.systemGridList.addToPane(this.systemMesTxtArea);
 
-			this.chatComBox=new ChannelComboBox(49, 22);
+			this.chatComBox=new ChannelComboBox(49, 22, ChatEnum.COMBOX_CHAT_CHANNEL);
 			this.chatComBox.x=0;
 			this.chatComBox.y=253; //253
 			this.chatComBox.onClickItemFun=this.onComBoxClick;
@@ -141,7 +142,7 @@ package com.leyou.ui.chat {
 			this.privateChatRender.visible=false;
 			this.addChild(this.privateChatRender);
 
-			this.chatInput.input.maxChars=ChatEnum.MESSAGE_LONG;
+//			this.chatInput.input.maxChars=ChatEnum.MESSAGE_LONG;
 			this.chatInput.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			this.sendBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.faceBtn.addEventListener(MouseEvent.CLICK, onClick);
@@ -157,28 +158,51 @@ package com.leyou.ui.chat {
 		}
 
 		private function onKeyUp(evt:KeyboardEvent):void {
+			evt.stopImmediatePropagation();
 			switch (evt.keyCode) {
 				case KeysEnum.ENTER:
-					this.sendChatCmd();
+					if (!this.chatInput.text == ""){
+						this.sendChatCmd();
+					}
+					else {
+						if(!this.focusFlag&&this.stage.focus ==this.chatInput.input)
+							this.stage.focus=null;
+							else if (this.stage.focus !=this.chatInput.input)
+								this.stage.focus=this.chatInput.input;
+							if(this.focusFlag)
+								this.focusFlag=false;
+					}
+//					evt.stopImmediatePropagation();
 					break;
 				case KeysEnum.SPACE:
 					if (this.chatInput.text.length <= 4 && this.changeChannel(chatInput.text)) {
 						this.chatInput.text="";
-						evt.stopImmediatePropagation();
+//						evt.stopImmediatePropagation();
 						return;
 					}
 					break;
 				default:
 					break;
 			}
+			var btArr:ByteArray=new ByteArray();
 			if (this.currentChannelIdx == ChatEnum.CHANNEL_UNION) {
-				if (this.chatInput.text.length > ChatEnum.MESSAGE_HORN_LONG) {
-					this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_HORN_LONG);
+				btArr.writeMultiByte(this.chatInput.text, "gb2312");
+				if (btArr.length > ChatEnum.MESSAGE_HORN_LONG * 2) {
+					btArr.length=ChatEnum.MESSAGE_HORN_LONG * 2;
+					btArr.position=0;
+					this.chatInput.text=btArr.readMultiByte(ChatEnum.MESSAGE_HORN_LONG * 2, "gb2312");
+//				if (this.chatInput.text.length > ChatEnum.MESSAGE_HORN_LONG) {
+//					this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_HORN_LONG);
 				}
-			} else if (this.chatInput.text.length > ChatEnum.MESSAGE_LONG) {
-				this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_LONG);
+			} else {
+				btArr.writeMultiByte(this.chatInput.text, "gb2312");
+				if (btArr.length > ChatEnum.MESSAGE_LONG * 2) {
+					btArr.length=ChatEnum.MESSAGE_LONG * 2;
+					btArr.position=0;
+					this.chatInput.text=btArr.readMultiByte(ChatEnum.MESSAGE_LONG * 2, "gb2312");
+				}
+//				this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_LONG);
 			}
-			evt.stopImmediatePropagation();
 		}
 
 		public function addFaceSign(sign:String):void {
@@ -186,7 +210,7 @@ package com.leyou.ui.chat {
 			if (this.chatInput.text.length > ChatEnum.MESSAGE_LONG)
 				this.chatInput.text=this.chatInput.text.substr(0, ChatEnum.MESSAGE_LONG);
 			this.chatInput.input.setSelection(this.chatInput.input.text.length, this.chatInput.input.text.length);
-			this.onStageEnter();
+			this.onStageEnter(false);
 		}
 
 		/**
@@ -280,6 +304,7 @@ package com.leyou.ui.chat {
 
 		//发送聊天信息
 		private function sendChatCmd():void {
+			this.stage.focus=null;
 			if (this.chatInput.text == "")
 				return;
 			var str:String=this.chatInput.text;
@@ -322,6 +347,7 @@ package com.leyou.ui.chat {
 					if (UIManager.getInstance().settingWnd.settingInfo.groupChat == 0) { //设置面板中禁止行会聊天
 						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置禁止行会聊天", SystemNoticeEnum.IMG_PROMPT);
 						this.chatInput.text="";
+						return;
 					} else
 						str=ChatEnum.FLAG_GUILD + str;
 //						this.channelTime[ChatEnum.FLAG_GUILD]=getTimer();
@@ -335,16 +361,18 @@ package com.leyou.ui.chat {
 					} else if (UIManager.getInstance().settingWnd.settingInfo.privateChat == 0) {
 						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置禁止私聊!", SystemNoticeEnum.IMG_PROMPT);
 						this.chatInput.text == "";
+						return;
 					} else {
 						if (this.privateChatRender.chatPlayerName == "") {
 							UIManager.getInstance().noticeMidDownUproll.setNoticeStr("请输入密聊玩家名字", SystemNoticeEnum.IMG_WRONG); //私聊人的名字问空 弹提示 暂无
 							this.chatInput.text="";
 							return;
+						}else{
+							this.privateChatRender.checkPrivatePlayerName();
+							this.showSelfToPan(this.privateChatRender.chatPlayerName + str);
+							str=ChatEnum.FLAG_PRIVATE + this.privateChatRender.chatPlayerName + str;
+							this.channelTime[ChatEnum.FLAG_PRIVATE]=getTimer();
 						}
-						this.privateChatRender.checkPrivatePlayerName();
-						this.showSelfToPan(this.privateChatRender.chatPlayerName + str);
-						str=ChatEnum.FLAG_PRIVATE + this.privateChatRender.chatPlayerName + str;
-						this.channelTime[ChatEnum.FLAG_PRIVATE]=getTimer();
 					}
 					break;
 				case ChatEnum.CHANNEL_TEAM:
@@ -359,7 +387,7 @@ package com.leyou.ui.chat {
 						this.chatInput.text="";
 						return;
 					} else if (UIManager.getInstance().settingWnd.settingInfo.groupChat == 0) {
-						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置组队聊天!", SystemNoticeEnum.IMG_PROMPT);
+						UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您已设置禁止组队聊天!", SystemNoticeEnum.IMG_PROMPT);
 						this.chatInput.text == "";
 					} else
 						str=ChatEnum.FLAG_TEAM + str;
@@ -400,7 +428,8 @@ package com.leyou.ui.chat {
 		}
 
 		//焦点
-		public function onStageEnter():void {
+		public function onStageEnter(f:Boolean=true):void {
+			this.focusFlag=f;
 			this.stage.focus=this.chatInput.input;
 		}
 
@@ -788,7 +817,7 @@ package com.leyou.ui.chat {
 		}
 
 		//点击玩家的名字
-		private function onClickPlayerName(str:String):void {
+		public function onClickPlayerName(str:String):void {
 			var name:String=str;
 //			if(this.currentChannelIdx!=ChatEnum.CHANNEL_PRIVATE)
 			this.onComBoxClick(ChatEnum.CHANNEL_PRIVATE, "");
@@ -797,10 +826,13 @@ package com.leyou.ui.chat {
 
 		public function resize():void {
 			var xx:Number=UIManager.getInstance().toolsWnd.x;
+			var yy:Number=UIEnum.HEIGHT;
+//			trace("yy: " + yy);
 			if (xx > 290)
-				this.y=UIEnum.HEIGHT - this.height + 90;
+				this.y=yy - this.height + 90;
 			else
-				this.y=UIEnum.HEIGHT - 332 - 30;
+				this.y=yy - 332 - 30;
+//			trace("y: " + this.y);
 		}
 	}
 }

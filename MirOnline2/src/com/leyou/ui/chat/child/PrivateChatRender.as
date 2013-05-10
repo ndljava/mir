@@ -79,7 +79,7 @@ package com.leyou.ui.chat.child {
 					break;
 				}
 			}
-			UIManager.getInstance().chatWnd.onStageEnter();
+			UIManager.getInstance().chatWnd.onStageEnter(false);
 		}
 
 		/**

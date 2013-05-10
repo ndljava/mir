@@ -36,16 +36,19 @@ package com.leyou.ui.team.child {
 			this.nameLbl.text=info.name + "";
 			this.lvLbl.text=info.level + "";
 			this.typeLbl.text="" + PlayerUtil.getPlayerRaceByIdx(int(info.member), 1);
-			//this.iconImg.bitmapData = null
-			//trace(PlayerUtil.getPlayerHeadImg(info.member, info.sex),this.iconImg.bitmapData, "====");
 			this.iconImg.updateBmp(PlayerUtil.getPlayerHeadImg(info.race, info.sex));
-			//trace(PlayerUtil.getPlayerHeadImg(info.member, info.sex),this.iconImg.bitmapData, "====2222");
 		}
 
 		public function updateHpandMp(player:LivingModel):void {
-			if (player.infoB.hp <= 0)
+			if (player.infoB.baseInfo.MaxHP <= 0)
 				return;
-			this.hp.scaleX=(player.infoB.hp / player.infoB.baseInfo.MaxHP)
+
+			this.hp.width=121;
+			this.hp.height=12;
+
+			//this.hp.width=(player.infoB.hp / player.infoB.baseInfo.MaxHP);
+			//this.hp.scaleX=.6;
+			this.hp.width=(player.infoB.hp / player.infoB.baseInfo.MaxHP) * this.hp.width;
 		}
 
 		public function get username():String {

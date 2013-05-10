@@ -8,13 +8,11 @@ package com.leyou.ui.shop.child {
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.lable.Label;
-	import com.ace.ui.window.children.ConfirmWindow;
 	import com.ace.ui.window.children.PopWindow;
 	import com.ace.ui.window.children.WindInfo;
-	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.backpack.child.ItemTip;
-
+	
 	import flash.geom.Rectangle;
 
 	public class GridShop extends GridBase {
@@ -94,7 +92,7 @@ package com.leyou.ui.shop.child {
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
-			super.switchHandler(fromItem);
+//			super.switchHandler(fromItem);
 
 			if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 				if (fromItem) {
@@ -114,6 +112,7 @@ package com.leyou.ui.shop.child {
 
 				}
 			} else {
+				return;
 			}
 			function okFun():void {
 				MyInfoManager.getInstance().waitItemFromId=fromItem.dataId;

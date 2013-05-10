@@ -93,8 +93,8 @@ package com.leyou.ui.team {
 		 * @return
 		 *
 		 */
-		public function getPlayInTeam(id:int):Boolean {
-			return (this.getTeamInfoByID(id) == null ? false : true);
+		public function getPlayInTeam(name:String):Boolean {
+			return this.getTeamIndex(name);
 		}
 
 		public function updata(arr:Vector.<TeamInfo>):void {
@@ -134,7 +134,10 @@ package com.leyou.ui.team {
 					Cmd_Team.cm_createGroup(null);
 					break;
 				case "deleteMemBtn":
-					Cmd_Team.cm_delGroupMember(getTeamInfoByID(selectIndex).name);
+					var tinfo:TeamInfo=getTeamInfoByID(selectIndex);
+					if (tinfo == null)
+						break;
+					Cmd_Team.cm_delGroupMember(tinfo.name);
 					break;
 				case "addMemBtn":
 					UIManager.getInstance().teamAddWnd.show();
@@ -264,16 +267,15 @@ package com.leyou.ui.team {
 						}
 					}
 				}
-
 			}
 
 			UIManager.getInstance().teamAddWnd.updata();
 		}
 
 		/**
-		 * 更新组队信息 
-		 * 
-		 */		
+		 * 更新组队信息
+		 *
+		 */
 		public function updateTeamInfo():void {
 			this.updata(teamerInfo);
 		}
@@ -313,8 +315,6 @@ package com.leyou.ui.team {
 			}
 
 			Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_WEB_GET + "," + tmp + ",MemberType|Level");
-			//updata(teamerInfo);
-			//UIManager.getInstance().teamAddWnd.updata();
 		}
 
 		public function serv_RemoveAllTeam():void {

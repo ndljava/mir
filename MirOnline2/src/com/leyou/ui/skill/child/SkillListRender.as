@@ -25,6 +25,7 @@ package com.leyou.ui.skill.child {
 		private var trainLbl:Label;
 		private var desLbl:Label;
 		private var studyBtn:NormalButton;
+	
 
 		public function SkillListRender() {
 			super(LibManager.getInstance().getXML("config/ui/skill/SkillListRender.xml"));

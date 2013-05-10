@@ -176,7 +176,8 @@ package com.leyou.ui.storage {
 			if (v)
 				tw=FilterUtil.showGlowFilter(this.glowBg);
 			else {
-				tw.kill();
+				if (tw != null)
+					tw.kill();
 				this.glowBg.filters=[];
 			}
 
@@ -187,7 +188,6 @@ package com.leyou.ui.storage {
 		 * @param e
 		 */
 		private function onClick(e:MouseEvent):void {
-
 			switch (e.target.name) {
 				case "neatenBtn":
 //					storeRequestShow=true;

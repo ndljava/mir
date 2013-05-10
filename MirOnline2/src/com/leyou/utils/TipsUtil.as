@@ -11,15 +11,32 @@ package com.leyou.utils {
 		public function TipsUtil() {
 		}
 
-		public static function getTypeName(type:int):int {
+		public static function getTypeName(type:int,shap:int):int {
 			var name:int;
 			switch (type) {
+				case 0:
+					name=ItemEnum.TYPE_ITEM_DRUG;
+					break;
 				case 1:
 				case 2:
 					name=ItemEnum.TYPE_ITEM_FOOD; //食物
 					break;
 				case 3:
-					name=ItemEnum.TYPE_ITEM_SCROLL_POTIONS; //药水卷轴
+					switch(shap){
+						case 1:
+						case 2:
+						case 3://卷轴
+						case 5:
+						case 11:
+							name=ItemEnum.TYPE_ITEM_CROLL;
+							break;
+						case 4:
+						case 12:
+						case 9://特殊药水
+							name=ItemEnum.TYPE_ITEM_SPECIAL;
+							break;
+					}
+//					name=ItemEnum.TYPE_ITEM_SCROLL_POTIONS; //药水卷轴
 					break;
 				case 50:
 					name=ItemEnum.TYPE_ITEM_CROLL; //卷轴
@@ -348,7 +365,7 @@ package com.leyou.utils {
 			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.id);
 			var arr:Array=[];
 			if (info.type == ItemEnum.ITEM_TYPE_DRUG) { //药品
-				if (info.ac != 0) 
+				if (info.ac != 0)
 					arr.push(getProperKey(info.ac, tInfo.ac, "HP回复：", false));
 				if (info.mac != 0) 
 					arr.push(getProperKey(info.mac, tInfo.mac, "MP回复：", false));
@@ -430,22 +447,22 @@ package com.leyou.utils {
 					arr.push(getProperBaseKey(info.ac, info.ac2, tInfo.ac2, "防御："));
 				if (info.mac != 0 || info.mac2 != 0)
 					arr.push(getProperBaseKey(info.mac, info.mac2, tInfo.mac2, "魔防："));
-				if (info.dc >= 0)
+				if (info.dc > 0)
 					arr.push(getProperKey(info.dc, tInfo.dc, "准确：", false));
-				if (info.mc >= 0)
+				if (info.mc > 0)
 					arr.push(getProperKey(info.mc, tInfo.mc, "敏捷：", false));
-				if (info.sc >= 0)
+				if (info.sc > 0)
 					arr.push(getProperKey(info.sc, tInfo.sc, "魔法躲避：", true));
 			} else if (info.type == ItemEnum.ITEM_TYPE_BELT) { //腰带
 				if (info.ac != 0 || info.ac2 != 0)
 					arr.push(getProperBaseKey(info.ac, info.ac2, tInfo.ac2, "防御："));
 				if (info.mac != 0 || info.mac2 != 0)
 					arr.push(getProperBaseKey(info.mac, info.mac2, tInfo.mac2, "魔防："));
-				if (info.dc >= 0)
+				if (info.dc > 0)
 					arr.push(getProperKey(info.dc, tInfo.dc, "体力恢复：", true));
-				if (info.mc >= 0)
+				if (info.mc > 0)
 					arr.push(getProperKey(info.mc, tInfo.mc, "魔法恢复：", true));
-				if (info.sc >= 0)
+				if (info.sc > 0)
 					arr.push(getProperKey(info.sc, tInfo.sc, "中毒恢复：", true));
 			} else {
 				if (info.ac != 0 || info.ac2 != 0)

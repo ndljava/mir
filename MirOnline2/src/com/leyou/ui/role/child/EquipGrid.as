@@ -7,6 +7,7 @@ package com.leyou.ui.role.child {
 	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.protocol.Cmd_Role;
 	import com.leyou.ui.backpack.child.BackpackGrid;
 	import com.leyou.ui.backpack.child.ItemTip;
 
@@ -28,6 +29,8 @@ package com.leyou.ui.role.child {
 
 		override public function updataInfo(info:*):void {
 			this.reset();
+			if((this.gridType == ItemEnum.TYPE_GRID_EQUIP&&(info as TClientItem).s==null||info==null)||(this.gridType == ItemEnum.TYPE_GRID_OTHER_EQUIP)&&info==null)
+				return;
 			this.isLock=false;
 			this.isEmpty=false;
 			this.bgBmp.alpha=1;
@@ -35,12 +38,13 @@ package com.leyou.ui.role.child {
 				if (TClientItem(info).isJustFill)
 					return;
 			}
-//			if()
 			super.updataInfo(info);
 			if (this.gridType == ItemEnum.TYPE_GRID_EQUIP)
 				this.iconBmp.updateBmp("items/" + TClientItem(info).s.appr + ".png");
-			if (this.gridType == ItemEnum.TYPE_GRID_OTHER_EQUIP)
+			if (this.gridType == ItemEnum.TYPE_GRID_OTHER_EQUIP) {
 				this.iconBmp.updateBmp("items/" + TItemInfo(info).appr + ".png");
+				this.canMove=false;
+			}
 			this.iconBmp.x=this.iconBmp.y=(ItemEnum.ITEM_BG_WIDTH - ItemEnum.ITEM_ICO_WIDTH) / 2;
 			this.iconBmp.x=4 + (40 - 28) >> 1;
 			this.iconBmp.y=4 + (40 - 30) >> 1;
@@ -77,6 +81,8 @@ package com.leyou.ui.role.child {
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
+			if (this.gridType == ItemEnum.TYPE_GRID_OTHER_EQUIP)
+				return;
 //			super.switchHandler(fromItem);
 			if (this.gridType != fromItem.gridType) {
 				if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
@@ -101,5 +107,45 @@ package com.leyou.ui.role.child {
 				}
 			}
 		}
+		
+		override public function doubleClickHandler():void{
+			if(this.gridType!=ItemEnum.TYPE_GRID_EQUIP||this.isEmpty==true)
+				return;
+				var equip:TClientItem;
+				//多个物品id当到一个格子的问题
+				if (this.dataId == 2 || this.dataId == 0 || this.dataId == 4) {
+					equip=MyInfoManager.getInstance().equips[this.dataId];
+					if (equip == null || equip.s == null) {
+						var i:int;
+						if (this.dataId == 2)
+							i=14;
+						else if (this.dataId == 4)
+							i=13;
+						else if (this.dataId == 0)
+							i=15;
+						
+						equip=MyInfoManager.getInstance().equips[i];
+						if (equip == null || equip.s == null)
+							return;
+						else {
+							UIManager.getInstance().roleWnd.takeOffEquipId=i;
+							Cmd_Role.cm_takeOffItem(equip.MakeIndex, this.dataId, equip.s.name);
+						}
+						
+					} else {
+						UIManager.getInstance().roleWnd.takeOffEquipId=this.dataId;
+						Cmd_Role.cm_takeOffItem(equip.MakeIndex, this.dataId, equip.s.name);
+					}
+				} else {
+					equip=MyInfoManager.getInstance().equips[this.dataId];
+					if (equip == null || equip.s == null)
+						return;
+					
+					UIManager.getInstance().roleWnd.takeOffEquipId=this.dataId;
+					Cmd_Role.cm_takeOffItem(equip.MakeIndex, this.dataId, equip.s.name);
+				}
+		}
+		
+		
 	}
 }

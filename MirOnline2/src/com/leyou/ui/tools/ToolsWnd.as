@@ -1,6 +1,7 @@
 package com.leyou.ui.tools {
 	import com.ace.enum.ItemEnum;
 	import com.ace.enum.UIEnum;
+	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
@@ -9,21 +10,20 @@ package com.leyou.ui.tools {
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.input.children.HideInput;
 	import com.greensock.TweenMax;
-	import com.leyou.config.Core;
 	import com.leyou.data.tool.data.ShortCutGridInfo;
+	import com.leyou.enum.SkillEnum;
 	import com.leyou.manager.ShareObjManage;
 	import com.leyou.manager.UIManager;
-	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEnum;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.net.protocol.Cmd_backPack;
-	import com.leyou.net.protocol.scene.CmdScene;
+	import com.leyou.ui.skill.child.SkillGrid;
 	import com.leyou.ui.tools.child.ShortcutsGrid;
 	import com.leyou.utils.FilterUtil;
-
+	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
@@ -155,7 +155,8 @@ package com.leyou.ui.tools {
 					UIManager.getInstance().friendWnd.open();
 					break;
 				case "playerBtn":
-					UIManager.getInstance().roleWnd.open();
+					UIManager.getInstance().roleWndI.open();
+//					UIManager.getInstance().roleWnd.open();
 					break;
 				case "settingBtn":
 					UIManager.getInstance().settingWnd.open();
@@ -174,6 +175,7 @@ package com.leyou.ui.tools {
 					break;
 				case "guildBtn":
 					Cmd_Guild.cm_openGuildDlg();
+//					UIManager.getInstance().buf.addBuff();
 					break;
 			}
 			evt.stopImmediatePropagation();
@@ -285,6 +287,27 @@ package com.leyou.ui.tools {
 				w=this.expWidth;
 			this.expScaleBitMap.setSize(w, this.expHight);
 //			this.expScaleBitMap.setSize(0.1, this.expHight);
+		}
+
+		public function setCD(grid:ShortcutsGrid):void {
+			var time:int=TableManager.getInstance().getSkillInfo(MyInfoManager.getInstance().skills[grid.dataId].def.wMagicId).delay;
+			for (var i:int=0; i < 10; i++) {
+				if(shortCutDic[i].isEmpty||shortCutDic[i].cloneGridType!=ItemEnum.TYPE_GRID_SKILL)
+					continue;
+				var t:int=TableManager.getInstance().getSkillInfo(MyInfoManager.getInstance().skills[shortCutDic[i].dataId].def.wMagicId).delay;
+				if (i != grid.gridId&&shortCutDic[i].isEmpty==false&&shortCutDic[i].cloneGridType==ItemEnum.TYPE_GRID_SKILL) {
+//					if(shortCutDic[i].isCD)
+						
+					if (time < t) {
+						this.shortCutDic[i].cdTimer(time);
+					}
+					else {
+						this.shortCutDic[i].cdTimer(t);
+					}
+				} else if(i==grid.gridId)
+					this.shortCutDic[i].cdTimer(t);
+			}
+			UIManager.getInstance().skillWnd.setCD(MyInfoManager.getInstance().skills[grid.dataId]);
 		}
 
 		public function resize():void {

@@ -2,6 +2,7 @@ package com.leyou.game.scene.player {
 	import com.ace.astarII.child.INode;
 	import com.ace.enum.PlayerEnum;
 	import com.ace.game.manager.TableManager;
+	import com.ace.game.scene.part.LivingModel;
 	import com.ace.game.scene.player.MyPlayerModel;
 	import com.ace.game.utils.SceneUtil;
 	import com.ace.gameData.player.PlayerInfo;
@@ -9,6 +10,7 @@ package com.leyou.game.scene.player {
 	import com.ace.gameData.table.TActInfo;
 	import com.ace.gameData.table.TActsInfo;
 	import com.ace.gameData.table.TPnfInfo;
+	import com.ace.gameData.table.TTransInfo;
 	import com.ace.utils.DebugUtil;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
@@ -33,17 +35,60 @@ package com.leyou.game.scene.player {
 			UIManager.getInstance().mirScene.setMapPs(this.x, this.y);
 		}
 
+
+		private var _cacheCmdWalk:Boolean; //是否缓冲了延迟发送“行走”协议  要走之前=true，协议回来=false
+		private var cmdAct:String;
+		private var cmdPs:Point=new Point();
+		private var cmdDir:int;
+
+		public function get cacheCmdWalk():Boolean {
+			return _cacheCmdWalk;
+		}
+
+		public function set cacheCmdWalk(value:Boolean):void {
+			_cacheCmdWalk=value;
+		}
+
+		public function sendCacheCmdWalk():void {
+			if (this.cacheCmdWalk) {
+				this.cmd_moveTo(this.cmdAct, this.cmdPs.x, this.cmdPs.y, this.cmdDir);
+			}
+		}
+
+		public function checkTrans(id:String):Boolean {
+			//如果有传送点，传送，然后加载完毕后，在发送传送协议
+			var info:TTransInfo=TableManager.getInstance().getTransInfo(id);
+			if (info) {
+				this.cacheCmdWalk=true;
+				UIManager.getInstance().mirScene.gotoMap(info.toId, info.toPs);
+				return true;
+			}
+			return false;
+		}
+
 		override public function moveTo(node:INode, act:String, slow:Boolean=false):void {
+			this.cmdAct=act;
+			this.cmdPs.x=node.x;
+			this.cmdPs.y=node.y;
+			this.cmdDir=this.info.currentDir;
+
+			if (this.checkTrans(MapInfoManager.getInstance().id + "-" + node.x + ":" + node.y)) {
+				return;
+			}
 			this.info.preTile=this.nowTilePt();
 			super.moveTo(node, act, slow);
 			if (this.info.moveLocked) //野蛮冲撞，服务端过来协议，修改为true，此次截止
 				return;
+			this.cmd_moveTo(act, node.x, node.y, this.info.currentDir);
+		}
+
+		private function cmd_moveTo(act:String, tx:int, ty:int, dir:int):void {
 			if (act == PlayerEnum.ACT_RUN) {
-				CmdScene.cm_SendRun(node.x, node.y, this.info.currentDir);
+				CmdScene.cm_SendRun(tx, ty, dir);
 			} else if (act == PlayerEnum.ACT_WALK) {
-				CmdScene.cm_SendWalk(node.x, node.y, this.info.currentDir);
+				CmdScene.cm_SendWalk(tx, ty, dir);
 			} else {
-				CmdScene.cm_SendRide(node.x, node.y, this.info.currentDir);
+				CmdScene.cm_SendRide(tx, ty, dir);
 			}
 		}
 
@@ -82,7 +127,6 @@ package com.leyou.game.scene.player {
 			if (this._info.moveLocked)
 				return;
 			if (skillId == 0) {
-				trace("发送攻击协议：位置-" + this.nowTilePt() + "方向-" + dir);
 				CmdScene.cm_Attack(MirProtocol.CM_HIT, this.nowTilePt().x, this.nowTilePt().y, dir);
 			} else if (skillId == PlayerEnum.SKILL_FIRHIT)
 				CmdScene.cm_Attack(MirProtocol.CM_FIREHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
@@ -134,6 +178,17 @@ package com.leyou.game.scene.player {
 		}
 
 
+		//使用技能
+		override public function useMagic(pt:Point, magicId:int, player:LivingModel):Boolean {
+			if (this.info.isMoveing || this.info.moveLocked || this.info.isOnMount || this.info.isSpelling)
+				return false;
+			//如果cd时间满足
+			if (!this.magicCDIsOver(magicId)) {
+				return false;
+			}
+			UIManager.getInstance().skillWnd.checkUseItem(magicId);
+			return super.useMagic(pt, magicId, player);
+		}
 
 		//=======================================
 

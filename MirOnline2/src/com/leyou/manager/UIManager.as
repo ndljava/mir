@@ -20,6 +20,7 @@ package com.leyou.manager {
 	import com.leyou.ui.backpack.child.BagDropPanel;
 	import com.leyou.ui.backpack.child.BagSplitPanel;
 	import com.leyou.ui.backpack.child.DiscardMessageWnd;
+	import com.leyou.ui.buff.Buff;
 	import com.leyou.ui.chat.ChatWnd;
 	import com.leyou.ui.creatUser.CreatUserWnd;
 	import com.leyou.ui.forge.ForgeWnd;
@@ -30,6 +31,7 @@ package com.leyou.manager {
 	import com.leyou.ui.guild.child.GuildAddContributPanel;
 	import com.leyou.ui.loadingWnd.LoadingWnd;
 	import com.leyou.ui.login.LoginWnd;
+	import com.leyou.ui.lost.LostAndFoundWnd;
 	import com.leyou.ui.map.MapWnd;
 	import com.leyou.ui.market.FittingRoomWnd;
 	import com.leyou.ui.market.MarketWnd;
@@ -37,6 +39,7 @@ package com.leyou.manager {
 	import com.leyou.ui.role.PropertyPointWnd;
 	import com.leyou.ui.role.PropertyWnd;
 	import com.leyou.ui.role.RoleWnd;
+	import com.leyou.ui.roleHead.OtherRoleHeadWnd;
 	import com.leyou.ui.roleHead.RoleHeadWnd;
 	import com.leyou.ui.selectUser.SelectUserWnd;
 	import com.leyou.ui.setting.SettingWnd;
@@ -92,6 +95,7 @@ package com.leyou.manager {
 		public var sellMessageWnd:SellMessageWnd;
 		public var stallWnd:StallWnd;
 		public var roleHeadWnd:RoleHeadWnd;
+		public var otherRoleHeadWnd:OtherRoleHeadWnd;
 		public var smallMapWnd:SmallMapWnd;
 		public var mapWnd:MapWnd;
 		public var noticeUproll:NoticeUproll;
@@ -105,7 +109,8 @@ package com.leyou.manager {
 		public var propertyPointWnd:PropertyPointWnd;
 		public var forgeWnd:ForgeWnd;
 		public var otherRoleWnd:OtherRoleWnd;
-
+		public var buf:Buff;
+		public var lostWnd:LostAndFoundWnd;
 
 		public static function getInstance():UIManager {
 			if (!instance)
@@ -151,7 +156,7 @@ package com.leyou.manager {
 		public function addLoadingWnd():void {
 			if (this.loadingWnd == null) {
 				this.loadingWnd=new LoadingWnd();
-				LayerManager.getInstance().gameLayer.addChildAt(this.loadingWnd, 0);
+				LayerManager.getInstance().gameLayer.addChild(this.loadingWnd);
 			} else {
 				this.loadingWnd.visible=true;
 				this.loadingWnd.setProgress(0, 100);
@@ -210,6 +215,7 @@ package com.leyou.manager {
 			this.sellMessageWnd=new SellMessageWnd();
 			this.stallWnd=new StallWnd();
 			this.roleHeadWnd=new RoleHeadWnd();
+			this.otherRoleHeadWnd=new OtherRoleHeadWnd();
 			this.noticeUproll=new NoticeUproll();
 			this.noticeLeftroll=new NoticeLeftroll();
 			this.noticeMidDown=new NoticeMidDown();
@@ -220,6 +226,8 @@ package com.leyou.manager {
 			this.propertyPointWnd=new PropertyPointWnd();
 			this.forgeWnd=new ForgeWnd();
 			this.otherRoleWnd=new OtherRoleWnd();
+			this.buf=new Buff();
+			this.lostWnd=new LostAndFoundWnd();
 
 
 			this.toolsWnd.resize();
@@ -258,7 +266,10 @@ package com.leyou.manager {
 			LayerManager.getInstance().windowLayer.addChild(this.propertyPointWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.forgeWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.otherRoleWnd);
-
+			LayerManager.getInstance().windowLayer.addChild(this.buf);
+			LayerManager.getInstance().windowLayer.addChild(this.otherRoleHeadWnd);
+			LayerManager.getInstance().windowLayer.addChild(this.lostWnd);
+			
 			LayerManager.getInstance().mainLayer.addChild(this.chatWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.toolsWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.roleHeadWnd);

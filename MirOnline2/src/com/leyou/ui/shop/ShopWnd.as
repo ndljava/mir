@@ -195,7 +195,7 @@ package com.leyou.ui.shop {
 //		}
 
 		private function ok(str:String):void {
-			if (str == ""||int(str) <=0)
+			if (str == "" || int(str) <= 0)
 				return;
 			Cmd_Task.cm_userBuyItem(this.npc, 12 + (this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + this.clickRenderIdx, int(str), this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + this.clickRenderIdx].Name);
 		}
@@ -226,18 +226,25 @@ package com.leyou.ui.shop {
 		}
 
 
+		private var shopFlag:Boolean;
 		public function ser_ShowShopWnd(arr:Vector.<TStdItem>, npc:int, count:int, idx:int):void {
 			this.show(true, true);
 			this.npc=npc;
 			this.goodCount=count;
 			this.sumPage=goodCount;
 			this.goodIdx=idx;
-			this.itemArr=this.itemArr.concat(arr);
+			if (this.shopFlag==true){
+				this.itemArr=this.itemArr.concat(arr);
+				this.shopFlag=false;
+			}
+			else this.itemArr=arr;
 			this.currentPage=1;
 			this.updata(this.itemArr);
 			Cmd_Task.cm_closeNpcWin();
-			if (goodCount > this.goodIdx)
+			if (goodCount > this.goodIdx) {
+				this.shopFlag=true;
 				Cmd_Task.cm_userGetDeailItem(npc, goodIdx + 1);
+			}
 		}
 
 		public function buyFailed(reson:int):void {
@@ -246,10 +253,10 @@ package com.leyou.ui.shop {
 					UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "物品购买失败");
 					break;
 				case 2: //2: FrmDlg.DMessageDlg ('您无法携带更多物品了.', [mbOk]);
-					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您无法携带更多物品了",SystemNoticeEnum.IMG_PROMPT);
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您无法携带更多物品了", SystemNoticeEnum.IMG_PROMPT);
 					break;
 				case 3: //3: FrmDlg.DMessageDlg ('您没有足够的钱来购买此物品.', [mbOk]);
-					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您没有足够的钱来购买此物品",SystemNoticeEnum.IMG_PROMPT);
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您没有足够的钱来购买此物品", SystemNoticeEnum.IMG_PROMPT);
 					break;
 			}
 		}
@@ -266,10 +273,17 @@ package com.leyou.ui.shop {
 
 		public function renderClick(idx:int):void {
 			this.clickRenderIdx=idx;
+			var table:TItemInfo=TableManager.getInstance().getItemByName(this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
+			var count:int;
+			if (table) {
+				count=table.stackNum;
+				if (count == 0)
+					return;
+			}
 			var win:WindInfo=WindInfo.getInputInfo("请输入购买数量");
 			win.okFun=ok;
 			win.cancelFun=cancle;
-			inputW=PopWindow.showWnd(UIEnum.WND_TYPE_INPUT,win,"shop_inputWnd") as InputWindow;
+			inputW=PopWindow.showWnd(UIEnum.WND_TYPE_INPUT, win, "shop_inputWnd") as InputWindow;
 			inputW.textbox.text="1";
 			inputW.textbox.restrict="0-9";
 			inputW.textbox.input.maxChars=4;
@@ -287,10 +301,13 @@ package com.leyou.ui.shop {
 		public function renderDoubleClick(idx:int):void {
 			var table:TItemInfo=TableManager.getInstance().getItemByName(this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
 			var count:int;
-			if(table)
+			if (table) {
 				count=table.stackNum;
-			else count=1;
-			Cmd_Task.cm_userBuyItem(this.npc, 12 + (this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx, table.stackNum, this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
+				if (count == 0)
+					count=1;
+			} else
+				count=1;
+			Cmd_Task.cm_userBuyItem(this.npc, 12 + (this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx, count, this.itemArr[(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM + idx].Name);
 		}
 
 		public function getInfoByIdx(idx:int):TStdItem {

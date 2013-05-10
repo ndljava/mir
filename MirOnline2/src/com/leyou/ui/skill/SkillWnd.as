@@ -1,5 +1,8 @@
 package com.leyou.ui.skill {
+	import com.ace.enum.ItemEnum;
+	import com.ace.game.manager.DragManager;
 	import com.ace.game.manager.TableManager;
+	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.playerSkill.TClientMagic;
 	import com.ace.gameData.table.TSkillInfo;
@@ -7,8 +10,10 @@ package com.leyou.ui.skill {
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.scrollPane.children.ScrollPane;
+	import com.leyou.enum.SkillEnum;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
+	import com.leyou.ui.backpack.child.BackpackGrid;
 	import com.leyou.ui.skill.child.SkillGrid;
 	import com.leyou.ui.skill.child.SkillListRender;
 	import com.leyou.ui.skill.child.SkillShortCutBar;
@@ -52,17 +57,17 @@ package com.leyou.ui.skill {
 					this.renderArr.push(render);
 					this.gridList.addToPane(render);
 					render.updata(arr[i]);
-					if(arr[i].isLearn)
+					if (arr[i].isLearn)
 						num++;
 				}
 			} else {
 				for (i=0; i < arr.length; i++) {
 					this.renderArr[i].updata(arr[i]);
-					if(arr[i].isLearn)
+					if (arr[i].isLearn)
 						num++;
 				}
 			}
-			this.numLbl.text=num+"/"+arr.length;
+			this.numLbl.text=num + "/" + arr.length;
 		}
 
 		/**
@@ -124,15 +129,16 @@ package com.leyou.ui.skill {
 				this.updata(MyInfoManager.getInstance().skills, true);
 			}
 		}
+
 		/**
 		 * 技能的熟练度更新
-		 * @param id 
+		 * @param id
 		 * @param exp
-		 * 
+		 *
 		 */
-		public function skillExpChange(id:int,exp:int,lv:int):void{
-			for(var i:int=0;i<MyInfoManager.getInstance().skills.length;i++){
-				if(MyInfoManager.getInstance().skills[i].skillId==id){
+		public function skillExpChange(id:int, exp:int, lv:int):void {
+			for (var i:int=0; i < MyInfoManager.getInstance().skills.length; i++) {
+				if (MyInfoManager.getInstance().skills[i].skillId == id) {
 					MyInfoManager.getInstance().skills[i].curTrain=exp;
 					MyInfoManager.getInstance().skills[i].level=lv;
 					this.renderArr[i].updata(MyInfoManager.getInstance().skills[i]);
@@ -140,7 +146,7 @@ package com.leyou.ui.skill {
 				}
 			}
 		}
-		
+
 		/**
 		 *设置技能格子的快捷键的显示
 		 * @param gridDate 格子的数据id
@@ -151,5 +157,84 @@ package com.leyou.ui.skill {
 			if (gridDateId >= 0)
 				this.renderArr[gridDateId].grid.setShortCutKeyNum(shortCutNum);
 		}
+
+		/**
+		 *使用技能时 检查是否需要自动穿道具
+		 * @param info
+		 *
+		 */
+		public function checkUseItem(mgicId:int):void {
+			var equip:Vector.<TClientItem>=MyInfoManager.getInstance().equips;
+			var binfo:TClientItem;
+			var id:Array;
+			if (SkillEnum.SKILL_USE_SIGN.indexOf(mgicId) > -1) { //使用符
+				if (equip[ItemEnum.U_BUJUK] == null || equip[ItemEnum.U_BUJUK].s == null || equip[ItemEnum.U_BUJUK].s.name.indexOf("护身符") == -1) {
+					id=getItemIdByName("护身符");
+					if (id[0] > -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+//						UIManager.getInstance().backPackWnd.useItem(id[0]);
+				}
+			} else if (SkillEnum.SKILL_USE_DRYG.indexOf(mgicId) > -1) { //使用药水
+				if (equip[ItemEnum.U_BUJUK] == null || equip[ItemEnum.U_BUJUK].s == null || (equip[ItemEnum.U_BUJUK].s.name.indexOf("黄色药粉") == -1 && equip[ItemEnum.U_BUJUK].s.name.indexOf("灰色药粉") == -1)) {
+					var idd:Array=getItemIdByName("黄色药粉");
+					id=getItemIdByName("灰色药粉");
+					if (idd[0] != -1 && id[0] != -1) {
+						if (idd[1] > id[1])
+							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+//							UIManager.getInstance().backPackWnd.useItem(id[0]);
+						else
+							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,idd[1]) as BackpackGrid).onUse();
+//							UIManager.getInstance().backPackWnd.useItem(idd[0]);
+					}
+					else if(idd[0] != -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,idd[1]) as BackpackGrid).onUse();
+//						UIManager.getInstance().backPackWnd.useItem(idd[0]);
+					else if(id[0] != -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+//						UIManager.getInstance().backPackWnd.useItem(id[0]);
+				}
+				else if(equip[ItemEnum.U_BUJUK].s.name.indexOf("黄色药粉") > -1){
+					id=getItemIdByName("灰色药粉");
+					if(id[0]>-1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+//						UIManager.getInstance().backPackWnd.useItem(id[0]);
+				}
+				else if(equip[ItemEnum.U_BUJUK].s.name.indexOf("灰色药粉") > -1){
+					id=getItemIdByName("黄色药粉");
+					if(id[0]>-1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+//						UIManager.getInstance().backPackWnd.useItem(id[0]);
+				}
+			}
+		}
+
+		private function getItemIdByName(n:String):Array {
+			var idarr:Array=[-1, -1];
+			var equip:Vector.<TClientItem>=MyInfoManager.getInstance().backpackItems;
+			for (var i:int=0; i < equip.length; i++) {
+				if (equip[i].s != null && equip[i].s.name.indexOf(n) > -1) {
+					idarr[0]=equip[i].s.id;
+					idarr[1]=i
+					break;
+				}
+			}
+			return idarr;
+		}
+		
+		public function setCD(info:TClientMagic):void{
+			var time:int=TableManager.getInstance().getSkillInfo(info.def.wMagicId).delay;
+			for(var i:int=0;i<this.renderArr.length;i++){
+				var inf:TClientMagic=MyInfoManager.getInstance().skills[i];
+				if(i!=MyInfoManager.getInstance().skills.indexOf(info)){
+					var t:int=TableManager.getInstance().getSkillInfo(inf.def.wMagicId).delay
+					if(time<t)
+						this.renderArr[i].grid.cdTime(time);
+					else this.renderArr[i].grid.cdTime(t);
+				}
+				else this.renderArr[i].grid.cdTime(time);
+			}
+		}
+		
+		
 	}
 }

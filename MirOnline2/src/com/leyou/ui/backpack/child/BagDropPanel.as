@@ -30,9 +30,11 @@ package com.leyou.ui.backpack.child {
 			this.dropBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.saveBtn.addEventListener(MouseEvent.CLICK, onClick);
 
-			this.itemGrid=new BackpackGrid(0);
+			this.itemGrid=new BackpackGrid(-1);
 			this.addChild(this.itemGrid);
 
+			this.itemGrid.enable=false;
+			
 			this.itemGrid.x=30;
 			this.itemGrid.y=60;
 		}

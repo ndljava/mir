@@ -50,7 +50,7 @@ package com.leyou.utils {
 			//trace(p, "111");
 
 			if (p.indexOf("color") > -1)
-				p=p.replace(/<color=([a-zA-Z0-9]{2,6})\s(.*?)(\|(.*?))?\s*>/g, '<font color="#$1"><a href="event:$4-">$2</a></font>');
+				p=p.replace(/<color=([a-zA-Z0-9]{2,6})\s(.*?)(\|(.*?))?\s*>/g, '<font color="#$1"><a class="b" href="event:$4-">$2</a></font>');
 			else if (p.indexOf("Img") > -1)
 				//标志位  <Img:22:0:3:0:0|一键押满/@@@ToMax,1|您确定直接10亿坐庄？>
 				p=p.replace(/<(.*?)(\|(.*?))?(\/(@+.*?))(\|(.*?))?>/g, "<font color='#ffffff'><a href='event:$3-$5-$7' class='c'>+</a></font>");
@@ -67,7 +67,6 @@ package com.leyou.utils {
 
 			return p;
 		}
- 
-
+		
 	}
 }

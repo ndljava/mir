@@ -36,6 +36,9 @@ package com.leyou.ui.storage.child {
 		override public function mouseDownHandler($x:Number, $y:Number):void {
 			//仓库批量存取
 			if (UIManager.getInstance().backPackWnd.visible && UIManager.getInstance().storageWnd.isbatchSave) {
+				
+				if(this.dataId==-1 || MyInfoManager.getInstance().waitItemFromId!=-1) return ;
+				
 				MyInfoManager.getInstance().waitItemFromId=this.dataId; //从仓库
 				MyInfoManager.getInstance().waitItemToId=MyInfoManager.getInstance().findEmptyPs(ItemEnum.TYPE_GRID_BACKPACK);
 				Cmd_backPack.cm_userTakeBackStorageItem(MyInfoManager.getInstance().talkNpcId, data);

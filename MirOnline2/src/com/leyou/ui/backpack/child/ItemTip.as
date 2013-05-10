@@ -8,6 +8,7 @@ package com.leyou.ui.backpack.child {
 	import com.leyou.data.net.shop.TStdItem;
 	import com.leyou.enum.SkillEnum;
 	import com.leyou.enum.TipsEnum;
+	import com.leyou.manager.TimerManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.ui.tips.TipsEquip;
 	import com.leyou.ui.tips.TipsEquipsEmpty;
@@ -17,6 +18,7 @@ package com.leyou.ui.backpack.child {
 	
 	import flash.display.Sprite;
 	import flash.display.Stage;
+	import flash.geom.Point;
 
 	public class ItemTip extends SpriteNoEvt {
 		private static var INSTANCE:ItemTip; //非自己
@@ -56,7 +58,7 @@ package com.leyou.ui.backpack.child {
 			this.tipsSkill=new TipsSkill();
 			this.tipsSkill.visible=false;
 			this.addChild(this.tipsSkill);
-			
+
 			this.tipsEquipEmpty=new TipsEquipsEmpty();
 			this.tipsEquipEmpty.visible=false;
 			this.addChild(this.tipsEquipEmpty);
@@ -64,7 +66,10 @@ package com.leyou.ui.backpack.child {
 
 		public function show(id:int, grid:String):void {
 			if (id == -1)
-				return
+				return;
+			
+			TimerManager.getInstance().removeAll();
+			
 			this.itemId=id;
 			this.stg.addChild(this);
 			this.visible=true;
@@ -73,7 +78,7 @@ package com.leyou.ui.backpack.child {
 			switch (grid) {
 				case ItemEnum.TYPE_GRID_BACKPACK: //背包格子
 					info=MyInfoManager.getInstance().backpackItems[this.itemId];
-					if (info == null || info.s==null)
+					if (info == null || info.s == null)
 						return;
 					type=(info as TClientItem).s.type;
 					if (TipsUtil.getTipsType(type) == TipsEnum.TYPE_TIPS_ITEM) {
@@ -86,7 +91,7 @@ package com.leyou.ui.backpack.child {
 					break;
 				case ItemEnum.TYPE_GRID_STORAGE:
 					info=MyInfoManager.getInstance().backpackItems[this.itemId];
-					if (info == null || info.s==null)
+					if (info == null || info.s == null)
 						return;
 					type=(info as TClientItem).s.type;
 					if (TipsUtil.getTipsType(type) == TipsEnum.TYPE_TIPS_ITEM) {
@@ -135,46 +140,78 @@ package com.leyou.ui.backpack.child {
 						this.tipsItem.marketTip(info, UIManager.getInstance().marketWnd.currentBtnIndex);
 						this.tipsItem.visible=true;
 					} else if (TipsUtil.getTipsType(type) == TipsEnum.TYPE_TIPS_EQUIP) {
-						this.tipsEquip.marketTip(info,UIManager.getInstance().marketWnd.currentBtnIndex);
+						this.tipsEquip.marketTip(info, UIManager.getInstance().marketWnd.currentBtnIndex);
 						this.tipsEquip.visible=true;
 					}
 					break;
 				case ItemEnum.TYPE_GRID_EQUIP: //人物面板
 					info=MyInfoManager.getInstance().equips[this.itemId];
-					if((info as TClientItem).s==null&&this.itemId==2){
+					if ((info as TClientItem).s == null && this.itemId == 2) {
 						this.itemId=14;
 						info=MyInfoManager.getInstance().equips[this.itemId];
 					}
-					if((info as TClientItem).s==null&&this.itemId==4){
+					if ((info as TClientItem).s == null && this.itemId == 4) {
 						this.itemId=13;
 						info=MyInfoManager.getInstance().equips[this.itemId];
 					}
-					if((info as TClientItem).s==null&&this.itemId==0){
-						
-						if(MyInfoManager.getInstance().equips.length>15){
+					if ((info as TClientItem).s == null && this.itemId == 0) {
+
+						if (MyInfoManager.getInstance().equips.length > 15) {
 							this.itemId=15;
 							info=MyInfoManager.getInstance().equips[this.itemId];
-						}	
+						}
 					}
-					if (info == null|| (info as TClientItem).s == null){
+					if (info == null || (info as TClientItem).s == null) {
 						this.tipsEquipEmpty.equipEmptyTips(itemId);
 						this.tipsEquipEmpty.visible=true;
-					}
-					else{
+					} else {
 						this.tipsEquip.bagTip(info);
 						this.tipsEquip.visible=true;
 					}
 					break;
 				case ItemEnum.TYPE_GRID_OTHER_EQUIP:
-					if(this.itemId>=UIManager.getInstance().otherRoleWnd.equipInfo.length)
+					if (this.itemId >= UIManager.getInstance().otherRoleWnd.equipInfo.length)
 						return;
 					info=UIManager.getInstance().otherRoleWnd.equipInfo[this.itemId];
-					if(info==null||(info as TSClientItem).wIndex<=0)
+					if (info == null || (info as TSClientItem).wIndex <= 0)
 						return;
 					this.tipsEquip.otherRoleTip(info);
 					this.tipsEquip.visible=true;
 					break;
+				case ItemEnum.TYPE_GRID_LOST:
+					info=UIManager.getInstance().lostWnd.itemData[id].UserItem.toTClientItem();
+					if (info == null || info.s == null)
+						return;
+
+					type=(info as TClientItem).s.type;
+
+					if (TipsUtil.getTipsType(type) == TipsEnum.TYPE_TIPS_ITEM) {
+						this.tipsItem.bagTips(info);
+						this.tipsItem.visible=true;
+					} else if (TipsUtil.getTipsType(type) == TipsEnum.TYPE_TIPS_EQUIP) {
+						this.tipsEquip.bagTip(info);
+						this.tipsEquip.visible=true;
+					}
+					break;
+				case ItemEnum.TYPE_GRID_LOSTRENDER:
+					info=UIManager.getInstance().lostWnd.itemData[id];
+					if (info == null)
+						return;
+
+					this.tipsItem.LostRenderTips(info);
+					this.tipsItem.visible=true;
+
+					break;
 			}
+		}
+
+		public function showString(str:String):void {
+			if (str == "")
+				return;
+			this.visible=true;
+			this.stg.addChild(this);
+			this.tipsEquipEmpty.showBuffTips(str);
+			this.tipsEquipEmpty.visible=true;
 		}
 
 		public function hide():void {
@@ -197,13 +234,15 @@ package com.leyou.ui.backpack.child {
 				sp=this.tipsItem;
 			else if (this.tipsSkill.visible == true)
 				sp=this.tipsSkill;
-
+			else if (this.tipsEquipEmpty.visible == true)
+				sp=this.tipsEquipEmpty;
 			if (sp) {
 				if (this.x + sp.width > this.stg.stageWidth)
 					this.x=this.stg.stageWidth - sp.width;
 				if (this.y + sp.height > this.stg.stageHeight)
 					this.y=this.stg.stageHeight - sp.height;
 			}
+			//			trace("x:" + this.x + "/n+y:" + this.y);
 		}
 	}
 }

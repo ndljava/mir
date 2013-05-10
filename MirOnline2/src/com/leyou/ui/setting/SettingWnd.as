@@ -11,7 +11,7 @@ package com.leyou.ui.setting {
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.ui.setting.child.SettingGamePanel;
 	import com.leyou.ui.setting.child.SettingVideoPanel;
-	
+
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
@@ -219,17 +219,19 @@ package com.leyou.ui.setting {
 		 *
 		 */
 		public function get settingInfo():SettingGameInfo {
-			if (this.settingGamePanel.settingInfo == null)
-				return this.settingGameInfo;
-			else
-				return this.settingGamePanel.settingInfo;
+			if (this.settingGamePanel.settingInfo == null) {
+				this.getClientData();
+				this.updata();
+			}
+			return this.settingGamePanel.settingInfo;
 		}
 
 		public function get videoInfo():SettingVideoInfo {
-			if (this.settingVideoPanel.settingVideoInfo == null)
-				return this.settingVideoInfo;
-			else
-				return this.settingVideoPanel.settingVideoInfo;
+			if (this.settingVideoPanel.settingVideoInfo == null) {
+				this.getClientData();
+				this.updata();
+			}
+			return this.settingVideoPanel.settingVideoInfo;
 		}
 	}
 }

@@ -80,7 +80,6 @@ package com.leyou.ui.trade.child {
 
 		public function send_DragdealAddItem():void {
 			//设置当前render的index;
-			UIManager.getInstance().tradeWnd.waitIndex=int(this.parent.name.split("_")[1]);
 
 			var g:GridBase;
 			if (BackpackGrid.menuState == 2)
@@ -97,8 +96,8 @@ package com.leyou.ui.trade.child {
 			if (this.dataId != -1 || tc == null || tc.s == null || g.gridType != ItemEnum.TYPE_GRID_BACKPACK)
 				return;
 
-			MyInfoManager.getInstance().waitItemFromId=g.gridId;
-
+			MyInfoManager.getInstance().waitItemFromId=g.initId;
+			UIManager.getInstance().tradeWnd.waitIndex=int(this.parent.name.split("_")[1]);
 			//协议
 			Cmd_Trade.cm_dealAddItem(tc);
 			BackpackGrid.menuState=-1;

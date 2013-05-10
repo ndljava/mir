@@ -8,56 +8,73 @@ package com.leyou.ui.role {
 	import com.ace.ui.lable.Label;
 	import com.ace.utils.HexUtil;
 	import com.leyou.data.net.role.TNakedAbility;
-	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Role;
-
+	import com.leyou.ui.backpack.child.ItemTip;
+	import com.leyou.ui.tips.TipsEquipsEmpty;
+	
+	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.ui.Mouse;
 
 	public class PropertyPointWnd extends AutoWindow {
+//		private var attNameLbl:Label;
 		private var attKeyLbl:Label; //攻击
 		private var attPointLbl:Label;
 		private var addAttBtn:NormalButton;
 		private var cutAttBtn:NormalButton;
+		private var attSp:Sprite;
 
+//		private var mpNameLbl:Label;
 		private var mpAttLbl:Label; //法攻
 		private var mpAttPointLbl:Label;
 		private var addMpAttBtn:NormalButton;
 		private var cutMpAttBtn:NormalButton;
+		private var mpAttSp:Sprite;
 
+		private var taoistNameLbl:Label;
 		private var taoistKeyLbl:Label; //道术
 		private var taositPointLbl:Label;
 		private var addTaoistBtn:NormalButton;
 		private var cutTaoistBtn:NormalButton;
+		private var taoistSp:Sprite;
 
+		private var defNameLbl:Label;
 		private var defKeylbl:Label; //防御
 		private var defPointLbl:Label;
 		private var addDefBtn:NormalButton;
 		private var cutDefBtn:NormalButton;
+		private var defSp:Sprite;
 
 		private var mpDefKeyLbl:Label; //法防
 		private var mpDefPointLbl:Label;
 		private var addMpDefBtn:NormalButton;
 		private var cutMpDefBtn:NormalButton;
+		private var mpDefSp:Sprite;
 
 		private var phyKeylbl:Label; //体力
 		private var phyPointLbl:Label;
 		private var addPhyBtn:NormalButton;
 		private var cutPhyBtn:NormalButton;
-
+		private var phySp:Sprite;
+		
 		private var mpKeyLbl:Label; //魔法
 		private var mpPointLbl:Label;
 		private var addMpBtn:NormalButton;
 		private var cutMpBtn:NormalButton;
+		private var mpSp:Sprite;
 
 		private var exactKeyLbl:Label; //准确
 		private var exactPointLbl:Label;
 		private var addExactBtn:NormalButton;
 		private var cutExactBtn:NormalButton;
-
+		private var exactSp:Sprite;
+	
 		private var nimbleKeyLbl:Label; //敏捷
 		private var nimblePointLbl:Label;
 		private var addNimbleBtn:NormalButton;
 		private var cutNimbleBtn:NormalButton;
+		private var nimbleSp:Sprite;
 
 		private var pointLbl:Label;
 		private var sureBtn:NormalButton;
@@ -67,62 +84,190 @@ package com.leyou.ui.role {
 		private var afterPoint:int;
 		private var addFlag:TNakedAbility;
 		private var cmFlag:Boolean;
-
+		
+		private var tips:TipsEquipsEmpty;
 		public function PropertyPointWnd() {
 			super(LibManager.getInstance().getXML("config/ui/PropertyPointWnd.xml"));
+			this.mouseChildren=true;
 			this.init();
 		}
 
 		private function init():void {
 			this.addInfo=new TNakedAbility();
 			this.addFlag=new TNakedAbility();
-			this.attKeyLbl=this.getUIbyID("attKeyLbl") as Label;
+			
+			this.attSp=new Sprite();
+			this.attSp.x=24;;
+			this.attSp.y=155;
+			this.attSp.name="attSp"
+			this.addChild(this.attSp);
+			this.attSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.attSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var attNameLbl:Label=new Label();
+			attNameLbl.text="攻击";
+			this.attSp.addChild(attNameLbl);
+			this.attKeyLbl=new Label();
+			this.attKeyLbl.x=32;
+			this.attSp.addChild(this.attKeyLbl);
+//			this.attKeyLbl=this.getUIbyID("attKeyLbl") as Label;
 			this.attPointLbl=this.getUIbyID("attPointLbl") as Label;
 			this.addAttBtn=this.getUIbyID("addAttBtn") as NormalButton;
 			this.cutAttBtn=this.getUIbyID("cutAttBtn") as NormalButton;
+			
 
-			this.mpAttLbl=this.getUIbyID("mpAttLbl") as Label;
+			this.mpAttSp=new Sprite();
+			this.mpAttSp.x=24;
+			this.mpAttSp.y=184;
+			this.mpAttSp.name="mpSp";
+			this.addChild(this.mpAttSp);
+			this.mpAttSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.mpAttSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var mpAttNameLbl:Label=new Label();
+			mpAttNameLbl.text="魔攻";
+			this.mpAttSp.addChild(mpAttNameLbl);
+			this.mpAttLbl=new Label();
+			this.mpAttLbl.x=32;
+			this.mpAttSp.addChild(this.mpAttLbl);
+//			this.mpAttLbl=this.getUIbyID("mpAttLbl") as Label;
 			this.mpAttPointLbl=this.getUIbyID("mpAttPointLbl") as Label;
 			this.addMpAttBtn=this.getUIbyID("addMpAttBtn") as NormalButton;
 			this.cutMpAttBtn=this.getUIbyID("cutMpAttBtn") as NormalButton;
 
-			this.taoistKeyLbl=this.getUIbyID("taoistKeyLbl") as Label;
+			
+			this.taoistSp=new Sprite();
+			this.taoistSp.x=24;
+			this.taoistSp.y=213;
+			this.taoistSp.name="taoistSp";
+			this.addChild(this.taoistSp);
+			this.taoistSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.taoistSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var taoistNameLbl:Label=new Label();
+			taoistNameLbl.text="道术";
+			this.taoistSp.addChild(taoistNameLbl);
+			this.taoistKeyLbl=new Label();
+			this.taoistKeyLbl.x=32;
+			this.taoistSp.addChild(this.taoistKeyLbl);
+//			this.taoistKeyLbl=this.getUIbyID("taoistKeyLbl") as Label;
 			this.taositPointLbl=this.getUIbyID("taositPointLbl") as Label;
 			this.addTaoistBtn=this.getUIbyID("addTaoistBtn") as NormalButton;
 			this.cutTaoistBtn=this.getUIbyID("cutTaoistBtn") as NormalButton;
 
-			this.defKeylbl=this.getUIbyID("defKeylbl") as Label;
+			this.defSp=new Sprite();
+			this.defSp.x=24;
+			this.defSp.y=242;
+			this.defSp.name="defSp";
+			this.addChild(this.defSp);
+			this.defSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.defSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var defNameLbl:Label=new Label();
+			defNameLbl.text="防御";
+			this.defSp.addChild(defNameLbl);
+			this.defKeylbl=new Label();
+			this.defKeylbl.x=32;
+			this.defSp.addChild(this.defKeylbl);
+//			this.defKeylbl=this.getUIbyID("defKeylbl") as Label;
 			this.defPointLbl=this.getUIbyID("defPointLbl") as Label;
 			this.addDefBtn=this.getUIbyID("addDefBtn") as NormalButton;
 			this.cutDefBtn=this.getUIbyID("cutDefBtn") as NormalButton;
 
-			this.mpDefKeyLbl=this.getUIbyID("mpDefKeyLbl") as Label;
+			this.mpDefSp=new Sprite();
+			this.mpDefSp.x=24;
+			this.mpDefSp.y=271;
+			this.mpDefSp.name="mpDefSp";
+			this.addChild(this.mpDefSp);
+			this.mpDefSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.mpDefSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var mpDefNameLbl:Label=new Label();
+			mpDefNameLbl.text="魔防";
+			this.mpDefSp.addChild(mpDefNameLbl);
+			this.mpDefKeyLbl=new Label();
+			this.mpDefKeyLbl.x=32;
+			this.mpDefSp.addChild(this.mpDefKeyLbl);
+//			this.mpDefKeyLbl=this.getUIbyID("mpDefKeyLbl") as Label;
 			this.mpDefPointLbl=this.getUIbyID("mpDefPointLbl") as Label;
 			this.addMpDefBtn=this.getUIbyID("addMpDefBtn") as NormalButton;
 			this.cutMpDefBtn=this.getUIbyID("cutMpDefBtn") as NormalButton;
 
-			this.phyKeylbl=this.getUIbyID("phyKeylbl") as Label;
+			this.phySp=new Sprite();
+			this.phySp.x=24;
+			this.phySp.y=300;
+			this.phySp.name="phySp";
+			this.addChild(this.phySp);
+			this.phySp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.phySp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var phyNameLbl:Label=new Label();
+			phyNameLbl.text="体力";
+			this.phySp.addChild(phyNameLbl);
+			this.phyKeylbl=new Label();
+			this.phyKeylbl.x=32;
+			this.phySp.addChild(this.phyKeylbl);
+//			this.phyKeylbl=this.getUIbyID("phyKeylbl") as Label;
 			this.phyPointLbl=this.getUIbyID("phyPointLbl") as Label;
 			this.addPhyBtn=this.getUIbyID("addPhyBtn") as NormalButton;
 			this.cutPhyBtn=this.getUIbyID("cutPhyBtn") as NormalButton;
 
-			this.mpKeyLbl=this.getUIbyID("mpKeyLbl") as Label;
+			this.mpSp=new Sprite();
+			this.mpSp.x=24;
+			this.mpSp.y=331;
+			this.mpSp.name="mpSp";
+			this.addChild(this.mpSp);
+			this.mpSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.mpSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var mpNameLbl:Label=new Label();
+			mpNameLbl.text="魔法";
+			this.mpSp.addChild(mpNameLbl);
+			this.mpKeyLbl=new Label();
+			this.mpKeyLbl.x=32;
+			this.mpSp.addChild(this.mpKeyLbl);
+//			this.mpKeyLbl=this.getUIbyID("mpKeyLbl") as Label;
 			this.mpPointLbl=this.getUIbyID("mpPointLbl") as Label;
 			this.addMpBtn=this.getUIbyID("addMpBtn") as NormalButton;
 			this.cutMpBtn=this.getUIbyID("cutMpBtn") as NormalButton;
 
-			this.exactKeyLbl=this.getUIbyID("exactKeyLbl") as Label;
+			this.exactSp=new Sprite();
+			this.exactSp.x=24;
+			this.exactSp.y=360;
+			this.exactSp.name="exactSp";
+			this.addChild(this.exactSp);
+			this.exactSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.exactSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var exactNameLbl:Label=new Label();
+			exactNameLbl.text="准确";
+			this.exactSp.addChild(exactNameLbl);
+			this.exactKeyLbl=new Label();
+			this.exactKeyLbl.x=32;
+			this.exactSp.addChild(this.exactKeyLbl);
+//			this.exactKeyLbl=this.getUIbyID("exactKeyLbl") as Label;
 			this.exactPointLbl=this.getUIbyID("exactPointLbl") as Label;
 			this.addExactBtn=this.getUIbyID("addExactBtn") as NormalButton;
 			this.cutExactBtn=this.getUIbyID("cutExactBtn") as NormalButton;
 
-			this.nimbleKeyLbl=this.getUIbyID("nimbleKeyLbl") as Label;
+			this.nimbleSp=new Sprite();
+			this.nimbleSp.x=24;
+			this.nimbleSp.y=389;
+			this.nimbleSp.name="nimbleSp";
+			this.addChild(this.nimbleSp);
+			this.nimbleSp.addEventListener(MouseEvent.MOUSE_OVER,onOverFun);
+			this.nimbleSp.addEventListener(MouseEvent.MOUSE_OUT,onOutFun);
+			var nimbleNameLbl:Label=new Label();
+			nimbleNameLbl.text="敏捷";
+			this.nimbleSp.addChild(nimbleNameLbl);
+			this.nimbleKeyLbl=new Label();
+			this.nimbleKeyLbl.x=32;
+			this.nimbleSp.addChild(this.nimbleKeyLbl);
+//			this.nimbleKeyLbl=this.getUIbyID("nimbleKeyLbl") as Label;
 			this.nimblePointLbl=this.getUIbyID("nimblePointLbl") as Label;
 			this.addNimbleBtn=this.getUIbyID("addNimbleBtn") as NormalButton;
 			this.cutNimbleBtn=this.getUIbyID("cutNimbleBtn") as NormalButton;
 
 			this.pointLbl=this.getUIbyID("pointLbl") as Label;
+			var pointName:Label=new Label();
+			pointName.text="点数";
+			pointName.x=24;
+			pointName.y=this.pointLbl.y;
+			this.addChild(pointName);
 			this.sureBtn=this.getUIbyID("sureBtn") as NormalButton;
+			
 
 			this.addAttBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
 			this.cutAttBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
@@ -144,6 +289,10 @@ package com.leyou.ui.role {
 			this.cutTaoistBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
 
 			this.sureBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
+			
+			this.tips=new TipsEquipsEmpty();
+			this.addChild(this.tips);
+			this.tips.visible=false;
 		}
 
 		private function onBtnClick(evt:MouseEvent):void {
@@ -431,5 +580,42 @@ package com.leyou.ui.role {
 			this.addFlag.clearMe();
 		}
 
+		private function onOverFun(evt:MouseEvent):void{
+			switch(evt.target.name){
+				case "attSp":
+					this.tips.showString("攻击点");
+					break;
+				case "mpSp":
+					this.tips.showString("魔攻点");
+					break;
+				case "taoistSp":
+					this.tips.showString("道术点");
+					break;
+				case "defSp":
+					this.tips.showString("防御点");
+					break;
+				case "mpDefSp":
+					this.tips.showString("魔防点");
+					break;
+				case "phySp":
+					this.tips.showString("体力点");
+					break;
+				case "mpSp":
+					this.tips.showString("魔法点");
+					break;
+				case "exactSp":
+					this.tips.showString("准确点");
+					break;
+				case "nimbleSp":
+					this.tips.showString("敏捷点");
+					break;					
+			}
+			this.tips.x=this.mouseX+5;
+			this.tips.y=this.mouseY+5;
+			this.tips.visible=true;
+		}
+		private function onOutFun(evt:MouseEvent):void{
+			this.tips.visible=false;
+		}
 	}
 }
