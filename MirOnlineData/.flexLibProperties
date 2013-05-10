@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="com.leyou.data.backPack.TClientItem"/>
+    <classEntry path="com.leyou.data.friend.FriendInfo"/>
+    <classEntry path="com.leyou.data.playerSkill.TMagic"/>
+    <classEntry path="com.leyou.data.scene.FeatureInfo"/>
+    <classEntry path="com.leyou.data.scene.LivingInfo"/>
+    <classEntry path="com.leyou.data.scene.PlayerInfo"/>
+    <classEntry path="com.leyou.data.table.TActInfo"/>
+    <classEntry path="com.leyou.data.table.TActsInfo"/>
+    <classEntry path="com.leyou.data.table.TBulletInfo"/>
+    <classEntry path="com.leyou.data.table.TItemInfo"/>
+    <classEntry path="com.leyou.data.table.TMonSpeciesInfo"/>
+    <classEntry path="com.leyou.data.table.TPnfInfo"/>
+    <classEntry path="com.leyou.data.table.TSkillInfo"/>
+    <classEntry path="com.leyou.enum.FriendEnum"/>
+    <classEntry path="com.leyou.enum.SkillEnum"/>
+    <classEntry path="com.leyou.enum.TaskEnum"/>
+    <classEntry path="com.leyou.data.net.scene.TMessageBodyWL"/>
+    <classEntry path="com.leyou.data.net.scene.TCharDesc"/>
+    <classEntry path="com.leyou.data.net.scene.TMessageBodyW"/>
+    <classEntry path="com.leyou.data.net.role.TAbility"/>
+    <classEntry path="com.leyou.data.net.scene.TFeature"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
