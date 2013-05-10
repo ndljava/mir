@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300"
+		 title="底图变更">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.event.MapEditerEvent;
+			import com.ui.map.MapPanel;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			private var _file:File = new File();
+			private const _mapImageFilter:FileFilter = new FileFilter("Images","*.png;*.jpg;*.gif");//文件定义
+			/* 打开按钮点击 */
+			private function btnOpenImgClick():void
+			{
+				_file.browseForOpen("选择图片文件",[_mapImageFilter]);
+				_file.addEventListener(Event.SELECT,fileSelectHanlder);
+			}
+			private function fileSelectHanlder(evt:Event):void
+			{
+				imgInput.text = _file.nativePath;
+			}
+			/*  确定按钮*/
+			private function btnSureClick():void
+			{
+				if(imgInput.text == "" ||scaleInput.text == ""){
+					Alert.show("请将信息填写完整");
+					return;
+				}
+				else if(int(scaleInput.text) < 0 || int(scaleInput.text) >100)
+				{
+					Alert.show("缩小比例 请填写 1——100 之间的数  ");
+					return;
+				}
+				MapPanel.instance.changePath = imgInput.text;
+				MapPanel.instance.changeMapScale = int(scaleInput.text);
+				dispatchEvent(new MapEditerEvent(MapEditerEvent.CHANGEMAPINFO_SUBMITE));
+				PopUpManager.removePopUp(this);
+			}
+			/* 取消按钮 */
+			private function btnCancleClick():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+		]]>
+	</fx:Script>
+	<s:TextInput id="imgInput"
+				 x="108"
+				 y="81"
+				 width="150"
+				 text=""
+				 enabled="false"/>
+	<s:Button id="btnOpenImg"
+			  x="285"
+			  y="81"
+			  label="打开"
+			  click="btnOpenImgClick()"/>
+	<s:Button id="btnSure" 
+			  x="106" 
+			  y="161" 
+			  label="确定"
+			  click="btnSureClick()"/>
+	<s:Button id="btnCancle"
+			  x="239"
+			  y="161"
+			  label="取消"
+			  click="btnCancleClick()"/>
+	<s:Label x="38" y="86" text="底图文件"/>
+	<s:Label x="37" y="125" text="缩小比例"/>
+	<s:TextInput id="scaleInput"
+				 x="106"
+				 y="122"
+				 width="70"
+				 text="50"
+				 restrict="0-9"/>
+</s:Panel>

@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<panel:BasePanle xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx" 
+			 xmlns:panel="com.ui.panel.*"
+			 width="290"
+			 height="451"
+			 creationComplete="created()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.ui.map.child.MapBox;
+			import com.ui.map.child.MapEffect;
+			import com.ui.map.child.MapMonster;
+			import com.ui.map.child.MapScene;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			
+			import spark.components.DataGrid;
+			import spark.events.IndexChangeEvent;
+			private var idx:int = -1;
+			public var sceneListCLickFun:Function;
+			public var monsterListClickFun:Function;
+			public var effectListClickFun:Function;
+			
+			public var searchModeFun:Function;
+			public var searchMonsterFun:Function;
+			public var searchBoxFun:Function;
+			public var searchEffectFun:Function;
+			
+			public var boxListClickFun:Function;
+			/* 设置显示哪一个页签 */
+			public function panelType(type:int):void
+			{
+				idx = type;
+				if(type == MirMapEditer.SCENE)
+					tabB.selectedItem = tab0;
+				else if(type == MirMapEditer.MONSTER)
+					tabB.selectedItem = tab1;
+				else if(type == MirMapEditer.BOX)
+					tabB.selectedItem = tab2;
+				else if(type == MirMapEditer.EFFECT)
+					tabB.selectedItem = tab3;
+			}
+			/* 往list里放数据 */
+			public function setList(xml:XMLList):void
+			{
+				var key:*;
+				if(idx == MirMapEditer.SCENE)//模型表
+				{
+					var arr:ArrayCollection = new ArrayCollection();
+					for each(key in  xml){
+						arr.addItem({id:key.@id,name:key.@name,imgId:key.@imgId});
+					}
+					list0.dataProvider = arr;
+				}
+				else if(idx == MirMapEditer.MONSTER){
+					var arr1:ArrayCollection = new ArrayCollection();
+					for each(key in  xml){
+						arr1.addItem({index:key.@index,name:key.@name,title:key.@title,lv:key.@lv});
+					}
+					list1.dataProvider = arr1;
+				}
+				else if(idx == MirMapEditer.BOX){
+					var arr2:ArrayCollection = new ArrayCollection();
+					for each(key in  xml){
+						arr2.addItem({id:key.@id,name:key.@name,modelId:key.@modelId});
+					}
+					list2.dataProvider = arr2;
+				}
+				else if(idx == MirMapEditer.EFFECT){
+					var arr3:ArrayCollection = new ArrayCollection();
+					for each(key in  xml){
+						arr3.addItem({id:key.@id,name:key.@name,imgId:key.@imgId});
+					}
+					list3.dataProvider = arr3;
+				}
+			}
+			/* 模型表里的list点击 */
+			private function list0Change(evt:IndexChangeEvent):void
+			{
+				var idx:int = evt.newIndex;
+				if(sceneListCLickFun != null)
+					sceneListCLickFun(idx);
+//				clickId = idx;
+			}
+			/* 怪物表里的list点击 */
+			private function list1Change(evt:IndexChangeEvent):void
+			{
+				var idx:int = evt.newIndex;
+				if(monsterListClickFun != null)
+					monsterListClickFun(idx);
+			}
+			/*  宝箱的list点击*/
+			private function list2Change(evt:IndexChangeEvent):void
+			{
+				var idx:int = evt.newIndex;
+				if(boxListClickFun != null)
+					boxListClickFun(idx);
+			}
+			/* 特效的list点击 */
+			private function list3Change(evt:IndexChangeEvent):void
+			{
+				var idx:int = evt.newIndex;
+				if(effectListClickFun != null)
+					effectListClickFun(idx);
+			}
+			/* 查询id按钮 点击*/
+			private function modeSearch():void
+			{
+				if(modeInput.text ==  "")
+				{
+					Alert.show("请输入您要找的id号");
+					return;
+				}
+				else if(searchModeFun != null)
+					searchModeFun(int(modeInput.text));
+			}
+			/* 怪物id查询 */
+			private function searchMonster():void
+			{
+				if(monsterInput.text == "")
+				{
+					Alert.show("请输入您要找的id号");
+					return;
+				}
+				if(searchMonsterFun != null)
+					searchMonsterFun(int(monsterInput.text));
+			}
+			/* 宝箱id查询 */
+			private function searchBox():void
+			{
+				if(boxInput.text == "")
+				{
+					Alert.show("请输入您要找的id号");
+					return;
+				}
+				if(searchBoxFun != null)
+					searchBoxFun(int(boxInput.text));
+			}
+			/* 特效id查询 */
+			private function effextSearch():void
+			{
+				if(EffectInput.text == "")
+				{
+					Alert.show("请输入您要找的id号");
+					return;
+				}
+				if(searchEffectFun != null)
+					searchEffectFun(int(EffectInput.text));
+			}
+			 /* 往怪物list里放数据 */ 
+			private function initList1():void
+			{
+				list1.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+				MapMonster.instance.rightListInit();
+//				MapMonster.instance.setListData();
+			}
+			/* 往宝箱list里放数据 */
+			private function initList2():void
+			{
+				list2.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+				MapBox.instance.rightListInit();
+//				MapBox.instance.setListData();
+			}
+			/* 往特效list里放数据 */
+			private function initList3():void
+			{
+				list3.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+				MapEffect.instance.rightListInit();
+//				MapEffect.instance.setListData();
+			}
+			/* 设置list0 Item 的select */
+			public function setList0SelectItem($id:int):void
+			{
+				list0.selectedIndex = $id;
+			}
+			/* 设置list0 Item 的select */
+			public function setList1SelectItem($id:int):void
+			{
+				list1.selectedIndex = $id;
+			}
+			/* 设置list2 Item 的select */
+			public function setList2SelectItem($id:int):void
+			{
+				list2.selectedIndex = $id;
+			}
+			/* 设置list1 Item 的select */
+			public function setList3SelectItem($id:int):void
+			{
+				list3.selectedIndex = $id;
+			}
+			private function created():void
+			{
+				list0.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+			}
+			private function onMouseDown(evt:MouseEvent):void
+			{
+				evt.stopPropagation();
+			}
+		]]>
+	</fx:Script>
+	<s:TabBar id="tabB" 
+			  x="2"
+			  y="0" 
+			  skinClass="spark.skins.spark.TabBarSkin"
+			  dataProvider="{vs}"
+			  mouseEnabled="false"
+			  mouseChildren="false">
+	</s:TabBar>
+	<mx:ViewStack id="vs"
+				  x="0" 
+				  y="24" 
+				  width="289" 
+				  height="400">
+		<s:NavigatorContent id="tab0" 
+							label="模型选择"
+							backgroundColor="0x789898">
+			
+			<s:List id="list0"
+					x="12" 
+					y="83" 
+					width="242"
+					height="271"
+					changing="list0Change(event)">
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer>
+							<s:Label id="idLable" text="{data.id} ,{data.name} ,{data.imgId}  " fontSize="20" />
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:List>
+			<s:Label x="19" 
+					 y="10" 
+					 text="模型Id"/>
+			<s:TextInput id="modeInput" 
+						 x="10"
+						 y="30"
+						 restrict="0-9"/>
+			<s:Button x="176" 
+					  y="29" 
+					  label="查找"
+					  click="modeSearch()"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="tab1" 
+							label="怪物选择"
+							backgroundColor="0x789898" >
+			<s:List id="list1"
+					x="12"
+					y="96"
+					width="263"
+					height="271"
+					changing="list1Change(event)"
+					creationComplete="initList1()">
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer>
+							<s:Label id="idLable" text="{data.index}        {data.name}         {data.title}        {data.lv}" fontSize="20" />
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:List>
+			<s:Label x="19" 
+					 y="10" 
+					 text="怪物Id"/>
+			<s:TextInput id="monsterInput" 
+						 x="10"
+						 y="30"
+						 restrict="0-9"/>
+			<s:Button x="177" 
+					  y="29" 
+					  label="查找"
+					  click="searchMonster()"/>
+			<s:Label x="21" y="78" text="idx"/>
+			<s:Label x="74" y="79" text="name"/>
+			<s:Label x="151" y="79" text="title"/>
+			<s:Label x="213" y="78" text="lv"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="tab2" 
+							label="宝箱选择"
+							backgroundColor="0x789898" >
+			<s:List id="list2"
+					x="12"
+					y="96"
+				    width="263"
+					height="271"
+					changing="list2Change(event)"
+					creationComplete="initList2()">
+					<s:itemRenderer>
+						<fx:Component>
+							<s:ItemRenderer>
+								<s:Label id="idLable" text="{data.id}        {data.name}         {data.modelId}" fontSize="20" />
+							</s:ItemRenderer>
+						</fx:Component>
+					</s:itemRenderer>
+			</s:List>
+			<s:Label x="19" 
+					 y="10" 
+					 text="宝箱Id"/>
+			<s:TextInput id="boxInput" 
+						 x="10"
+						 y="30"
+						 restrict="0-9"/>
+			<s:Button x="177" 
+					  y="29" 
+					  label="查找"
+					  click="searchBox()"/>
+			<s:Label x="21" y="78" text="idx"/>
+			<s:Label x="74" y="79" text="name"/>
+			<s:Label x="151" y="79" text="modelId"/>
+		</s:NavigatorContent>
+		<s:NavigatorContent id="tab3" 
+							label="特效选择"
+							backgroundColor="0x789898">
+			<s:List id="list3" 
+					x="12" 
+					y="83" 
+					width="242"
+					height="271"
+					changing="list3Change(event)"
+					creationComplete="initList3()">
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer>
+							<!--<s:states>
+							<s:State name="normal" />
+							<s:State name="hovered" />
+							<s:State name="selected" />
+							</s:states>-->
+							<s:Label id="idLable" text="{data.id} ,{data.name} ,{data.imgId}  " fontSize="20" />
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:List>
+			<s:Label id="modeId0"
+					 x="19" 
+					 y="10" 
+					 text="模型Id"/>
+			<s:TextInput id="EffectInput" 
+						 x="10"
+						 y="30"
+						 restrict="0-9"/>
+			<s:Button x="173" 
+					  y="29" 
+					  label="查找"
+					  click="effextSearch()"/>
+		</s:NavigatorContent>
+	</mx:ViewStack>
+</panel:BasePanle>

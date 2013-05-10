@@ -1,0 +1,12 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+global
+{
+	chrome-color: #8E8787;
+	vertical-align: top;
+	font-size: 12;
+}
+	

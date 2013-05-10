@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<panel:BasePanle xmlns:fx="http://ns.adobe.com/mxml/2009"
+			  xmlns:s="library://ns.adobe.com/flex/spark"
+			  xmlns:mx="library://ns.adobe.com/flex/mx"
+			  xmlns:panel="com.ui.panel.*"
+			  width="230"
+			  height="500"
+			  creationComplete="created()">
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.ui.map.child.MapMonster;
+			import com.ui.map.child.MapScene;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.TreeEvent;
+			public var sceActionSelectFun:Function;
+			public var monsterActionSelectFun:Function;
+			public var sceneTreeClickFun:Function;
+			public var monsterTreeClickFun:Function;
+			public var effectTreeClickFun:Function;
+			
+			public var monsterWatSelectFun:Function;
+			public var onMonsterRandomDirClickFun:Function;
+			
+			public var boxActionSelectFun:Function;
+			public var boxTreeClickFun:Function;
+//			private var treeData:XML = new XML();
+			private var _idx:int = -1;
+			/*  set 一级标签*/
+			public function set panTitle($title:String):void {
+				titile.text=$title;
+			}
+			/* set 二级标签 */
+			public function set panStaTitle($t:String):void {
+				this.staTitle.text=$t;
+			}
+			/* 设置本面板是否 显示 true显示 false 不显示 */
+			public function panVisibleSta($f:Boolean):void
+			{
+				this.visible = $f;
+			}
+
+			/*  板的类型*/
+			public function panelType($idx:int):void {
+				clearPanel();
+				if ($idx == MirMapEditer.SCENE) {
+					_idx = $idx;
+//					this.lableTiTile.visible=false;
+//					this.inputTex.visible=false;
+					this.lablePatrolId.visible=false;
+					this.patrolList.visible = false;
+					this.boxRandDir.visible = false;
+					this.lableDir.visible = true;
+					this.btnLeft.visible = true;
+					this.btnRight.visible = true;
+					this.lableAct.visible= true;
+					this.actionList.visible = true;
+				}
+				else if($idx == MirMapEditer.EFFECT){
+					_idx = $idx;
+//					this.lableTiTile.visible=false;
+//					this.inputTex.visible=false;
+					this.lablePatrolId.visible=false;
+					this.patrolList.visible = false;
+					this.boxRandDir.visible = false;
+					this.lableDir.visible = false;
+					this.btnLeft.visible = false;
+					this.btnRight.visible = false;
+					this.lableAct.visible= false;
+					this.actionList.visible = false;
+				}
+				else if($idx == MirMapEditer.MONSTER)
+				{
+					_idx = $idx;
+//					this.lableTiTile.visible=true;
+//					this.inputTex.visible=true;
+					this.lablePatrolId.visible=true;
+					this.patrolList.visible = true;
+					this.boxRandDir.visible = true;
+					this.lableDir.visible = true;
+					this.btnLeft.visible = true;
+					this.btnRight.visible = true;
+					this.lableAct.visible= true;
+					this.actionList.visible = true;
+				}
+				else if($idx == MirMapEditer.BOX)
+				{
+					_idx = $idx;
+//					this.lableTiTile.visible=false;
+//					this.inputTex.visible=false;
+					this.lablePatrolId.visible=false;
+					this.patrolList.visible = false;
+					this.boxRandDir.visible = false;
+					this.lableDir.visible = false;
+					this.btnLeft.visible = false;
+					this.btnRight.visible = false;
+					this.lableAct.visible= true;
+					this.actionList.visible = true;
+				}
+				else
+					_idx = -1;
+			}
+			/* 动作的数据 */
+			public function setActionData(arr:ArrayCollection):void
+			{
+				actionList.dataProvider = arr;
+			}
+			/* 点击选择动作 */
+			private function onClickActionData():void
+			{
+				if(_idx == -1)
+					return;
+				else if(_idx == MirMapEditer.SCENE)
+				{
+					if(sceActionSelectFun != null)
+						sceActionSelectFun(actionList.selectedIndex);
+				}
+				else if(_idx == MirMapEditer.MONSTER)
+				{
+					if(monsterActionSelectFun != null)
+						monsterActionSelectFun(actionList.selectedIndex);
+				}
+				else if(_idx == MirMapEditer.BOX)
+				{
+					if(boxActionSelectFun != null)
+						boxActionSelectFun(actionList.selectedIndex);
+				}
+			}
+			/* 清理屏幕 */
+			private function clearPanel():void
+			{
+				if(preGroup.numElements && preGroup)
+					preGroup.removeElementAt(0);
+				setTreeData(new XML);
+			}
+			/* tree指定数据 */
+			[Bindable]
+			private var _treeXml:XML;
+			public function setTreeData($xml:XML):void
+			{
+				_treeXml = $xml;
+//				tree.dataProvider = $xml;
+			}
+			/* 点击tree的监听事件 */
+			private function treeChanged(evt:Event):void
+			{
+				var xml:XML = Tree(evt.target).selectedItem as XML;
+				if(xml..@xx == undefined || xml..@yy == undefined)
+					return;
+				var xx:int = parseInt(xml..@xx,2);
+				var yy:int = parseInt(xml..@yy,2);
+				if(xx < 0 || yy < 0)
+					return;
+				if(_idx == MirMapEditer.SCENE)
+				{
+					if(sceneTreeClickFun != null)
+						sceneTreeClickFun(xx,yy);
+				}
+				else if(_idx == MirMapEditer.EFFECT)
+				{
+					if(effectTreeClickFun != null)
+						effectTreeClickFun(xx,yy);
+				}
+				else if(_idx == MirMapEditer.MONSTER)
+				{
+					if(monsterTreeClickFun != null)
+						monsterTreeClickFun(xx,yy);
+				}
+				else if(_idx == MirMapEditer.BOX)
+				{
+					if(boxTreeClickFun != null)
+						boxTreeClickFun(xx,yy);
+				}
+			}
+			/* 左转按钮点击事件 */
+			private function leftTurnBtnClick():void
+			{
+				if(_idx == MirMapEditer.SCENE)//模型
+				{
+					MapScene.instance.leftClick();
+				}
+				else if(_idx == MirMapEditer.MONSTER)//怪物
+				{
+					MapMonster.instance.leftClick();
+				}
+			}
+			/* 右转按钮点击事件 */
+			private function rightTurnBtnClick():void
+			{
+				if(_idx == MirMapEditer.SCENE)//模型
+				{
+					MapScene.instance.rightClick();
+				}
+				else if(_idx == MirMapEditer.MONSTER)//怪物
+				{
+					MapMonster.instance.rightClick();
+				}
+			}
+			/*设置寻路的数据  */
+			public function setWaydata(arr:ArrayCollection):void
+			{
+				patrolList.dataProvider = arr;
+			}
+			/* 寻路数据的点击 */
+			private function onClickWayItem():void
+			{
+				if(_idx != MirMapEditer.MONSTER)
+					return;
+				var idx:int = patrolList.selectedIndex;
+				if(sceActionSelectFun != null)
+				{
+					monsterWatSelectFun(idx);
+				}
+			}
+			private function randomDir():void
+			{
+				if(_idx == MirMapEditer.MONSTER)
+				{
+					if(onMonsterRandomDirClickFun != null)
+						onMonsterRandomDirClickFun();
+				}
+			}
+			/* 设置 可选标签是否选中*/
+			public function setRandomDirSelect($f:Boolean):void
+			{
+				boxRandDir.selected = $f;
+			}
+			/* init */
+			private function created():void
+			{
+				tree.addEventListener(MouseEvent.MOUSE_DOWN,onMonseDown);
+			}
+			private function onMonseDown(evt:MouseEvent):void
+			{
+				evt.stopPropagation();
+			}
+		]]>
+	</fx:Script>
+	<s:Panel id="main" x="5" y="1" width="220" height="100%" backgroundAlpha="0.5"
+			 chromeColor="#F6F2F2" contentBackgroundAlpha="1.0" symbolColor="#EFE5E5">
+		<s:Label id="titile"
+				 y="-21"
+				 horizontalCenter="-2"
+				 text="123"/>
+		<s:Label id="staTitle"
+				 x="10"
+				 y="10"
+				 text="抓半天"/>
+		<!--<s:Scroller x="20"
+					y="30"
+					width="180"
+					height="190">
+			<s:HGroup width="100%"
+					  height="100%">-->
+		<mx:Tree id="tree" 
+				 x="20"
+				 y="30"
+				 width="190"
+				 height="152"
+				 labelField="@lable"
+				 showRoot="true"
+				 change="treeChanged(event);"
+				 dataProvider="{_treeXml}">
+		</mx:Tree>
+		<!--</s:HGroup>
+	</s:Scroller>-->
+		<s:Label id="lablePatrolId"
+				 x="10"
+				 y="195"
+				 text="巡逻id"/>
+		<!--<s:DropDownList x="62" y="223"></s:DropDownList>-->
+		<s:ComboBox id="patrolList"
+					x="52"
+					y="190"
+					width="150"
+					change = "onClickWayItem()">
+			<s:itemRenderer>
+				<fx:Component>
+					<s:ItemRenderer>
+						<s:Label  text="{data}" fontSize="15" />
+					</s:ItemRenderer>
+				</fx:Component>
+			</s:itemRenderer>
+			</s:ComboBox>
+		<s:Label id="lableDir"
+				 x="10"
+				 y="230"
+				 text="方向"/>
+		<s:Button id="btnLeft"
+				  x="40"
+				  y="225"
+				  label="左转"
+				  click = "leftTurnBtnClick()"/>
+		<s:Button id="btnRight"
+				  x="120"
+				  y="225"
+				  label="右转"
+				  click="rightTurnBtnClick()"/>
+		<s:CheckBox id="boxRandDir" x="60" y="250" label="随机方向" chromeColor="#171616"
+					click="randomDir()" symbolColor="#ECE3E3"/>
+		<!--<s:Label id="lableTiTile"
+				 x="10"
+				 y="280"
+				 text="称号"/>
+		<s:TextInput id="inputTex"
+					 x="50"
+					 y="275"
+					 text="输入称号"/>-->
+		<s:Label x="10"
+				 y="300"
+				 text="预览"/>
+		<s:Group id="preGroup" x="10" y="315" width="132" height="141" contentBackgroundAlpha="0.0"
+				 contentBackgroundColor="#BCB5B5">
+		</s:Group>
+		<s:Label id="lableAct"
+				 x="150"
+				 y="320"
+				 text="动作选择"/>
+		<s:ComboBox id="actionList"
+					x="150"
+					y="335"
+					width="70"
+					change = "onClickActionData()">
+			<s:itemRenderer>
+				<fx:Component>
+					<s:ItemRenderer>
+				      <s:Label id="idLable" text="{data}" fontSize="15" />
+					</s:ItemRenderer>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:ComboBox>	
+		
+	</s:Panel>
+</panel:BasePanle>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<panel:BasePanle xmlns:fx="http://ns.adobe.com/mxml/2009"
+			  xmlns:s="library://ns.adobe.com/flex/spark"
+			  xmlns:mx="library://ns.adobe.com/flex/mx"
+			  xmlns:panel="com.ui.panel.*"
+			  width="220"
+			  height="420"
+			  creationComplete="created()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.ui.map.child.MapObstacle;
+			
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			public var areaListClickFun:Function;
+			public var obstacleListLickFun:Function;
+			public var areaBtnVisibaleFun:Function;
+			public var obstacleBtnVisibaleFun:Function;
+			private var _idx:int;
+			private var areaArr:ArrayCollection = new ArrayCollection(
+				["区域0[黄]","区域1[蓝]","区域2[红]","区域3[绿]",
+				"区域4[灰]","区域5[橙]","区域6[金]","区域7[紫]",
+				"区域8[棕褐]","区域9[深红]","区域10[深蓝]","区域11[ 靛蓝]",
+				"区域12[深橙]","区域13[粉红]","区域14[深粉红]","区域15[番茄红]"]);
+			private var obstacleArr:ArrayCollection = new ArrayCollection(
+				["可行走区域（不可编辑）","遮罩区域","不可行走区域"]);
+			private var brushData:ArrayCollection = new ArrayCollection(["1Px","4Px","9Px","16Px"]);
+			/* set 面板的title */
+			public function set panTitle($t:String):void {
+				this.title.text=$t;
+			}
+
+			public function set panStaTitle($t:String):void {
+				this.staTitle.text=$t;
+			}
+			/*  */
+			public function panelType($idx:int):void{
+				_idx = $idx;
+				if($idx == MirMapEditer.OBSTACLE){
+					this.lablebrush.visible = true;
+					this.boxBlush.visible = true;
+					areaId.text = "障碍ID";
+					dataList.dataProvider = obstacleArr;
+					this.btnVisibale.label = "显示或者隐藏区域颜色"
+					
+				}
+				else if($idx == MirMapEditer.AREA){
+					this.lablebrush.visible = false;
+					this.boxBlush.visible = false;
+					areaId.text = "区域ID";
+					dataList.dataProvider = areaArr;
+					this.btnVisibale.label = "显示或者隐藏障碍颜色";
+				}
+			}
+			
+			private function clickListItem(evt:IndexChangeEvent):void
+			{
+				var idx:int = evt.newIndex;
+				if(_idx == MirMapEditer.AREA)
+				{
+					if(areaListClickFun != null)
+						areaListClickFun(idx);
+				}
+				else if(_idx == MirMapEditer.OBSTACLE)
+				{
+					if(obstacleListLickFun != null)
+						obstacleListLickFun(idx);
+				}
+			}
+			/* 选择笔刷 */
+			private function onClickBrush():void
+			{
+				if(_idx == MirMapEditer.OBSTACLE)
+					MapObstacle.instance.brushClick(boxBlush.selectedIndex);
+					
+			}
+			private function boxBlusahInit():void
+			{
+				boxBlush.dataProvider = brushData;
+			}
+			/*  设置list的索引*/
+			public function setColorListItem($idx:int):void
+			{
+				dataList.selectedIndex = $idx;
+			}
+			public function btnVisibaleClick():void
+			{
+				if(_idx == MirMapEditer.AREA)
+				{
+					if(areaBtnVisibaleFun!= null)
+						areaBtnVisibaleFun();
+				}
+				else if(_idx == MirMapEditer.OBSTACLE)
+				{
+					if(obstacleBtnVisibaleFun != null)
+						obstacleBtnVisibaleFun();
+				}
+			}
+			private function created():void
+			{
+				dataList.addEventListener(MouseEvent.MOUSE_DOWN,onMouseDown);
+			}
+			private function onMouseDown(evt:MouseEvent):void
+			{
+				evt.stopPropagation();
+			}
+		]]>
+	</fx:Script>
+	<s:Panel id="main"
+			 x="0"
+			 y="0"
+			 width="220"
+			 height="100%">
+		<s:Label id="title"
+				 y="-21"
+				 horizontalCenter="-2"
+				 text="123"/>
+		<s:Label id="staTitle"
+				 x="10"
+				 y="10"/>
+		<s:Label id="areaId"
+				 x="100"
+				 y="25"/>
+		<s:List id="dataList"
+				x="10"
+				y="40" 
+				width="198" 
+				height="270"
+				changing="clickListItem(event)">
+			<s:itemRenderer>
+				<fx:Component>
+					<s:ItemRenderer>
+						<s:Label text = "{data}" fontSize="12" height="20"/>
+					</s:ItemRenderer>
+				</fx:Component>
+			</s:itemRenderer>
+		</s:List>
+		<s:Label id="lablebrush"
+				 x="15"
+				 y="325"
+				 text="笔刷大小"/>
+		<s:ComboBox id="boxBlush" 
+					x="70"
+					y="320"
+					width="110"
+					creationComplete="boxBlusahInit()"
+					change="onClickBrush()">	
+		</s:ComboBox>
+		<s:Button id="btnVisibale"
+				  x="20" 
+				  y="360" 
+				  label="显示或者隐藏区域颜色"
+				  click="btnVisibaleClick()"/>
+	</s:Panel>
+</panel:BasePanle>

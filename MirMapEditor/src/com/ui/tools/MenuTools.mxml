@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="30"
+		 creationComplete="initApp()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<fx:XMLList id="myXMLList">   
+			<item id="新建地图"/>   
+			<item id="打开地图" />   
+			<item id="存储地图" /> 
+			<item id="功能编辑">
+				<item id ="场景编辑"/>
+				<item id ="特效编辑"/>
+				<item id ="怪物编辑"/>
+				<item id = "宝箱编辑"/>
+				<item id = "区域编辑"/>
+				<item id = "障碍编辑"/>
+				<item id = "巡逻编辑"/>
+				<item id = "点编辑"/>
+			</item>
+			<item id="撤销"/>
+			<item id="图层显示选择" >   
+				<item id="单位图层"/>   
+				<item id="特效图层"/>   
+				<item id="submenu5"
+					  type="radio"
+					  groupName="two" />
+			</item>  
+			<item id="网格选择显示" >   
+				<item id="不显示"/>   
+				<item id="1PX" />   
+				<item id="4PX"/>
+				<item id="9PX"/>
+				<item id="16PX"/>
+			</item> 
+			<item id="底图选择" >   
+			</item>
+			<item id = "显示 / 隐藏小地图">
+			</item>
+		</fx:XMLList>  
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.ui.map.MapPanel;
+			import com.ui.map.child.MapGrid;
+			import com.utils.MapUtil;
+			
+			import mx.collections.XMLListCollection;
+			import mx.containers.Grid;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.controls.menuClasses.MenuBarItem;
+			import mx.events.MenuEvent;
+			import mx.utils.object_proxy;
+			
+			import spark.components.gridClasses.GridLayer;
+			private function initApp():void{
+			}
+			/* 子集菜单的点击事件 */
+			private function menuItemClick(evt:MenuEvent):void{
+				if(MapPanel.instance.creatFlag == false){
+					MapUtil.notMapAlert();
+				}
+				else {
+					this.l.text = evt.label;
+					if(evt.label=="单位图层"){
+						MapPanel.instance.layerEffectShowContrl(-1);
+					}
+					else if(evt.label=="特效图层"){
+						MapPanel.instance.layerEffectShowContrl(MirMapEditer.EFFECT);
+					}
+					else if(evt.label=="不显示"){
+						MapPanel.instance.gridStatus(MapGrid.GRIDE_HIDE);
+					}
+					else if(evt.label=="1PX"){
+						MapPanel.instance.gridStatus(MapGrid.GRIDE_SHOW_ONE);
+					}
+					else if(evt.label=="4PX"){
+						MapPanel.instance.gridStatus(MapGrid.GRIDE_SHOW_FOUR);
+					}
+					else if(evt.label=="9PX"){
+						MapPanel.instance.gridStatus(MapGrid.GRIDE_SHOW_NINE);
+					}
+					else if(evt.label=="16PX"){
+						MapPanel.instance.gridStatus(MapGrid.GRIDE_SHOW_SIX);
+					}
+					else if(evt.label == "场景编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.SCENE);
+					}
+					else if(evt.label == "特效编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.EFFECT);
+					}
+					else if(evt.label == "怪物编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.MONSTER);
+					}
+					else if(evt.label == "宝箱编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.BOX);
+					}
+					else if(evt.label == "区域编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.AREA);
+					}
+					else if(evt.label == "障碍编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.OBSTACLE);
+					}
+					else if(evt.label == "巡逻编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.PATROL);
+					}
+					else if(evt.label == "点编辑"){
+						MapPanel.instance.btnClick(MirMapEditer.POINT);
+					}	
+				}
+				
+			}
+			/*  菜单的点击事件*/
+			private function meneClick():void{
+				this.l.text = myMenu.selectedIndex.toString();
+				if(myMenu.selectedIndex!=-1&& MenuBarItem(myMenu.getChildAt(myMenu.selectedIndex+1)).data==""){
+					/*新建地图  */
+					if(myMenu.selectedIndex == 0){
+						MapPanel.instance.showNewPanInfo();
+					}
+					/*打开地图  */
+					else if(myMenu.selectedIndex == 1){
+						MapPanel.instance.showOpenMapInfo();
+					}
+					else {
+						if(MapPanel.instance.creatFlag == false)
+							MapUtil.notMapAlert();
+						else{
+							/*打开地图  */
+							/* if(myMenu.selectedIndex == 1){
+								MapPanel.instance.openMap();
+							} */
+							/* 存存储地图 */
+							if(myMenu.selectedIndex == 2){
+								MapPanel.instance.saveFile();
+							}
+							/* 撤销 */
+							if(myMenu.selectedIndex == 3){
+							}
+							/*地图选择  */
+							if(myMenu.selectedIndex == 7){
+								MapPanel.instance.changeMapMenuClick();
+							}
+							if(myMenu.selectedIndex == 8){
+								MapPanel.instance.showOrhideSamllmap();
+							}
+						}
+					}
+				}
+			}
+			/* <item id="底图选择" >   
+				<item id="submenu3"
+					  type="radio" 
+					  groupName="two" />   
+				<item id="submenu4" 
+					  type="radio" 
+					  groupName="two" 
+					  selected="true" />   
+				<item id="submenu5"
+					  type="radio"
+					  groupName="two" />
+			</item>    */
+		]]>
+	</fx:Script>
+	<mx:MenuBar id="myMenu" 
+				showRoot="false" 
+				labelField="@id" 
+				height="32" 
+				styleName="MainMenuBar" 
+				fontSize="12" 
+				fontWeight="bold"
+				width="100%"
+				itemClick="menuItemClick(event)"
+				click="meneClick()"
+				dataProvider="{myXMLList}">
+	</mx:MenuBar>         
+	<s:Label id="l"
+		x="832" y="10" text=""/>
+	
+</s:Group>
+

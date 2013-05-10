@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="500"
+		 height="400"
+		 title="创建地图"
+		 creationComplete="init()">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.event.MapEditerEvent;
+			import com.ui.map.MapPanel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			private const _mapImageFilter:FileFilter = new FileFilter("Images","*.png;*.jpg;*.gif");//文件定义
+			private const _gridTypeData:ArrayCollection = new ArrayCollection(["外菱形","方形","内菱形"]);
+			private const _readTypeData:ArrayCollection = new ArrayCollection(["散图","整图"])
+			private var _file:File = new File();
+			private function init():void
+			{
+				gridSumSta(false);
+			}
+			/*打开地图的按钮  */
+			private function btnOpenImgClick():void
+			{
+				if(readType.selectedIndex == -1)
+				{
+					Alert.show("请先选择读取类型!!");
+					return;
+				}
+				else
+				{
+					if(readType.selectedIndex == 0)//散图
+					{
+						/* if(xCuttingNum.text =="")
+						{
+							Alert.show("请输入散图的横向数量!!");
+							return;
+						}
+						if(yCuttingNum.text == "")
+						{
+							Alert.show("请输入散图的纵向数量!!");
+							return;
+						} */
+						_file.browseForDirectory("选择图片文件");
+					}
+					else if(readType.selectedIndex == 1)//整图
+					{
+						_file.browseForOpen("选择图片文件",[_mapImageFilter]);
+					}
+					_file.addEventListener(Event.SELECT,fileSelectHanlder);
+				}
+			}
+			private function fileSelectHanlder(evt:Event):void
+			{
+				imgInput.text = _file.nativePath;
+			}
+			private function btnSureClick():void
+			{
+				if(sceneInput.text == "" ){
+					Alert.show("请输入场景名字!!!");
+					return;
+				}
+				if(imgInput.text == "")
+				{
+					Alert.show("请选择地图文件!!!");
+					return;
+				}
+				if(cutSize.text == "")
+				{
+					Alert.show("请输入裁图大小!!!");
+					return;
+				}
+				if(scaleInput.text == "")
+				{
+					Alert.show("请输入缩小比例!!");
+					return;
+				}
+				else if(int(scaleInput.text) > 100 || int(scaleInput.text)<0)
+				{
+					Alert.show("缩小比例 请填写 1——100 之间的数");
+					return;
+				}
+				if(gridH.text == "")
+				{
+					Alert.show("请输入格子的高!!");
+					return;
+				}
+				if(gridW.text == "")
+				{
+					Alert.show("请输入格子的宽!!");
+					return;
+				}
+				if(gridType.selectedIndex == -1)
+				{
+					Alert.show("请选择格子类型!!");
+					return;
+				}
+				if(readType.selectedIndex == -1)
+				{
+					Alert.show("请选择读取类型!!");
+					return;
+				}
+				if(gridType.selectedIndex == 0 &&int(gridH.text) *2 != int(gridW.text))
+				{
+					Alert.show("棱形格子的宽 需要是高的两倍,请重新输入!!");
+					return;
+				}
+				MapPanel.instance.readType = readType.selectedIndex;
+				MapPanel.instance.imgPath = imgInput.text;
+				MapPanel.instance.sceneName = sceneInput.text;
+				MapPanel.instance.scalePersent = int(scaleInput.text);
+				MapPanel.instance.gridType = gridType.selectedIndex;
+				MapPanel.instance.gridH = Number(gridH.text);
+				MapPanel.instance.gridW = Number(gridW.text);
+				MapPanel.instance.cutSize = int(cutSize.text);
+//				MapPanel.instance.xCuttingNum = int(xCuttingNum.text);
+//				MapPanel.instance.yCuttingNum = int(yCuttingNum.text); 
+				dispatchEvent(new MapEditerEvent(MapEditerEvent.NEWMAPINFO_SUBMITE));
+				PopUpManager.removePopUp(this);
+			}
+			private function btnCancleClick():void
+			{
+				PopUpManager.removePopUp(this);
+			}
+			private function girdChange():void
+			{
+				if(gridType.selectedIndex == 1)
+				{
+					gridH.text = "32";
+					gridW.text = "48";
+				}
+				else if(gridType.selectedIndex == 0&&gridType.selectedIndex ==2)
+				{
+					gridH.text = "32";
+					gridW.text = "64";
+				}
+			}
+			/* 地图读取类型的变化 */
+			private function readChange():void
+			{
+				if(readType.selectedIndex == 0)//散图
+				{
+					gridSumSta(true);
+					imgInput.text = "";
+					
+				}
+				else if(readType.selectedIndex == 1)//整图
+				{
+					gridSumSta(false);
+					imgInput.text = "";
+				}
+			}
+			/*  */
+			private function gridSumSta($f:Boolean):void
+			{
+//				xCuttingNum.visible = $f;
+//				xCutting.visible = $f;
+//				yCuttingNum.visible = $f;
+//				yCuting.visible = $f;
+			}
+		]]>
+	</fx:Script>
+	<s:TextInput id="sceneInput"
+				 x="109"
+				 y="32"
+				 width="251"
+				 text=""/>
+	<s:TextInput id="imgInput"
+				 x="109"
+				 y="164"
+				 width="150"
+				 text=""
+				 enabled="false"/>
+	<s:Label x="338" y="206" width="30" text="%"/>
+	<s:Button id="btnOpenImg"
+			  x="280"
+			  y="164"
+			  label="打开"
+			  click="btnOpenImgClick()"/>
+	<s:Button id="btnSure" 
+			  x="106" 
+			  y="274" 
+			  label="确定"
+			  click="btnSureClick()"/>
+	<s:Button id="btnCancle"
+			  x="239"
+			  y="274"
+			  label="取消"
+			  click="btnCancleClick()"/>
+	<!--<s:Label x="38" y="44" text="场景名"/>
+	<s:Label x="38" y="44" text="场景名"/>-->
+	<s:Label x="39" y="37" text="场景名字"/>
+	<s:Label x="38" y="169" text="底图文件"/>
+	<s:Label x="235" y="205" text="缩小比例"/>
+	<s:TextInput id="scaleInput"
+				 x="294"
+				 y="201"
+				 width="38"
+				 text="50"
+				 restrict="0-9"/>
+	<s:TextInput id="gridW"
+				 x="160"
+				 y="234"
+				 width="38"
+				 text="64"
+				 restrict="0-9"/>
+	<s:Label x="105" y="238" text="格子宽"/>
+	<s:TextInput id="gridH"
+				 x="268"
+				 y="235"
+				 width="38"
+				 text="32"
+				 restrict="0-9"/>
+	<s:Label x="213" y="238" text="格子高"/>
+	<s:ComboBox id="gridType"
+				x="109"
+				y="199" 
+				width="98"
+				change="girdChange()"
+				dataProvider="{_gridTypeData}"/>
+	<s:Label x="38" y="203" text="格子类型"/>
+	<s:ComboBox id="readType"
+				x="109"
+				y="66" 
+				width="89"
+				change="readChange()"
+				dataProvider="{_readTypeData}"/>
+	<s:Label x="39" 
+			 y="72"
+			 text="读取类型"/>
+	<!--<s:TextInput id="xCuttingNum"
+				 x="240"
+				 y="94"
+				 width="66"
+				 restrict="0-9"/>
+	<s:Label id="xCutting" 
+			 x="175"
+			 y="101" 
+			 text="横向散图数"/>
+	<s:TextInput id="yCuttingNum"
+				 x="239" 
+				 y="127" 
+				 width="67" 
+				 restrict="0-9"/>
+	<s:Label id="yCuting" 
+			 x="177" 
+			 y="132" 
+			 text="纵向散图数"/>-->
+	<s:TextInput id="cutSize"
+				 x="110"
+				 y="111"
+				 width="57"
+				 text="300"
+				 restrict="0-9"/>
+	<s:Label x="40"
+			 y="118" 
+			 text="切图大小"/>
+	
+</s:Panel>

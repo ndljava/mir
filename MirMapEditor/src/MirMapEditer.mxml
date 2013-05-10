@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:tools="com.ui.tools.*"
+					   xmlns:panel="com.ui.panel.*"
+					   width="1900"
+					   height="1000"
+					   backgroundColor="#FBF6F6"
+					   creationComplete="init()">
+	<fx:Style source="MirMapEditer.css"/>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.event.MapEditerEvent;
+			import com.info.child.DecorateInfo;
+			import com.ui.map.MapPanel;
+			import com.ui.panel.ChangeMapPanel;
+			import com.ui.panel.NewMapInfoPanel;
+			import com.ui.panel.OpenMapPanel;
+			import com.utils.FileUtil;
+			import com.utils.MapUtil;
+			
+			import fileName.FileName;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.Application;
+			import mx.events.DragEvent;
+			import mx.events.ScrollEvent;
+			import mx.events.ScrollEventDetail;
+			import mx.events.ScrollEventDirection;
+			import mx.managers.PopUpManager;
+			
+			public static const SCENE:int=0;
+			public static const EFFECT:int=1;
+			public static const MONSTER:int=2;
+			public static const BOX:int=3;
+			public static const AREA:int=4;
+			public static const OBSTACLE:int=5;
+			public static const PATROL:int=6;
+			public static const POINT:int=7;
+			private var tableIdx:int=-1;
+			public var newFlag:Boolean;
+			private function init():void {
+				patrolPan.visible=false;
+				obsAndAreaPan.visible=false;
+				pointPan.visible=false;
+				sceEffMonBoxPan.visible=false;
+				this.rightPan.visible = false;
+				MapPanel.instance.mian = this;
+				systemManager.stage.focus = this;
+				this.addEventListener(KeyboardEvent.KEY_DOWN,MapPanel.instance.onkeyBoardDown);
+				this.addEventListener(KeyboardEvent.KEY_UP,MapPanel.instance.onkeyBoardUp);
+				this.addEventListener(MouseEvent.MOUSE_UP,onMouseUp);
+				readConfig();
+			}
+			/* 鼠标抬起 */
+			private function onMouseUp(evt:MouseEvent):void
+			{
+				rightPan.stopDrag();
+				MapPanel.instance.scrollerDrop();
+//				if(tableIdx != MirMapEditer.AREA)
+//					MapPanel.instance.onUpMap();
+			}
+			/* 读取配置文件 */
+			public static var swfPath:String;
+			private function readConfig():void
+			{
+				System.useCodePage = true;//防止出现乱码
+				var swfUrl:String = this.parent.loaderInfo.url; //获取swf加载路径
+				var endIndex:int = swfUrl.indexOf("MirMapEditer"); //搜索swf目录的路径位置
+				var path:String = swfUrl.substring(0,endIndex); //截取到swf目录前的url
+				swfPath = path;
+				path+= "assets/config.xml";
+				var ba:ByteArray = FileUtil.readFile(path);
+				if(ba == null)
+				{
+					Alert.show("配置文件读取错误");
+					return;
+				}
+				ba.position = 0; 
+				var xml:XML = new XML(ba.readMultiByte(ba.length,"utf-8"));
+				var obj:Object = new Object();
+				for each(var str:XML in xml.children())
+				{
+					for each(var str1:XML in str.children())
+						obj[str.name().toString()]=str1;
+				}
+				FileName.readFilePath = obj["readFilePath"];
+				FileName.saveFilePath = obj["saveFilePath"];
+				FileName.pointFilePath = obj["pointFilePath"];
+			}
+			/* 显示新建地图面板 */
+			public function showNewPanInfo():void
+			{
+				newFlag = true;
+				var mapInfoPanel:* = PopUpManager.createPopUp(this,NewMapInfoPanel,true);
+				PopUpManager.centerPopUp(mapInfoPanel);
+				mapInfoPanel.addEventListener(MapEditerEvent.NEWMAPINFO_SUBMITE,MapPanel.instance.createNewMap);
+			}
+			/*显示打开地图面板  */
+			public function showOpenMapInfo():void
+			{
+				newFlag = false;
+				var mapInfoPanel:* = PopUpManager.createPopUp(this,OpenMapPanel,true);
+				PopUpManager.centerPopUp(mapInfoPanel);
+				mapInfoPanel.addEventListener(MapEditerEvent.OPENMAPINFO_SUBMITE,MapPanel.instance.openNewMap);
+			}
+			/**
+			 *更换的底图 
+			 * 
+			 */		
+			public function changeMapMenuClick():void
+			{
+				var change:* = PopUpManager.createPopUp(this,ChangeMapPanel,true);
+				PopUpManager.centerPopUp(change);
+				change.addEventListener(MapEditerEvent.CHANGEMAPINFO_SUBMITE,MapPanel.instance.changeMap);
+			}
+		]]>
+	</fx:Script>
+	
+	<tools:MenuTools id="menuTool"
+					 x="0"
+					 y="0">
+	</tools:MenuTools>
+	<!--<s:Button id="sceneBtn"
+			  x="10"
+			  y="38"
+			  label="场景编辑"
+			  click="btnClick(SCENE)"/>
+	<s:Button id="effectBtn"
+			  x="92"
+			  y="37"
+			  label="特效编辑"
+			  click="btnClick(EFFECT)"/>
+	<s:Button id="monsterBtn"
+			  x="10"
+			  y="65"
+			  label="怪物编辑"
+			  click="btnClick(MONSTER)"/>
+	<s:Button id="boxBtn"
+			  x="92"
+			  y="64"
+			  label="宝箱编辑"
+			  click="btnClick(BOX)"/>
+	<s:Button id="areaBtn"
+			  x="10"
+			  y="93"
+			  label="区域编辑"
+			  click="btnClick(AREA)"/>
+	<s:Button id="obstacleBtn"
+			  x="92"
+			  y="91"
+			  label="障碍编辑"
+			  click="btnClick(OBSTACLE)"/>
+	<s:Button id="patrolBtn"
+			  x="10"
+			  y="120"
+			  label="巡逻编辑"
+			  click="btnClick(PATROL)"/>
+	<s:Button id="pointBtn"
+			  x="92"
+			  y="119"
+			  width="70"
+			  label="点编辑"
+			  click="btnClick(POINT)"/>-->
+	<s:Scroller id="mapScroller"
+				x="5"
+				y = "30"
+				width="1900" 
+				height="940">
+	  <s:Group id="mapContain"
+			   x="5" 
+			   y="30" 
+			   width="1880" 
+ 			   height="920"
+			   >
+	  </s:Group>
+	</s:Scroller>
+
+	<s:Label x="958" y="10" text="地图尺寸："/>
+	<s:Label id="imgSize" 
+			 x="1026" 
+			 y="10"/>
+	<s:Label x="1124"
+			 y="10" 
+			 text="格子坐标："/>
+	<s:Label id="gridId"
+			 x="1192"
+			 y="10" />
+	<panel:PatrolPanel id="patrolPan"
+					   x="6"
+					   y="200">
+	</panel:PatrolPanel>
+	<panel:ObstacleAndAreaPanel id="obsAndAreaPan"
+								x="6"
+								y="200">
+	</panel:ObstacleAndAreaPanel>
+	<panel:PointPanel id="pointPan"
+					  x="6"
+					  y="200">
+	</panel:PointPanel>
+	<panel:SceEffMonBoxPanel id="sceEffMonBoxPan"
+							 x="6"
+							 y="200">
+	</panel:SceEffMonBoxPanel>
+	<panel:UnitSelectPanel id="rightPan"
+						   x="1597"
+						   y="38">
+	</panel:UnitSelectPanel>
+	<s:Label id="xy" 
+			 x="1326"
+			 y="10"
+			 text=""/>
+	<s:Group id="miniMap"
+			 x="1540"
+			 y="710"
+			 width="200"
+			 height="200">
+	</s:Group>
+	
+		
+	<!--</s:Panel>-->
+</s:WindowedApplication>
+
