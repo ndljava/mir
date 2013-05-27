@@ -27,6 +27,8 @@ package com.leyou.enum {
 	
 		static public const SKILL_USE_SIGN:Array=[13,16,17,30,18,19,15,14];//灵魂火符、困魔咒、召唤骷髅、召唤神兽、隐身术、集体隐身术、神圣圣甲术、幽灵盾
 		static public const SKILL_USE_DRYG:Array=[6];
+		
+		static public const SKILL_PUBLIC_CD_TIME:int=1000;
 
 
 		//轨迹

@@ -236,5 +236,9 @@ package com.ace.gameData.player {
 			return false;
 		}
 
+		public function reset():void {
+			this.moveLocked=false;
+			this.isHurting=false;
+		}
 	}
 }

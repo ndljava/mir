@@ -12,6 +12,7 @@ package com.leyou.enum {
 		public static const COLOR_DIRT:String="#978243";
 		public static const COLOR_BLUE:String="#87ceeb";
 		public static const COLOR_PINK:String="#FF00FF";
+		public static const COLOR_ORANGE:String="#DAA520";
 		
 		public static const TYPE_TIPS_ITEM:int=0;
 		public static const TYPE_TIPS_EQUIP:int=1;

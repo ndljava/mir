@@ -1,7 +1,7 @@
 package com.leyou.enum {
 
 	public class FriendEnum {
-		public static const FRIENDLIST_RENDER_HEIGHT:int=36;
+		public static const FRIENDLIST_RENDER_HEIGHT:int=56;
 		public static const FIREND_MENULIST_CONTAIN:Array=["私聊", "查看", "组队", "屏蔽", "删除"];
 		public static const PRIVATE_CHAT:int=0;
 		public static const CHECK:int=1;

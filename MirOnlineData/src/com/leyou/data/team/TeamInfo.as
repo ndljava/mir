@@ -7,6 +7,11 @@ package com.leyou.data.team {
 		public var member:String;
 		public var level:int;
 		public var id:int;
+		public var mapname:String;
+		public var x:int;
+		public var y:int;
+		public var relevel:int;
+		
 		public function TeamInfo() {
 		}
 	}

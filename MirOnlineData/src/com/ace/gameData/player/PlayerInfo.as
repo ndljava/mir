@@ -15,9 +15,9 @@ package com.ace.gameData.player {
 		public var targetTile:Point; //寻路的目标点
 		public var attackPt:Point;
 
-		public var autoWalk:Boolean;
-		public var autoWalkNum:int=0;
-		public var mouseDownTile:Point; //鼠标按下的点
+		public var leftMouseDown:Boolean;
+		public var rightMouseDown:Boolean;
+
 
 		public var hasTeam:Boolean;
 		public var hasGuild:Boolean;
@@ -145,7 +145,7 @@ package com.ace.gameData.player {
 		public function addItem($type:String, info:TClientItem, ps:int=-1):int {
 			if (ps == -1) {
 				//判断重复 ndl
-				var tmp:TClientItem=this.getItemByMakeIndex(info.MakeIndex,$type);
+				var tmp:TClientItem=this.getItemByMakeIndex(info.MakeIndex, $type);
 				if (tmp != null && tmp.Addvalue[0] <= tmp.s.stackNum)
 					ps=this.backpackItems.indexOf(tmp);
 				else
@@ -327,24 +327,9 @@ package com.ace.gameData.player {
 			this.waitItemUse=-1;
 		}
 
-		public function startAutoWalk(pt:Point):void {
-			this.autoWalk=true;
-			this.autoWalkNum++;
-			this.mouseDownTile=pt;
-		}
 
-		public function updataAutoWalk(pt:Point):void {
-			this.mouseDownTile=pt;
-		}
-
-		public function stopAutoWalk():void {
-			this.autoWalk=false;
-			this.autoWalkNum=0;
-			this.mouseDownTile=null;
-		}
-
-		public function cancelFindPath():Boolean {
-			return this.autoWalkNum > 1;
+		public function autoWalk():Boolean {
+			return this.leftMouseDown || this.rightMouseDown;
 		}
 	/*public function copyItems(fromId:int, toId:int):void {
 	var info:TClientItem=this.backpackItems[fromId];

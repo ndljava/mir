@@ -1,8 +1,8 @@
 package com.ace.enum {
 	import flash.utils.Dictionary;
-
+	
 	public class ItemEnum {
-
+		
 		public static const TYPE_GRID_BASE:String="baseGrid";
 		public static const TYPE_GRID_BACKPACK:String="backpackGrid";
 		public static const TYPE_GRID_STORAGE:String="storageGrid";
@@ -15,7 +15,7 @@ package com.ace.enum {
 		public static const TYPE_GRID_GUILD:String="guildGrid";
 		public static const TYPE_GRID_MARKET:String="marketGrid";
 		public static const TYPE_GRID_EQUIP:String="EquipGrid";
-
+		
 		public static const TYPE_GRID_OTHER_EQUIP:String="otherEquip";
 		public static const TYPE_GRID_FORGE:String="forgeGrid";
 		public static const TYPE_GRID_LOST:String="lostGrid";
@@ -29,27 +29,27 @@ package com.ace.enum {
 		//		public static const TYPE_ITEM_RING:int=0;
 		//		public static const TYPE_ITEM_BANGLE:int=0;
 		//		public static const TYPE_ITEM_NECKLACE:int=0;
-
+		
 		public static const ITEM_BG_WIDTH:int=38;
 		public static const ITEM_BG_HEIGHT:int=38;
-
+		
 		public static const ITEM_ICO_WIDTH:int=33;
 		public static const ITEM_ICO_HEIGHT:int=33;
-
+		
 		public static const GRID_HORIZONTAL:int=7;
 		public static const GRID_SPACE:int=3;
-
+		
 		public static const BACKPACK_GRID_TOTAL:int=70;
 		public static const BACKPACK_GRID_OPEN:int=46;
-
+		
 		public static const STORAGE_GRIDE_TOTAL:int=70;
 		public static const STORAGE_GRIDE_OPEN:int=42;
-
-
+		
+		
 		public static const TIP_PX:int=12;
 		public static const TIP_PY:int=22;
-
-
+		
+		
 		//public static const //装备项目
 		public static const U_DRESS:uint=0; //衣服
 		public static const U_WEAPON:uint=1; //武器
@@ -74,7 +74,7 @@ package com.ace.enum {
 		public static const U_St:uint=20;
 		public static const U_Kz:uint=21;
 		public static const U_Fs:uint=22;
-
+		
 		public static const TYPE_ITEM_FOOD:int=0; //食物
 		public static const TYPE_ITEM_CROLL:int=1; //卷轴
 		public static const TYPE_ITEM_BOOK:int=2; //书籍
@@ -106,8 +106,11 @@ package com.ace.enum {
 		public static const TYPE_ITEM_SCROLL_POTIONS:int=28; //药品卷轴
 		public static const TYPE_ITEM_DRUG:int=29;//物品
 		public static const TYPE_ITEM_SPECIAL_DRUG:int=30;//特殊药水
+		public static const TYPE_DOUBLE_CLICK_USE:int=31;//双击使用
+		public static const TYPE_ITEM_ACTIVE:int=32;//活动道具
+		public static const TYPE_ILLEGAL_ITEM:int=33;//非法道具
 		private static var _itemNameDic:Object;
-
+		
 		public static function get itemNameDic():Object {
 			if (_itemNameDic != null)
 				return _itemNameDic;
@@ -142,11 +145,15 @@ package com.ace.enum {
 			_itemNameDic[ItemEnum.TYPE_ITEM_SHIELD]="盾牌";
 			_itemNameDic[ItemEnum.TYPE_ITEM_SCROLL_POTIONS]="药水卷轴";
 			_itemNameDic[TYPE_ITEM_DRUG]="药品";
-			_itemNameDic[TYPE_ITEM_SPECIAL]="特殊药水";
+			_itemNameDic[TYPE_ITEM_SPECIAL_DRUG]="特殊药水";
+			_itemNameDic[TYPE_DOUBLE_CLICK_USE]="双击使用";
+			_itemNameDic[TYPE_ITEM_ACTIVE]="活动道具";
+			_itemNameDic[TYPE_ILLEGAL_ITEM]="非法道具";
+			
 			return _itemNameDic;
 		}
 		private static var _equipPos:Object;
-
+		
 		public static function get equipPos():Object {
 			if (_equipPos != null)
 				return _equipPos;
@@ -158,11 +165,11 @@ package com.ace.enum {
 			_equipPos[15]=U_HELMET; //头盔
 			_equipPos[19]=U_NECKLACE; //项链
 			_equipPos[20]=U_NECKLACE; //项链s
-			_equipPos[21]=U_BUJUK; //特殊项链
+			_equipPos[21]=U_NECKLACE; //特殊项链
 			_equipPos[22]=U_RINGL; //戒指
 			_equipPos[23]=U_RINGL; //戒指
 			_equipPos[24]=U_ARMRINGL; //手镯
-
+			
 			_equipPos[25]=U_BUJUK; //毒药 附s
 			_equipPos[26]=U_ARMRINGL; //手镯
 			_equipPos[29]=U_HORSE; //马牌
@@ -176,7 +183,7 @@ package com.ace.enum {
 			_equipPos[64]=U_BELT; //腰带
 			return _equipPos;
 		}
-
+		
 		public static const ITEM_TYPE_DRUG:int=0; //药品
 		public static const ITEM_TYPE_FOOD_I:int=1; //食物
 		public static const ITEM_TYPE_FOOD_II:int=2; //食物

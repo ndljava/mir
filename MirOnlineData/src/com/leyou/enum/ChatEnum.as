@@ -19,7 +19,7 @@ package com.leyou.enum {
 		public static const FLAG_UNION:String="!@";
 		public static const FLAG_COMPOSITE:String="~";
 
-		public static const MESSAGE_MAX_NUM:int=100;
+		public static const MESSAGE_MAX_NUM:int=50;
 		public static const MESSAGE_LONG:int=35;
 		public static const MESSAGE_HORN_LONG:int=50;
 
@@ -52,6 +52,7 @@ package com.leyou.enum {
 		public static const imgKeyArr:Array=["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39"];
 
 		public static const COMBOX_CHAT_CHANNEL:String="chat_channle";
+		public static const CHAT_MEMORY_LONG:int=5;
 		public function ChatEnum() {
 		}
 	}

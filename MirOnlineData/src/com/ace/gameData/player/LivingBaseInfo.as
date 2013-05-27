@@ -34,11 +34,17 @@ package com.ace.gameData.player {
 		public var attackTargetID:int=-1; //攻击目标玩家 
 		public var cancelAttackTarget:Boolean; //取消攻击目标
 
+		public var skillCdTime:int; //技能cd时间
+
 		public function LivingBaseInfo() {
 		}
 
 
-
+		public function clearPath():void {
+			while (this.pathArr.length) {
+				this.pathArr.shift();
+			}
+		}
 
 		public function get moveLocked():Boolean {
 			return _moveLocked;
