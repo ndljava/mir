@@ -1,13 +1,17 @@
 package com.leyou.game.scene.child {
 	import com.ace.tools.SpriteNoEvt;
 	import com.ace.ui.img.child.Image;
+	import com.ace.utils.DebugUtil;
 
 	public class Item extends SpriteNoEvt {
 		private var img:Image;
 
-		public function Item() {
+		public var id:int;
+
+		public function Item($id:int) {
+			this.id=$id;
 			this.init();
-//			Tools.addFlag(0,0,this);
+//			DebugUtil.addFlag(0,0,this);
 		}
 
 		private function init():void {

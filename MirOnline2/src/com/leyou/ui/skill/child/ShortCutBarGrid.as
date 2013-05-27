@@ -67,7 +67,7 @@ package com.leyou.ui.skill.child {
 			this.icon.bitmapData=null;
 			this.isEmpty=true;
 		}
-		public function set numberLbl(num:int):void {
+		public function set numberLbl(num:String):void {
 			this.numLbl.text=num.toString();
 		}
 		

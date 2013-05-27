@@ -6,8 +6,9 @@ package com.leyou.ui.tips {
 	import com.ace.ui.lable.Label;
 	import com.leyou.enum.TipsEnum;
 	import com.leyou.utils.TipsUtil;
-
+	
 	import flash.display.Sprite;
+	import flash.filters.GlowFilter;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 
@@ -92,9 +93,11 @@ package com.leyou.ui.tips {
 			this.updateInfo(str);
 		}
 
+		public static var blackStrokeFilters:Array = [new GlowFilter(0x000000, 1, 2, 2, 8)];
 		public function showBuffTips(str:String):void {
 			this.lbl.htmlText=str;
 			this.bg.setSize(this.lbl.width, this.lbl.height);
+			this.lbl.filters=blackStrokeFilters;
 		}
 
 		/**

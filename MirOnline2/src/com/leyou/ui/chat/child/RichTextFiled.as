@@ -32,9 +32,10 @@ package com.leyou.ui.chat.child {
 			this.imgFlg=flag;
 
 			this.textFiled=new TextField();
+			this.textFiled.cacheAsBitmap=true;
 			this.textFiled.width=w - 10;
 			this.textFiled.x=3;
-			this.textFiled.useRichTextClipboard=true;
+//			this.textFiled.useRichTextClipboard=true;
 			this.textFiled.multiline=true;
 			this.textFiled.wordWrap=true;
 			this.textFiled.selectable=false;
@@ -62,6 +63,9 @@ package com.leyou.ui.chat.child {
 		}
 
 		private function appendRichText(str:String):void {
+//			var htmlText:String=this.textFiled.htmlText;
+//			htmlText+=str;
+//			this.textFiled.htmlText=htmlText;
 			this.textFiled.htmlText+=str;
 			this.textFiled.height=this.height;
 			if (this.imgFlg) {
@@ -70,13 +74,14 @@ package com.leyou.ui.chat.child {
 		}
 
 		private function clear():void {
-			if (imgFlg) {
+			if (this.imgFlg) {
 				while (this.spContain.numChildren) {
 					this.spContain.removeChildAt(0);
 				}
 			}
 			this.textFiled.htmlText="";
 			this.overObj=null;
+			this.spriteMap.length=0;
 		}
 
 		private function convert():void {
@@ -251,7 +256,7 @@ package com.leyou.ui.chat.child {
 			var target:TextField=evt.currentTarget as TextField;
 			if (!target)
 				return;
-			var ishit:Boolean=this.stage.hitTestObject(target);
+//			var ishit:Boolean=this.stage.hitTestObject(target);
 			var n:int=target.getCharIndexAtPoint(target.mouseX, target.mouseY);
 			if (n > 0) {
 				var url:String=target.getTextFormat(n, n + 1).url;

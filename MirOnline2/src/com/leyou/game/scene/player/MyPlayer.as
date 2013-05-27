@@ -12,6 +12,7 @@ package com.leyou.game.scene.player {
 	import com.ace.gameData.table.TPnfInfo;
 	import com.ace.gameData.table.TTransInfo;
 	import com.ace.utils.DebugUtil;
+	import com.leyou.config.Core;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
@@ -36,7 +37,7 @@ package com.leyou.game.scene.player {
 		}
 
 
-		private var _cacheCmdWalk:Boolean; //是否缓冲了延迟发送“行走”协议  要走之前=true，协议回来=false
+		private var _cacheCmdWalk:Boolean; //地图传送：是否缓冲了延迟发送“行走”协议  要走之前=true，协议回来=false
 		private var cmdAct:String;
 		private var cmdPs:Point=new Point();
 		private var cmdDir:int;
@@ -67,6 +68,10 @@ package com.leyou.game.scene.player {
 		}
 
 		override public function moveTo(node:INode, act:String, slow:Boolean=false):void {
+			if (act == PlayerEnum.ACT_WALK && UIManager.getInstance().mirScene.checkPlayer(new Point(node.x, node.y))) { //防止穿人
+				this.playDefaultAct();
+				return;
+			}
 			this.cmdAct=act;
 			this.cmdPs.x=node.x;
 			this.cmdPs.y=node.y;
@@ -83,6 +88,7 @@ package com.leyou.game.scene.player {
 		}
 
 		private function cmd_moveTo(act:String, tx:int, ty:int, dir:int):void {
+//			trace("要走的位置：" + tx + "--" + ty)
 			if (act == PlayerEnum.ACT_RUN) {
 				CmdScene.cm_SendRun(tx, ty, dir);
 			} else if (act == PlayerEnum.ACT_WALK) {
@@ -97,11 +103,11 @@ package com.leyou.game.scene.player {
 		}
 
 		override protected function onMoveOver():void {
-			UIManager.getInstance().smallMapWnd.updataPs();
-			UIManager.getInstance().mapWnd.updataPs();
-			if (UIManager.getInstance().mirScene.hasItem(this.nowTilePt())) {
-				Cmd_backPack.cm_pickup(this.nowTilePt().x, this.nowTilePt().y); //如果有道具拾起来
+			if (!Core.bugTest) {
+				UIManager.getInstance().smallMapWnd.updataPs();
+				UIManager.getInstance().mapWnd.updataPs();
 			}
+			UIManager.getInstance().mirScene.pickUpItem(this.nowTilePt());
 			super.onMoveOver();
 		}
 
@@ -122,19 +128,23 @@ package com.leyou.game.scene.player {
 		}
 
 		override protected function actAttack(pt:Point, dir:int=0, skillId:int=0):void {
-			skillId=this.getSoldierSkill();
+			if (this.infoB.isAttacking) ///强制攻击时加的
+				return;
+			if (skillId == 0) {
+				skillId=this.getSoldierSkill();
+			}
 			super.actAttack(pt, dir, skillId);
 			if (this._info.moveLocked)
 				return;
 			if (skillId == 0) {
 				CmdScene.cm_Attack(MirProtocol.CM_HIT, this.nowTilePt().x, this.nowTilePt().y, dir);
-			} else if (skillId == PlayerEnum.SKILL_FIRHIT)
+			} else if (skillId == PlayerEnum.SKILL_FIRHIT) {
 				CmdScene.cm_Attack(MirProtocol.CM_FIREHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
-			else if (skillId == PlayerEnum.SKILL_LONGHIT)
+			} else if (skillId == PlayerEnum.SKILL_LONGHIT) {
 				CmdScene.cm_Attack(MirProtocol.CM_LONGHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
-			else if (skillId == PlayerEnum.SKILL_POWERHIT)
+			} else if (skillId == PlayerEnum.SKILL_POWERHIT) {
 				CmdScene.cm_Attack(MirProtocol.CM_POWERHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
-			else if (skillId == PlayerEnum.SKILL_WIDEHIT) {
+			} else if (skillId == PlayerEnum.SKILL_WIDEHIT) {
 				CmdScene.cm_Attack(MirProtocol.CM_WIDEHIT, this.nowTilePt().x, this.nowTilePt().y, dir);
 			}
 		}
@@ -144,7 +154,7 @@ package com.leyou.game.scene.player {
 			if (this.info.race != PlayerEnum.PRO_SOLDIER)
 				return 0;
 			var skillId:int=0;
-			if (this.info.canLongHit && this.canCiSha()) {
+			if (this.info.canLongHit && this.canCiSha(this.info.currentDir)) {
 				skillId=PlayerEnum.SKILL_LONGHIT;
 			}
 			if (this.info.canWideHit) {
@@ -166,17 +176,6 @@ package com.leyou.game.scene.player {
 			}
 			return skillId;
 		}
-
-		//判断在2格范围内是否有目标可以刺杀
-		private function canCiSha():Boolean {
-			var pt:Point=SceneUtil.frontPt(this.nowTilePt(), this.info.currentDir);
-			pt=SceneUtil.frontPt(pt, this.info.currentDir);
-			if (UIManager.getInstance().mirScene.findPlayer(pt)) {
-				return true;
-			}
-			return false;
-		}
-
 
 		//使用技能
 		override public function useMagic(pt:Point, magicId:int, player:LivingModel):Boolean {
@@ -222,6 +221,12 @@ package com.leyou.game.scene.player {
 			return info;
 		}
 
+		override protected function actDie():void {
+			Cmd_backPack.cm_queryBagItems();
+//			UIManager.getInstance().roleWnd.up
+			super.actDie();
+		}
+
 		override public function die():void {
 			DebugUtil.throwError("不该死亡");
 		}
@@ -231,7 +236,11 @@ package com.leyou.game.scene.player {
 			Cmd_Stall.cm_clickhuman(id);
 		}
 
-		override protected function lookPlayer(id:int, ps:Point):void {
+		override protected function lookPlayer(id:int, ps:Point, isHead:Boolean=false):void {
+			if (isHead && !Core.bugTest) {
+				UIManager.getInstance().otherRoleHeadWnd.updataInfo(id);
+				return;
+			}
 			Cmd_Role.cm_queryUserState(id, ps);
 		}
 
@@ -241,6 +250,10 @@ package com.leyou.game.scene.player {
 
 		override protected function onActSpell(v1:int, v2:int, magicId:int, v3:int):void {
 			CmdScene.cm_spell(v1, v2, magicId, v3);
+		}
+
+		override protected function onTurn():void {
+			CmdScene.cm_turn(this.nowTilePt().x, this.nowTilePt().y, this.info.currentDir);
 		}
 
 		override protected function sysNotic(str:String):void {

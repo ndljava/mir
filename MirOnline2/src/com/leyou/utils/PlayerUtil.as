@@ -35,6 +35,34 @@ package com.leyou.utils {
 		}
 
 		/**
+		 *根据玩家的 职业 性别 返回头像的路径
+		 * @param race
+		 * @param sex
+		 * @return
+		 *
+		 */
+		public static function getOtherPlayerHeadImg(race:int, sex:int):String {
+			var url:String;
+			if (race == PlayerEnum.PRO_SOLDIER) {
+				if (sex == PlayerEnum.SEX_BOY)
+					url="ui/other/small_zs_m.png";
+				else
+					url="ui/other/small_zs_f.png";
+			} else if (race == PlayerEnum.PRO_MASTER) {
+				if (sex == PlayerEnum.SEX_BOY)
+					url="ui/other/small_fs_m.png";
+				else
+					url="ui/other/small_fs_f.png";
+			} else if (race == PlayerEnum.PRO_TAOIST) {
+				if (sex == PlayerEnum.SEX_BOY)
+					url="ui/other/small_ds_m.png";
+				else
+					url="ui/other/small_ds_f.png";
+			}
+			return url;
+		}
+
+		/**
 		 *通过职业编号 返回职业名字
 		 * @param raceIdx
 		 * @param flag 0：职业全称 1：职业简称

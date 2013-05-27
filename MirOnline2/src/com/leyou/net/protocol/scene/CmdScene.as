@@ -57,12 +57,12 @@ package com.leyou.net.protocol.scene {
 			SendSocketStr(NetEncode.getInstance().EncodeMessage(t_DefaultMsg), 1);
 		}
 
-		/*	static public function cm_Say(_str:String):void {
-				var t_msg:TDefaultMessage=new TDefaultMessage;
-				t_msg.MakeDefaultMsg(MirProtocol.CM_SAY, 0, 0, 0, 0, NetGate.getInstance().certification);
-				var t_str:String=NetEncode.getInstance().EncodeMessage(t_msg) + NetEncode.getInstance().EncodeString(_str);
-				SendSocketStr(t_str, 1);
-			}*/
+		static public function cm_turn(px:int, py:int, dir:int):void {
+			var t_msg:TDefaultMessage=new TDefaultMessage;
+			t_msg.MakeDefaultMsg(MirProtocol.CM_TURN, HexUtil.MakeLong(px, py), 0, dir, 0, NetGate.getInstance().certification);
+			var t_str:String=NetEncode.getInstance().GetSendText(1, NetEncode.getInstance().EncodeMessage(t_msg));
+			NetGate.getInstance().SendString(t_str);
+		}
 
 		static public function cm_SendWalk(px:int, py:int, _nDir:int):void {
 			var t_msg:TDefaultMessage=new TDefaultMessage;
@@ -174,6 +174,12 @@ package com.leyou.net.protocol.scene {
 			} else {
 				trace("没找到人");
 			}
+		}
+
+		//周围状态，地图状态
+		static public function sm_areaState(td:TDefaultMessage, body:String):void {
+			!Core.bugTest && UIManager.getInstance().smallMapWnd.updateModel(td.Recog);
+//			td.Recog; // 显示地图状态，16种：0000000000000000 从右到左，为1表示：战斗、安全、攻城区域 (当前只有这几种状态)
 		}
 
 		//设置用户名
@@ -316,7 +322,7 @@ package com.leyou.net.protocol.scene {
 		//技能使用失败
 		static public function sm_magicFireFail(td:TDefaultMessage, body:String):void {
 //			trace("使用技能失败");
-			UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "使用技能失败");
+			!Core.bugTest && UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "使用技能失败");
 		}
 
 		//状态改变，buff等效果
@@ -377,27 +383,6 @@ package com.leyou.net.protocol.scene {
 				player.actHit(0, 0);
 			} else {
 				return;
-				var f:TFeature=new TFeature();
-				f.feature=desc.feature;
-
-				//根据不同类型的种族，创建玩家、npc、怪
-				var info:LivingInfo=new LivingInfo();
-				info.id=td.Recog;
-//				info.name=nameStr;
-				info.currentDir=HexUtil.LoByte(td.Series);
-				info.nextTile.x=td.Param;
-				info.nextTile.y=td.Tag;
-				info.race=HexUtil.HiByte(td.Series); //职业
-
-				info.sex=f.sex;
-				info.type=f.type; //种族
-
-				f.copyTo(info.featureInfo);
-
-				player=UIManager.getInstance().mirScene.addOtherLiving(info);
-				DelayCallManager.getInstance().delByOwner(player);
-				player.infoB.actLocked=false;
-				player.actHit(0, 0);
 			}
 		}
 

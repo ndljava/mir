@@ -1,5 +1,4 @@
 package com.leyou.net {
-	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.tools.print;
 	import com.leyou.config.Core;
 	import com.leyou.net.protocol.Cmd_Buffer;
@@ -31,6 +30,7 @@ package com.leyou.net {
 				cacheCmdDic={};
 				//登录
 				dict[MirProtocol.SM_PASSOK_SELECTSERVER]=Cmd_Login.sm_Login;
+				dict[MirProtocol.SM_PASSWD_FAIL]=Cmd_Login.sm_passwd_fail;
 				dict[MirProtocol.SM_SELECTSERVER_OK]=Cmd_Login.sm_selectServer;
 				dict[MirProtocol.SM_QUERYCHR]=Cmd_Login.sm_QueryChr;
 				dict[MirProtocol.SM_STARTPLAY]=Cmd_Login.sm_SelChr;
@@ -51,6 +51,7 @@ package com.leyou.net {
 				dict[MirProtocol.SM_HORSERUN]=CmdScene.sm_run;
 				dict[MirProtocol.SM_USERNAME]=CmdScene.sm_userName;
 				dict[MirProtocol.SM_DISAPPEAR]=CmdScene.sm_disappear;
+				dict[MirProtocol.SM_AREASTATE]=CmdScene.sm_areaState;
 
 				//战士技能
 				dict[MirProtocol.SM_HIT]=CmdScene.sm_hit;
@@ -87,7 +88,7 @@ package com.leyou.net {
 				//心灵启示
 				dict[MirProtocol.SM_OPENHEALTH]=CmdScene.sm_openHealth;
 				dict[MirProtocol.SM_CLOSEHEALTH]=CmdScene.sm_closeHealth;
-				
+
 				//其他
 				dict[MirProtocol.SM_SERVERCONFIG]=CmdScene.sm_xxxx;
 
@@ -101,6 +102,10 @@ package com.leyou.net {
 				dict[MirProtocol.SM_LIGHTING]=CmdScene.sm_lighting; //僵尸王放电
 
 
+				//显示道具
+				dict[MirProtocol.SM_ITEMSHOW]=Cmd_backPack.sm_itemShow;
+				dict[MirProtocol.SM_ITEMHIDE]=Cmd_backPack.sm_itemHide;
+
 				if (Core.bugTest)
 					return;
 
@@ -109,6 +114,7 @@ package com.leyou.net {
 				dict[MirProtocol.SM_BAGITEMS]=Cmd_backPack.sm_bagItems;
 				dict[MirProtocol.SM_ADDITEM]=Cmd_backPack.sm_addItem;
 				dict[MirProtocol.SM_DELITEM]=Cmd_backPack.sm_delItem;
+				dict[MirProtocol.SM_DELITEMS]=Cmd_backPack.sm_delItems;
 				dict[MirProtocol.SM_UPDATEITEM]=Cmd_backPack.sm_updateItem;
 				dict[MirProtocol.SM_ITEMCHANGECOUNT]=Cmd_backPack.sm_itemChangeCount;
 				//				dict[MirProtocol.SM_MERCHANTSAY]=Cmd_backPack.sm_merchantSay;//仓库
@@ -121,11 +127,6 @@ package com.leyou.net {
 				dict[MirProtocol.SM_TAKEBACKSTORAGEITEM_FULLBAG]=Cmd_backPack.sm_takeBackStorageItem_fullBag;
 				dict[MirProtocol.SM_DROPITEM_SUCCESS]=Cmd_backPack.sm_dropItem_success;
 				dict[MirProtocol.SM_DROPITEM_FAIL]=Cmd_backPack.sm_dropItem_fail;
-
-
-				//显示道具
-				dict[MirProtocol.SM_ITEMSHOW]=Cmd_backPack.sm_itemShow;
-				dict[MirProtocol.SM_ITEMHIDE]=Cmd_backPack.sm_itemHide;
 
 				//使用道具
 				dict[MirProtocol.SM_TAKEON_OK]=Cmd_backPack.sm_takeOn_ok;
@@ -156,11 +157,12 @@ package com.leyou.net {
 				dict[MirProtocol.SM_WEIGHTCHANGED]=Cmd_Role.sm_weightChanged;
 				dict[MirProtocol.SM_WINEXP]=Cmd_Role.sm_winExp; //经验改变
 				dict[MirProtocol.SM_LEVELUP]=Cmd_Role.sm_levelUp; //升级
+				dict[MirProtocol.SM_CHANGEATTATCKMODE]=Cmd_Role.sm_changeAttackMode;
 				//属性分配
 				dict[MirProtocol.SM_ADJUST_BONUS]=Cmd_Role.sm_adjust_bonus;
 				//查看其它玩家
 				dict[MirProtocol.SM_SENDUSERSTATE]=Cmd_Role.sm_sendUserState;
-				
+
 
 				//交易
 				dict[MirProtocol.SM_DEALMENU]=Cmd_Trade.sm_dealMenu;
@@ -189,11 +191,11 @@ package com.leyou.net {
 				dict[MirProtocol.SM_MERCHANTDLGCLOSE]=Cmd_Task.sm_merchantdlgclose;
 				dict[MirProtocol.SM_CloseBigDialogBox]=Cmd_Task.sm_closeBigDialogBox;
 				dict[MirProtocol.SM_USERLOSTITEM_FAIL]=Cmd_Task.sm_userSellItem_fail;
-				
+
 				//失物招领
 				dict[MirProtocol.SM_SENDLOSTITEMLIST]=Cmd_Task.sm_sendLostItemList;
 				dict[MirProtocol.SM_QUERYLOSTITEM]=Cmd_Task.sm_queryLostItem;
-				
+
 				//组队
 				dict[MirProtocol.SM_CREATEGROUP_FAIL]=Cmd_Team.sm_createGroup_fail;
 				dict[MirProtocol.SM_CREATEGROUP_OK]=Cmd_Team.sm_createGroup_ok;
@@ -237,13 +239,13 @@ package com.leyou.net {
 				dict[MirProtocol.SM_MASTERTAKEGUILDITEMFAIL]=Cmd_Guild.sm_masterTakeGuildItemFail;
 				dict[MirProtocol.SM_OPENGUILDDLG_FAIL]=Cmd_Guild.sm_openGuildDlg_fail;
 				dict[MirProtocol.SM_SENDGUILDMEMBERLIST]=Cmd_Guild.sm_sendGuildMemberList;
-				
-				
+
+
 				//合成
 				dict[MirProtocol.SM_OPENMITEMWIN]=Cmd_Forge.sm_openmItemWin;
 				dict[MirProtocol.SM_FIFITEM_SUCC]=Cmd_Forge.sm_fifItem_succ;
 				dict[MirProtocol.SM_FIFITEM_FAIL]=Cmd_Forge.sm_fifItem_fail;
-				
+
 				//buffer
 				dict[MirProtocol.SM_BUFF]=Cmd_Buffer.sm_buff;
 			}
@@ -254,12 +256,12 @@ package com.leyou.net {
 			MirProtocol.SM_TURN, MirProtocol.SM_SPELL, MirProtocol.SM_MAGICFIRE, MirProtocol.SM_DEATH, MirProtocol.SM_BACKSTEP, //场景 
 			MirProtocol.SM_BAGITEMS, MirProtocol.SM_SAVEITEMLIST, MirProtocol.SM_ADDITEM, MirProtocol.SM_DELITEM, MirProtocol.SM_UPDATEITEM, //背包
 			MirProtocol.SM_SENDMYMAGIC, //技能
-			MirProtocol.SM_ABILITY, MirProtocol.SM_SENDUSEITEMS, MirProtocol.SM_ADJUST_BONUS,MirProtocol.SM_SENDUSERSTATE,//角色
+			MirProtocol.SM_ABILITY, MirProtocol.SM_SENDUSEITEMS, MirProtocol.SM_ADJUST_BONUS, MirProtocol.SM_SENDUSERSTATE, //角色
 			MirProtocol.SM_DEALREMOTEADDITEM, MirProtocol.SM_DEALREMOTEDELITEM, //交易
 			MirProtocol.SM_SENGSHOPITEMS, MirProtocol.SM_SENGSHOPSPECIALLYITEMS, //market
 			MirProtocol.SM_BTITEM, //摆摊
 			MirProtocol.SM_GUILDSTROAGE, //行会
-			MirProtocol.SM_BUFF//buffer
+			MirProtocol.SM_BUFF //buffer
 			];
 
 
@@ -272,12 +274,12 @@ package com.leyou.net {
 			}
 			fun=ServerFunDic.dict[td.Ident];
 			if (fun == null) {
-				trace("☆☆☆☆☆☆☆ 【警告！暂时还没有该类[" + td.Ident + "]" + body + "】 ☆☆☆☆☆☆☆");
+				print("☆☆☆☆☆☆☆ 【警告！暂时还没有该类[" + td.Ident + "]" + body + "】 ☆☆☆☆☆☆☆");
 				return;
 			}
 
 			if (skipCmdArr.indexOf(td.Ident) == -1)
-				trace("收到协议❀❀❀❀❀❀❀❀❀❀❀❀❀【[" + td.Ident + "]" + body + "】");
+				print("收到协议❀❀❀❀❀❀❀❀❀❀❀❀❀【[" + td.Ident + "]" + body + "】");
 
 
 			if ( /*td.Recog != MyInfoManager.getInstance().id &&*/cacheCmdArr.indexOf(td.Ident) != -1 && CmdScene.playerIsBusy(td)) {

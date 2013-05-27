@@ -12,8 +12,9 @@ package com.leyou.ui.friend.child {
 		private var nameLbl:Label;
 		private var levelLbl:Label;
 		private var memberLbl:Label;
-		private var highLightSBM:ScaleBitmap;
+		private var selectScBtm:Image;
 		private var timeLbl:Label;
+		private var highLightSBM:ScaleBitmap;
 		public var id:int;
 
 		public function FriendListRender() {
@@ -27,8 +28,10 @@ package com.leyou.ui.friend.child {
 			this.nameLbl=this.getUIbyID("nameLbl") as Label;
 			this.levelLbl=this.getUIbyID("levelLbl") as Label;
 			this.memberLbl=this.getUIbyID("memberLbl") as Label;
-			this.highLightSBM=this.getUIbyID("highLightSBM") as ScaleBitmap;
+			this.selectScBtm=this.getUIbyID("selectScBtm") as Image;
 			this.timeLbl=this.getUIbyID("timeLbl") as Label;
+			this.highLightSBM=this.getUIbyID("highLightSBM") as ScaleBitmap;
+			this.selectScBtm.visible=false;
 			this.highLightSBM.visible=false;
 		}
 
@@ -37,11 +40,28 @@ package com.leyou.ui.friend.child {
 			this.levelLbl.text=infor.lv.toString();
 			this.memberLbl.text=PlayerUtil.getPlayerMemberByid(infor.mumber);
 			this.timeLbl.text=infor.outLineTime;
-			
+			this.userHeadImg.updateBmp(PlayerUtil.getOtherPlayerHeadImg(infor.race, infor.sex));
 		}
 
 		public function set hightLight(flag:Boolean):void {
+			this.selectScBtm.visible=flag;
 			this.highLightSBM.visible=flag;
+		}
+
+		public function get userNameLbl():Label {
+			return nameLbl;
+		}
+
+		public function get memLbl():Label {
+			return memberLbl;
+		}
+
+		public function get lvLbl():Label {
+			return levelLbl;
+		}
+
+		public function get lasttimeLbl():Label {
+			return this.timeLbl;
 		}
 
 	}

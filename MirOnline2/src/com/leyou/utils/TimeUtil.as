@@ -36,7 +36,7 @@ package com.leyou.utils {
 		}
 
 		/**
-		 *
+		 * 日期转string
 		 * @param d
 		 * @return
 		 *
@@ -68,6 +68,12 @@ package com.leyou.utils {
 			return d.fullYear + "-" + d.month + "-" + d.date + " " + hh + ":" + mm + ":" + ss;
 		}
 
+		/**
+		 * 时间戳转时间 
+		 * @param _i
+		 * @return 
+		 * 
+		 */		
 		public static function getIntToTime(_i:int):String {
 			if (_i <= 0)
 				return "";

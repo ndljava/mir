@@ -16,7 +16,7 @@ package com.leyou.ui.skill.child {
 		private var numLbl:Label;
 		
 		private var cd:CDTimer;
-		private var isCD:Boolean;
+		private var _isCD:Boolean;
 		private var cdRemaindTime:int;
 
 		public function SkillGrid() {
@@ -69,7 +69,7 @@ package com.leyou.ui.skill.child {
 			ItemTip.getInstance().updataPs($x, $y);
 		}
 
-		override public function mouseDownHandler($x:Number, $y:Number):void {
+		override public function mouseUpHandler($x:Number, $y:Number):void{
 			//只有主动技能才能设置快捷键 暂时先不做
 			UIManager.getInstance().skillWnd.setShortCutBarPos($x, $y, this.dataId);
 		}
@@ -86,36 +86,46 @@ package com.leyou.ui.skill.child {
 		 * 
 		 */		
 		public function setShortCutKeyNum(num:int):void{
-			if(num>=0)
-				this.numLbl.text=String(num);
+			if(num>0&&num<8)
+				this.numLbl.text=num+"";
+			else if(num==8)
+				this.numLbl.text="Q";
+			else if(num==9)
+				this.numLbl.text="W";
+			else if(num==0)
+				this.numLbl.text="E";
 			else this.numLbl.text="";
 		}
 		
 		public function cdTime(time:int=2000):void {
-			if (this.isCD == true){
+			if (this._isCD == true){
 				if(this.cdRemaindTime<time){
 					this.cd.stop();
 					this.cd.start(time);
 					this.cd.visible=true;
-					this.isCD=true;
+					this._isCD=true;
 					this.mouseEnabled=false;
 				}
 				return;
 			}
 			this.cd.start(time);
-			this.isCD=true;
+			this._isCD=true;
 			this.mouseEnabled=false;
 			this.cd.visible=true;
 		}
 		
 		public function cdEnd():void {
-			this.isCD=false;
+			this._isCD=false;
 			this.mouseEnabled=true;
 			this.cd.visible=false;
 		}
 		
 		private function cdEnterFrame(t:int):void{
 			this.cdRemaindTime=t;
+		}
+		
+		public function get isCD():Boolean{
+			return this._isCD;
 		}
 	}
 }

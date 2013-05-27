@@ -97,7 +97,7 @@ package com.leyou.ui.forge {
 		}
 
 		/**
-		 *删除一个格子
+		 *	删除一个格子
 		 * @param mid
 		 *
 		 */
@@ -149,8 +149,13 @@ package com.leyou.ui.forge {
 		override public function hide():void {
 			super.hide();
 			UIManager.getInstance().backPackWnd.refresh();
+			this.gridDataList.length=0;
+			updateGridList();
 		}
 
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
+		}
 
 	}
 }

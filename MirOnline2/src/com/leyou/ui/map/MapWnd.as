@@ -7,7 +7,7 @@ package com.leyou.ui.map {
 	import com.ace.ui.lable.Label;
 	import com.leyou.config.Core;
 	import com.leyou.manager.UIManager;
-	
+
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 
@@ -84,7 +84,9 @@ package com.leyou.ui.map {
 				return;
 			}
 
-			Core.me.findPath(pt);
+			Core.me.onSceneClick(null, pt);
+
+			this.mapContent.updatePathArr();
 		}
 
 		/**
@@ -92,7 +94,8 @@ package com.leyou.ui.map {
 		 *
 		 */
 		public function updataPs():void {
-			this.mapContent.updataMapPs();
+			if (this.visible)
+				this.mapContent.updataMapPs();
 		}
 
 		public function addItem(id:int, pt:Point, type:int):void {

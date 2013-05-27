@@ -1,15 +1,12 @@
 package com.leyou.ui.backpack.child {
 	import com.ace.gameData.backPack.TClientItem;
-	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
-	import com.ace.ui.input.children.NumInput;
 	import com.ace.ui.input.children.TextInput;
 	import com.ace.ui.slider.children.HSlider;
-	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_backPack;
-
+	
 	import flash.events.MouseEvent;
 
 	public class BagSplitPanel extends AutoWindow {
@@ -59,9 +56,12 @@ package com.leyou.ui.backpack.child {
 			this.newGrid.x=180;
 			this.newGrid.y=50;
 
-			this.currentGrid.enable=false;
-			this.oldGrid.enable=false;
-			this.newGrid.enable=false;
+			this.currentGrid.mouseChildren=false;
+			this.currentGrid.mouseEnabled=false;
+			this.oldGrid.mouseChildren=false;
+			this.newGrid.mouseChildren=false;
+			this.oldGrid.mouseEnabled=false;
+			this.newGrid.mouseEnabled=false;
 		}
 
 		private function updateGrid(info:TClientItem):void {
@@ -92,6 +92,6 @@ package com.leyou.ui.backpack.child {
 
 			this.hide();
 		}
- 
+
 	}
 }

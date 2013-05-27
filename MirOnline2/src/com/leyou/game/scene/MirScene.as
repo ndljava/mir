@@ -1,37 +1,21 @@
 package com.leyou.game.scene {
-	import com.ace.astarII.child.INode;
 	import com.ace.enum.KeysEnum;
-	import com.ace.enum.NodeEnum;
 	import com.ace.enum.PlayerEnum;
 	import com.ace.enum.SceneEnum;
 	import com.ace.game.core.SceneCore;
-	import com.ace.game.manager.TableManager;
 	import com.ace.game.scene.SceneModel;
-	import com.ace.game.scene.part.LivingAvatar;
 	import com.ace.game.scene.part.LivingModel;
 	import com.ace.game.utils.SceneUtil;
 	import com.ace.gameData.player.LivingInfo;
 	import com.ace.gameData.player.PlayerInfo;
-	import com.ace.gameData.scene.MapInfoManager;
-	import com.ace.gameData.table.TTransInfo;
-	import com.ace.loader.LoaderManager;
-	import com.ace.loaderSync.SyncLoader;
 	import com.ace.manager.KeysManager;
 	import com.ace.manager.LayerManager;
-	import com.ace.manager.LibManager;
 	import com.ace.reuse.ReuseDic;
-	import com.ace.tools.print;
-	import com.ace.ui.img.child.Image;
-	import com.ace.utils.DebugUtil;
 	import com.leyou.config.Core;
-	import com.leyou.data.net.role.TNakedAbility;
-	import com.leyou.game.DebugGame;
 	import com.leyou.game.scene.child.Item;
 	import com.leyou.game.scene.player.Living;
 	import com.leyou.game.scene.player.MyPlayer;
 	import com.leyou.manager.UIManager;
-	import com.leyou.net.protocol.Cmd_Chat;
-	import com.leyou.net.protocol.Cmd_Role;
 	import com.leyou.net.protocol.Cmd_backPack;
 
 	import flash.display.BitmapData;
@@ -40,7 +24,7 @@ package com.leyou.game.scene {
 	import flash.utils.ByteArray;
 
 	public class MirScene extends SceneModel {
-		protected var itemObj:Object={};
+		protected var itemObj:Vector.<Item>=new Vector.<Item>;
 
 		public function MirScene() {
 			super();
@@ -49,7 +33,7 @@ package com.leyou.game.scene {
 		override protected function init():void {
 			super.init();
 			this.reuseDic=new ReuseDic(Living, 200);
-			this.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+			!Core.bugTest && this.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyUp);
 			KeysManager.getInstance().addKeyFun(KeysEnum.SPACE, this.test); //测试
 			//			LayerManager.getInstance().mainLayer.visible=false;
 		}
@@ -60,7 +44,7 @@ package com.leyou.game.scene {
 
 		private function onKeyUp(evt:KeyboardEvent):void {
 			switch (evt.keyCode) {
-				case KeysEnum.KEY0:
+//				case KeysEnum.KEY0:
 				case KeysEnum.KEY1:
 				case KeysEnum.KEY2:
 				case KeysEnum.KEY3:
@@ -68,8 +52,11 @@ package com.leyou.game.scene {
 				case KeysEnum.KEY5:
 				case KeysEnum.KEY6:
 				case KeysEnum.KEY7:
-				case KeysEnum.KEY8:
-				case KeysEnum.KEY9:
+//				case KeysEnum.KEY8:
+//				case KeysEnum.KEY9:
+				case KeysEnum.Q:
+				case KeysEnum.W:
+				case KeysEnum.E:
 					UIManager.getInstance().toolsWnd.onShortcutDown(evt.keyCode - 48);
 					break;
 			}
@@ -77,7 +64,7 @@ package com.leyou.game.scene {
 
 		//切换地图时的操作
 		private function onGotoMap():void {
-			UIManager.getInstance().addLoadingWnd();
+			!Core.bugTest && UIManager.getInstance().addLoadingWnd();
 			LayerManager.getInstance().windowLayer.hideAllWnd();
 		}
 
@@ -91,7 +78,7 @@ package com.leyou.game.scene {
 //			UIManager.getInstance().hideLoadingWnd();
 			Core.me && Core.me.sendCacheCmdWalk();
 			super._gotoMap(br, bmd);
-			UIManager.getInstance().mapWnd.updataImg();
+			!Core.bugTest && UIManager.getInstance().mapWnd.updataImg();
 			if (Core.me) {
 				Core.me.flyTo(this.nextPs.x, this.nextPs.y);
 				this.setMapPs(this.nextPs.x * SceneEnum.TILE_WIDTH, this.nextPs.y * SceneEnum.TILE_HEIGHT);
@@ -123,6 +110,14 @@ package com.leyou.game.scene {
 			return null;
 		}
 
+		public function checkPlayer(pt:Point):Boolean {
+			for each (var living:LivingModel in this.playerArr) {
+				if (pt.equals(living.nowTilePt()))
+					return true;
+			}
+			return false;
+		}
+
 		public function get Players():Vector.<LivingModel> {
 			return this.playerArr;
 		}
@@ -138,7 +133,7 @@ package com.leyou.game.scene {
 			Core.me.flyTo(this.nextPs.x, this.nextPs.y);
 			this.setMapPs(this.selectPlayer.x, this.selectPlayer.y);
 			!Core.bugTest && UIManager.getInstance().roleHeadWnd.updataInfo(info);
-			UIManager.getInstance().smallMapWnd.updataPs();
+			!Core.bugTest && UIManager.getInstance().smallMapWnd.updataPs();
 		}
 
 		public function addOtherLiving(info:LivingInfo, nameStr:String):Living {
@@ -159,7 +154,7 @@ package com.leyou.game.scene {
 				case 50:
 					info.currentDir=(info.currentDir) % 3;
 					info.livingType=PlayerEnum.RACE_NPC;
-					MapInfoManager.getInstance().updataTile(info.nextTile.x, info.nextTile.y, NodeEnum.NODE_BLOCK);
+//					MapInfoManager.getInstance().updataTile(info.nextTile.x, info.nextTile.y, NodeEnum.NODE_BLOCK);//设置npc为障碍点
 					break;
 				default:
 					info.livingType=PlayerEnum.RACE_MONSTER;
@@ -204,29 +199,57 @@ package com.leyou.game.scene {
 		}
 
 		public function addItem(id:int, px:int, py:int, appr:int):void {
-			if (this.itemObj[id])
+			if (this.hasItemII(id))
 				return;
-			var item:Item=new Item();
+			var item:Item=new Item(id);
 			item.updateBmp(appr);
 			item.x=SceneUtil.tileXToScreenX(px);
 			item.y=SceneUtil.tileYToScreenY(py);
 			this.noEvLayer.addChild(item);
-			this.itemObj[id]=item;
-			this.itemObj[px + "_" + py]=item;
+			this.itemObj.push(item);
 		}
 
 		public function removeItem(id:int):void {
-			if (!this.itemObj[id])
+			var item:Item=this.getItem(id);
+			if (!item)
 				return;
-			var item:Item=this.itemObj[id]
 			this.noEvLayer.removeChild(item);
-			delete this.itemObj[id];
-			delete this.itemObj[SceneUtil.screenXToTileX(item.x) + "_" + SceneUtil.screenYToTileY(item.y)];
-			print("删除");
+			this.itemObj.splice(this.itemObj.indexOf(item), 1);
 		}
 
 		public function hasItem(pt:Point):Boolean {
-			return this.itemObj[pt.x + "_" + pt.y]
+			for each (var item:Item in this.itemObj) {
+				if (pt.equals(SceneUtil.screenToTile(item.x, item.y))) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public function pickUpItem(pt:Point):void {
+			for each (var item:Item in this.itemObj) {
+				if (pt.equals(SceneUtil.screenToTile(item.x, item.y))) {
+					Cmd_backPack.cm_pickup(pt.x, pt.y); //如果有道具拾起来
+				}
+			}
+		}
+
+		private function hasItemII(id:int):Boolean {
+			for each (var item:Item in this.itemObj) {
+				if (id == item.id) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public function getItem(id:int):Item {
+			for each (var item:Item in this.itemObj) {
+				if (id == item.id) {
+					return item;
+				}
+			}
+			return null;
 		}
 
 		override protected function reset():void {
@@ -239,8 +262,9 @@ package com.leyou.game.scene {
 					item.die();
 				}
 			}
-			this.itemObj={};
-
+			while (this.itemObj.length) {
+				this.itemObj.shift();
+			}
 		}
 	}
 }

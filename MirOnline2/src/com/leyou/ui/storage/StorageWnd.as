@@ -1,10 +1,12 @@
 package com.leyou.ui.storage {
 	import com.ace.enum.ItemEnum;
+	import com.ace.enum.UIEnum;
 	import com.ace.game.backpack.GridBase;
 	import com.ace.game.manager.DragManager;
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
+	import com.ace.manager.MouseManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
@@ -81,6 +83,12 @@ package com.leyou.ui.storage {
 				DragManager.getInstance().addGrid(g);
 				this.gridList.addToPane(g);
 			}
+
+			MouseManager.getInstance().addFun(MouseEvent.MOUSE_UP, onStageMouseUp);
+		}
+
+		private function onStageMouseUp(e:MouseEvent):void {
+			showDragGlowFilter();
 		}
 
 		//填充数据
@@ -127,7 +135,7 @@ package com.leyou.ui.storage {
 			}
 
 			var len:int=MyInfoManager.getInstance().getBagNum(ItemEnum.TYPE_GRID_STORAGE);
-			this.bagCapacity.text=len + "/70";
+			this.bagCapacity.text=len + "/42";
 			this.moneyLbl.text="0";
 		}
 
@@ -138,8 +146,8 @@ package com.leyou.ui.storage {
 		private function changeTab(type:Array, reverse:Boolean=false):void {
 			var arr:Vector.<TClientItem>=MyInfoManager.getInstance().backpackItems;
 
-			var tmp2:Vector.<TClientItem>=arr.filter(function(item:TClientItem, i:int, arr:Vector.<TClientItem>):Boolean {
-				if (item.s != null && i >= ItemEnum.BACKPACK_GRID_TOTAL) {
+			var tmp2:Vector.<TClientItem>=arr.filter(function(item:TClientItem, _i:int, arr:Vector.<TClientItem>):Boolean {
+				if (item.s != null && _i >= ItemEnum.BACKPACK_GRID_TOTAL) {
 					for (var i:int=0; i < type.length; i++) {
 						if (reverse) {
 							if (item.s.type == type[i])
@@ -166,10 +174,10 @@ package com.leyou.ui.storage {
 		}
 
 		/**
-		 *显示拖拽光圈
+		 *	显示拖拽光圈
 		 *
 		 */
-		public function showDragGlowFilter(v:Boolean):void {
+		public function showDragGlowFilter(v:Boolean=false):void {
 			if (!this.visible)
 				return;
 
@@ -181,7 +189,6 @@ package com.leyou.ui.storage {
 				this.glowBg.filters=[];
 			}
 
-			UIManager.getInstance().toolsWnd.showDragGlowFilter(v);
 		}
 
 		/**
@@ -190,8 +197,8 @@ package com.leyou.ui.storage {
 		private function onClick(e:MouseEvent):void {
 			switch (e.target.name) {
 				case "neatenBtn":
-//					storeRequestShow=true;
-//					CmdScene.cm_sendDefaultMsg(MirProtocol.CM_ADDSTARITEM, 0, NetEnum.NPC_STORAGE, 0, 0);
+					//					storeRequestShow=true;
+					//					CmdScene.cm_sendDefaultMsg(MirProtocol.CM_ADDSTARITEM, 0, NetEnum.NPC_STORAGE, 0, 0);
 					Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_GETBACK);
 					this.mouseChildren=false;
 					break;
@@ -235,20 +242,70 @@ package com.leyou.ui.storage {
 		}
 
 		//更新一个格子
-		public function updatOneGrid(id:int):void {
+		public function updatOneGrid(id:int, ps:int=-1):void {
 			var info:TClientItem=MyInfoManager.getInstance().backpackItems[id];
 			var g:GridBase;
-			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_STORAGE, id);
-			g.updataInfo(info); //有数据则填充，无数据则开锁
 
-			this.updateTab();
+			var i:int=ps == -1 ? getDragIdByDataID(id) : ps;
+
+			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_STORAGE, i);
+			if ((this.storageTabBar.turnOnIndex > 0) && (info == null || info.s == null))
+				g.visible=false;
+			else {
+				g.updataInfo(info); //有数据则填充，无数据则开锁
+				g.visible=true;
+			}
+
+			if (this.storageTabBar.turnOnIndex > 0)
+				this.updateTab();
+		}
+
+		private function getDragIdByDataID(id:int):int {
+			var i:int=0;
+			var g:GridBase;
+
+			var did:int=-1;
+			for (i=ItemEnum.BACKPACK_GRID_TOTAL; i < (ItemEnum.BACKPACK_GRID_TOTAL + ItemEnum.STORAGE_GRIDE_TOTAL); i++) {
+				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_STORAGE, i);
+				if (g.dataId == id)
+					return g.initId;
+
+				if (did == -1 && g.dataId == -1)
+					did=g.initId;
+			}
+
+			return did;
+		}
+
+		public function IsSwapItem(id:int):int {
+			var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_STORAGE, id);
+			if(g.dataId==-1 || MyInfoManager.getInstance().itemIsJustFill(g.dataId))
+				return -1;
+			
+			return g.dataId;
 		}
 
 		override public function show(toTop:Boolean=true, toCenter:Boolean=true):void {
-
 			Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_GETBACK);
 			this.setStopPrg(false);
 			super.show(toTop, toCenter);
 		}
+
+		override public function hide():void {
+			super.hide();
+
+			if (UIManager.getInstance().backPackWnd.visible) {
+				if (UIManager.getInstance().backPackWnd.rightBorder)
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width;
+				else
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width - 100;
+			}
+
+		}
+		
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
+		}
+
 	}
 }

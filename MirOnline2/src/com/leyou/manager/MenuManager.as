@@ -1,10 +1,12 @@
 package com.leyou.manager {
 	import com.ace.ICommon.IMenu;
+	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.menu.MenuButton;
 	import com.ace.ui.menu.data.MenuInfo;
 	import com.leyou.ui.backpack.child.BackpackGrid;
 	import com.leyou.ui.guild.child.children.GuildStoreGrid;
 	import com.leyou.ui.guild.child.children.MemberRender;
+	import com.leyou.ui.team.child.TeamListRender;
 
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
@@ -13,10 +15,9 @@ package com.leyou.manager {
 	public class MenuManager {
 		private static var instance:MenuManager;
 
-		private var stg:Sprite;
-		private var currentMenus:Vector.<MenuInfo>;
-		private var currentIMenu:IMenu;
-
+		private var stg:Sprite; //菜单容器
+		private var currentMenus:Vector.<MenuInfo>; //当前菜单s
+		private var currentIMenu:IMenu; //当前单击的菜单
 
 		public static function getInstance():MenuManager {
 			if (!instance)
@@ -46,7 +47,8 @@ package com.leyou.manager {
 		}
 
 		private function onMenuStageClick(evt:MouseEvent):void {
-			if (!(evt.target is MenuButton) && !(evt.target is BackpackGrid) && !(evt.target is MemberRender) && !(evt.target is GuildStoreGrid))
+			//注意
+			if (!(evt.target is MenuButton) && !(evt.target is BackpackGrid) && !(evt.target is MemberRender) && !(evt.target is GuildStoreGrid) && !(evt.target is TeamListRender))
 				this.stg.visible=false;
 		}
 
@@ -54,7 +56,7 @@ package com.leyou.manager {
 			if (evt.target is MenuButton) {
 				this.currentIMenu.onMenuClick(MenuButton(evt.target).index);
 			}
-			evt.stopImmediatePropagation()
+			evt.stopImmediatePropagation();
 			this.stg.visible=false;
 		}
 
@@ -91,3 +93,12 @@ package com.leyou.manager {
 
 	}
 }
+
+/*
+ *
+	负责右键菜单
+1：单击时显示隐藏
+2：鼠标移除菜单后隐藏
+3：单击菜单时回调
+
+*/

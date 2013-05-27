@@ -1,15 +1,21 @@
 package com.leyou.ui.team {
+	import com.ace.ICommon.IMenu;
+	import com.ace.enum.UIEnum;
 	import com.ace.game.scene.part.LivingModel;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.CheckBox;
 	import com.ace.ui.button.children.NormalButton;
+	import com.ace.ui.menu.data.MenuInfo;
 	import com.ace.ui.scrollPane.children.ScrollPane;
 	import com.leyou.data.team.TeamInfo;
+	import com.leyou.enum.FriendEnum;
 	import com.leyou.enum.TaskEnum;
 	import com.leyou.enum.TeamEnum;
+	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.protocol.Cmd_Role;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Team;
 	import com.leyou.ui.team.child.TeamListRender;
@@ -17,8 +23,9 @@ package com.leyou.ui.team {
 
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 
-	public class TeamWnd extends AutoWindow {
+	public class TeamWnd extends AutoWindow implements IMenu {
 		private var gridList:ScrollPane;
 		private var creatTeamBtn:NormalButton;
 		private var deleteMemBtn:NormalButton;
@@ -31,6 +38,8 @@ package com.leyou.ui.team {
 		private var renderArr:Vector.<TeamListRender>;
 
 		private var selectIndex:int=-1;
+
+		private var isrefresh:Boolean=false;
 
 		public function TeamWnd() {
 			super(LibManager.getInstance().getXML("config/ui/TeamWnd.xml"));
@@ -51,7 +60,7 @@ package com.leyou.ui.team {
 			this.gridList.addEventListener(MouseEvent.MOUSE_OUT, onGirdListOut);
 
 			//this.creatTeamBtn.addEventListener(MouseEvent.CLICK, onClick);
-			this.deleteMemBtn.addEventListener(MouseEvent.CLICK, onClick);
+			//this.deleteMemBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.addMemBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.openTeamChBox.addEventListener(MouseEvent.CLICK, onClick);
 			//this.promoteTeamerBtn.addEventListener(MouseEvent.CLICK, onClick);
@@ -68,7 +77,14 @@ package com.leyou.ui.team {
 
 		override public function show(toTop:Boolean=true, toCenter:Boolean=true):void {
 			super.show(toTop, toCenter);
+			UIManager.getInstance().settingWnd.initData();
+			isrefresh=true;
 			this.updata(teamerInfo);
+
+			if (UIManager.getInstance().teamAddWnd.visible) {
+				this.x=(UIEnum.WIDTH - UIManager.getInstance().teamAddWnd.width - this.width) / 2;
+				UIManager.getInstance().teamAddWnd.x=this.x + this.width + 3;
+			}
 		}
 
 		/**
@@ -110,9 +126,14 @@ package com.leyou.ui.team {
 				this.gridList.delFromPane(render);
 			}
 
+			this.gridList.updateUI(true);
 			this.renderArr.length=0;
 
+			var tmp:Array=[];
 			for (var i:int=0; i < arr.length; i++) {
+
+				if (isrefresh)
+					tmp.push(TeamInfo(arr[i]).name);
 
 				if (MyInfoManager.getInstance().name == arr[i].name)
 					continue;
@@ -122,10 +143,17 @@ package com.leyou.ui.team {
 				render.y=this.renderArr.length * TeamEnum.TEAMLIST_RENDER_HEIGHT;
 				this.gridList.addToPane(render);
 				this.renderArr.push(render);
+
+				render.addEventListener(MouseEvent.CLICK, onRenderClick);
+			}
+
+			if (isrefresh && tmp.length != 0) {
+				Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_WEB_GET + "," + tmp.join("|") + ",MemberType|Level|MapName|X|Y|relevel");
+				isrefresh=false;
 			}
 
 			//更新头像
-			UIManager.getInstance().teamListPanel.updateHead(arr);
+			//UIManager.getInstance().teamListPanel.updateHead(arr);
 		}
 
 		private function onClick(evt:Event):void {
@@ -143,12 +171,48 @@ package com.leyou.ui.team {
 					UIManager.getInstance().teamAddWnd.show();
 					break;
 				case "openTeamChBox":
-					setTeamState(this.openTeamChBox.isOn);
+					UIManager.getInstance().settingWnd.settingGamePane.setSettingIsOnTeam(this.openTeamChBox.isOn);
+					//setTeamState(this.openTeamChBox.isOn);
 					break;
 				case "promoteTeamerBtn":
 					break;
 				case "quitBtn":
 					Cmd_Team.cm_groupMode(0);
+					break;
+			}
+		}
+
+		private function onRenderClick(e:MouseEvent):void {
+
+			var menuVec:Vector.<MenuInfo>=new Vector.<MenuInfo>();
+			if (MyInfoManager.getInstance().name == teamerInfo[0].name)
+				menuVec.push(new MenuInfo("开除", 1));
+			menuVec.push(new MenuInfo("查看", 2));
+			menuVec.push(new MenuInfo("私聊", 3));
+			menuVec.push(new MenuInfo("加为好友", 4));
+			MenuManager.getInstance().show(menuVec, this, new Point(e.stageX, e.stageY));
+		}
+
+		public function onMenuClick(i:int):void {
+			var tinfo:TeamInfo=getTeamInfoByID(selectIndex);
+			if (tinfo == null)
+				return;
+
+			switch (i) {
+				case 1:
+					Cmd_Team.cm_delGroupMember(tinfo.name);
+					break;
+				case 2:
+					if (UIManager.getInstance().mirScene.getPlayerByName(tinfo.name)) {
+						var id:int=UIManager.getInstance().mirScene.getPlayerByName(tinfo.name).id;
+						Cmd_Role.cm_queryUserState(id, UIManager.getInstance().mirScene.getPlayer(id).nowTilePt());
+					}
+					break;
+				case 3:
+					UIManager.getInstance().chatWnd.onClickPlayerName(tinfo.name);
+					break;
+				case 4:
+					Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, FriendEnum.ADD_FRIEND + "," + tinfo.name);
 					break;
 			}
 		}
@@ -188,7 +252,6 @@ package com.leyou.ui.team {
 					if (render)
 						render.hightLight=true;
 				}
-					//trace(id);
 			}
 		}
 
@@ -248,6 +311,10 @@ package com.leyou.ui.team {
 						if (info.name == tmp[0]) {
 							info.member=PlayerUtil.getPlayerMemberByid(tmp[1]);
 							info.level=tmp[2];
+							info.mapname=tmp[3];
+							info.x=tmp[4];
+							info.y=tmp[5];
+							info.relevel=tmp[6];
 						}
 					}
 				}
@@ -280,6 +347,18 @@ package com.leyou.ui.team {
 			this.updata(teamerInfo);
 		}
 
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT - this.height) / 2;
+		}
+
+		override public function hide():void {
+			super.hide();
+
+			if (UIManager.getInstance().teamAddWnd.visible) {
+				UIManager.getInstance().teamAddWnd.x=(UIEnum.WIDTH - UIManager.getInstance().teamAddWnd.width) / 2;
+			}
+		}
+
 		/**
 		 * 添加好友
 		 * @param body
@@ -288,6 +367,8 @@ package com.leyou.ui.team {
 		public function serv_AddTeam(body:String):void {
 			if (body == null)
 				return;
+
+			UIManager.getInstance().settingWnd.settingGamePane.setSettingIsOnTeam(true);
 
 			teamerInfo.length=0;
 
@@ -314,7 +395,7 @@ package com.leyou.ui.team {
 				i++;
 			}
 
-			Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_WEB_GET + "," + tmp + ",MemberType|Level");
+			Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, TaskEnum.CMD_WEB_GET + "," + tmp + ",MemberType|Level|MapName|X|Y|relevel");
 		}
 
 		public function serv_RemoveAllTeam():void {

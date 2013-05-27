@@ -11,6 +11,7 @@ package {
 	import com.leyou.data.bag.GridOrder;
 	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.ui.UiTester;
 	import com.leyou.ui.backpack.child.ItemTip;
 	
 	import flash.display.Sprite;
@@ -23,7 +24,7 @@ package {
 		public function MirOnline() {
 			GameConfig.setup();
 			DragManager.getInstance().setup(this.stage, new GridOrder());
-			DebugUtil.addCopyright(this, "版本0.2.4");
+			DebugUtil.addCopyright(this, "版本0.3.0");
 
 			_enswf__edcn;
 			LibManager.startLoad(this, this.start);
@@ -44,7 +45,7 @@ package {
 
 		//====================================================test================================================
 		private function test():void {
-
+			LayerManager.getInstance().windowLayer.addChild(new UiTester());
 		}
 
 	}

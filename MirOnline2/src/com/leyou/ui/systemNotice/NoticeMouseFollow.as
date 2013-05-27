@@ -76,5 +76,10 @@ package com.leyou.ui.systemNotice {
 			else if (this.lbl.y < 0)
 				this.lbl.y=0;
 		}
+		
+		
+		
+		
+		
 	}
 }

@@ -1,19 +1,25 @@
 package com.leyou.ui.chat.child {
 
 	import com.ace.enum.FontEnum;
+	import com.ace.enum.KeysEnum;
 	import com.ace.manager.LibManager;
 	import com.ace.manager.SkinsManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.button.children.ImgButton;
 	import com.ace.ui.input.children.HideInput;
 	import com.leyou.enum.ChatEnum;
+	import com.leyou.manager.UIManager;
 	
 	import flash.display.Sprite;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.events.TextEvent;
 	import flash.geom.Rectangle;
+	import flash.text.TextField;
+	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
+	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 
 	public class ChannelComboBox extends Sprite {
@@ -30,6 +36,9 @@ package com.leyou.ui.chat.child {
 		private var btnInput:HideInput;
 		private var maxChar:int;
 		private var type:String;
+
+		private var chatLongNum:int;
+		private var chatFlag:Boolean;
 
 		public function ChannelComboBox(w:Number, h:Number, type:String="") {
 			this.comboxW=w;
@@ -62,14 +71,34 @@ package com.leyou.ui.chat.child {
 			this.bgSBM.scale9Grid=FontEnum.RECTANGLE_DIC["PanelBgOut"];
 			this.itemContain.addChild(this.bgSBM);
 			this.btnInput=new HideInput();
+			//屏蔽事件
 			this.btnInput.width=this.comboxW - 15;
-			this.btnInput.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+			this.btnInput.stopKeyDownEvt();
+//			this.btnInput.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			this.upBtn.addChild(this.btnInput);
 
 			this.setBtnInputSta(false);
 		}
 
 		private function onKeyUp(evt:KeyboardEvent):void {
+			if (evt.keyCode != KeysEnum.ENTER && this.stage.focus == this.btnInput)
+				this.chatLongNum=this.btnInput.text.length;
+			if (evt.keyCode == KeysEnum.ENTER && this.stage.focus == this.btnInput) {
+				if (this.chatLongNum < this.btnInput.text.length) {
+					this.chatLongNum=this.btnInput.text.length;
+					this.chatFlag=true;
+				}
+			}
+			if (evt.keyCode == KeysEnum.ENTER) {
+				if (!this.chatFlag && this.stage.focus == this.btnInput) {
+					UIManager.getInstance().chatWnd.onStageEnter(false);
+					this.chatFlag=false;
+				} else
+					this.chatFlag=false;
+			}
+
+
+			evt.stopImmediatePropagation();
 			if (this.btnInput.text.indexOf("[") > -1)
 				this.btnInput.text=this.btnInput.text.replace("[", "");
 			if (this.btnInput.text.indexOf("]") > -1)
@@ -83,6 +112,10 @@ package com.leyou.ui.chat.child {
 				if (this.btnInput.text.indexOf("?") == this.btnInput.text.length - 1)
 					this.btnInput.text=this.btnInput.text.replace("?", "");
 			}
+		}
+
+		private function onKeyDown(evt:MouseEvent):void {
+			evt.stopImmediatePropagation();
 		}
 
 		private function onUpBtnClick(evt:MouseEvent=null):void {
@@ -168,11 +201,10 @@ package com.leyou.ui.chat.child {
 		 */
 		public function setSelectTextByIdx(idx:int):void {
 			this.selectLabIdx=idx;
-			if (this.type == ChatEnum.COMBOX_CHAT_CHANNEL) {
+			if (this.type == ChatEnum.COMBOX_CHAT_CHANNEL) 
 				this.btnInput.text=this.itemArr[idx].text.substring(this.itemArr[idx].text.length - 2);
-			} else
+			else
 				this.btnInput.text=this.itemArr[idx].text;
-//			this.btnInput.text=this.itemArr[idx].text;
 			this.btnInput.text=getBtnLabText(this.btnInput.text);
 			this.setBtnInputColor(this.itemArr[idx].labTextColor);
 		}
@@ -212,6 +244,13 @@ package com.leyou.ui.chat.child {
 		 */
 		public function setBtnInputSta(sta:Boolean):void {
 			this.btnInput.mouseEnabled=sta;
+			if (sta == true) {
+				this.btnInput.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+				this.btnInput.addEventListener(MouseEvent.MOUSE_DOWN, onKeyDown);
+				this.btnInput.type=TextFieldType.INPUT;
+			} else 
+				this.btnInput.type=TextFieldType.DYNAMIC;
+
 		}
 
 		/**
@@ -236,6 +275,10 @@ package com.leyou.ui.chat.child {
 		public function setInputMaxChar(num:int):void {
 //			this.btnInput.maxChars=num;
 			this.maxChar=num;
+		}
+
+		public function setFocs():void {
+			this.stage.focus=this.btnInput;
 		}
 	}
 }

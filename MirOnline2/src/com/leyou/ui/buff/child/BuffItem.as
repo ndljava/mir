@@ -1,9 +1,10 @@
 package com.leyou.ui.buff.child {
 	import com.ace.ui.img.child.Image;
 	import com.leyou.enum.TipsEnum;
+	import com.leyou.manager.TimerManager;
 	import com.leyou.ui.backpack.child.ItemTip;
 	import com.leyou.utils.TipsUtil;
-
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -19,7 +20,7 @@ package com.leyou.ui.buff.child {
 		public var tipsStr:String;
 		public var timeOutFun:Function;
 
-		private var timer:Timer;
+//		private var timer:Timer;
 		private var timerFlag:int;
 		private var tipSta:Boolean;
 
@@ -73,22 +74,24 @@ package com.leyou.ui.buff.child {
 
 		public function timeStart():void {
 			this.timerFlag=0;
-			this.timer=new Timer(1000, this._time);
-			this.timer.start();
-			this.timer.addEventListener(TimerEvent.TIMER, onTimeFun);
+			TimerManager.getInstance().add(onTimeFun);
+//			this.timer=new Timer(1000, this._time);
+//			this.timer.start();
+//			this.timer.addEventListener(TimerEvent.TIMER, onTimeFun);
 
 		}
 
 		public function timeStop():void {
-			if (this.timer)
-				this.timer.stop();
-			if (this.timer.hasEventListener(TimerEvent.TIMER))
-				this.timer.removeEventListener(TimerEvent.TIMER, onTimeFun);
+//			if (this.timer)
+//				this.timer.stop();
+//			if (this.timer.hasEventListener(TimerEvent.TIMER))
+//				this.timer.removeEventListener(TimerEvent.TIMER, onTimeFun);
+			TimerManager.getInstance().remove(onTimeFun);
 			if (this.hasEventListener(Event.ENTER_FRAME))
 				this.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 
-		private function onTimeFun(evt:TimerEvent):void {
+		private function onTimeFun(evt:TimerEvent=null):void {
 			this.timerFlag++;
 			if (this.tipSta)
 				this.showTips(getTimeStr(this._time - this.timerFlag));
@@ -101,8 +104,9 @@ package com.leyou.ui.buff.child {
 					this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			}
 			if (this.timerFlag >= this._time) {
-				this.timer.stop();
-				this.timer.removeEventListener(TimerEvent.TIMER, onTimeFun);
+				TimerManager.getInstance().remove(onTimeFun);
+//				this.timer.stop();
+//				this.timer.removeEventListener(TimerEvent.TIMER, onTimeFun);
 				if (this.timeOutFun != null) {
 					this.timeOutFun(this);
 				}
@@ -122,10 +126,13 @@ package com.leyou.ui.buff.child {
 			this._time=t;
 		}
 
+		public function get time():int{
+			return this._time;
+		}
 		private function getTimeStr(t:int):String {
 			var str:String=new String();
 			if (t > 60 * 60)
-				str="永久";
+				str="长期";
 			else {
 				var _t:int;
 				var s:int=t % 60;

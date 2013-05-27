@@ -64,9 +64,20 @@ package com.leyou.manager {
 		}
 
 		public function remove(f:Function):void {
-			var _f:Function;
-			for each (_f in dic) {
-				if (_f == f) {
+			var _f:String;
+			for (_f in dic) {
+				if (dic[_f] == f) {
+					dic[_f] == null;
+					delete dic[_f];
+					break;
+				}
+			}
+		}
+		
+		public function removeBykey(key:String):void {
+			var _f:String;
+			for (_f in dic) {
+				if (_f == key) {
 					dic[_f] == null;
 					delete dic[_f];
 					break;

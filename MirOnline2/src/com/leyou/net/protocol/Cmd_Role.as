@@ -4,21 +4,18 @@ package com.leyou.net.protocol {
 	import com.ace.gameData.player.FeatureInfo;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.player.PlayerInfo;
-	import com.ace.ui.window.children.AlertWindow;
 	import com.ace.utils.HexUtil;
 	import com.leyou.config.Core;
 	import com.leyou.data.net.role.TAbility;
 	import com.leyou.data.net.role.TNakedAbility;
 	import com.leyou.data.net.role.TUserStateInfo;
 	import com.leyou.data.net.scene.TFeature;
-	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
 	import com.leyou.net.NetGate;
 	import com.leyou.net.protocol.scene.CmdScene;
-	import com.leyou.ui.role.RoleWnd;
-
+	
 	import flash.geom.Point;
 
 	public class Cmd_Role {
@@ -39,8 +36,8 @@ package com.leyou.net.protocol {
 			var info2:PlayerInfo=MyInfoManager.getInstance();
 
 			UIManager.getInstance().backPackWnd.updataMoney();
-			UIManager.getInstance().propertyWnd.updateBaseInfo(MyInfoManager.getInstance().baseInfo);
-			UIManager.getInstance().propertyPointWnd.updateKeyInfo();
+			UIManager.getInstance().roleWnd.updateInfo();
+			UIManager.getInstance().toolsWnd.updateExp();
 		}
 
 		//附加属性
@@ -52,8 +49,7 @@ package com.leyou.net.protocol {
 			MyInfoManager.getInstance().exInfo.healthRecover=HexUtil.LoByte(td.Series);
 			MyInfoManager.getInstance().exInfo.spellRecover=HexUtil.HiByte(td.Series);
 			MyInfoManager.getInstance().exInfo.antiMagic=HexUtil.LoByte(HexUtil.LoWord(td.Recog));
-			UIManager.getInstance().propertyWnd.updateAddInfo(MyInfoManager.getInstance().exInfo);
-			UIManager.getInstance().propertyPointWnd.updateKeyInfo();
+			UIManager.getInstance().roleWnd.updateInfo();
 			UIManager.getInstance().backPackWnd.setBagWeight(MyInfoManager.getInstance().baseInfo.Weight + "/" + MyInfoManager.getInstance().baseInfo.MaxWeight);
 			var info2:PlayerInfo=MyInfoManager.getInstance();
 		}
@@ -105,8 +101,10 @@ package com.leyou.net.protocol {
 			MyInfoManager.getInstance().hp=hp;
 			MyInfoManager.getInstance().mp=mp;
 			MyInfoManager.getInstance().baseInfo.MaxHP=maxHp;
-			UIManager.getInstance().roleHeadWnd.updateHealth();
-			UIManager.getInstance().propertyWnd.updateBaseInfo(MyInfoManager.getInstance().baseInfo);
+			if (!Core.bugTest) {
+				UIManager.getInstance().roleHeadWnd.updateHealth();
+				UIManager.getInstance().roleWnd.updateInfo();
+			}
 		}
 
 		//重量修改
@@ -144,7 +142,7 @@ package com.leyou.net.protocol {
 				info.readBr(NetEncode.getInstance().DecodeBuffer(arr[i]));
 				infoArr.push(info);
 			}
-			UIManager.getInstance().propertyPointWnd.updatePointInfo(td.Recog, infoArr);
+			UIManager.getInstance().roleWnd.updatePointInfo(td.Recog, infoArr);
 //			td.Recog+infoArr//需要的数据
 		}
 
@@ -165,10 +163,13 @@ package com.leyou.net.protocol {
 			var player:LivingModel=UIManager.getInstance().mirScene.getPlayer(td.Recog);
 			var info:TUserStateInfo=new TUserStateInfo(NetEncode.getInstance().DecodeBuffer(body));
 			UIManager.getInstance().otherRoleWnd.updateInfo(info);
-			UIManager.getInstance().otherRoleWnd.show(true, true);
-			UIManager.getInstance().otherRoleHeadWnd.updataInfo(info);
+			UIManager.getInstance().otherRoleWnd.show();
 
 		}
 
+		static public function sm_changeAttackMode(td:TDefaultMessage, body:String):void {
+			body;//
+			UIManager.getInstance().roleHeadWnd.setMode(body);
+		}
 	}
 }

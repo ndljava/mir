@@ -31,6 +31,7 @@ package com.leyou.net.protocol {
 		//打开行会-fail
 		static public function sm_openGuildDlg_fail(td:TDefaultMessage, body:String):void {
 			//提示：您还没有加入行会.
+			UIManager.getInstance().noticeMidDownUproll.setNoticeStr("打开行会失败!!!",0);
 		}
 
 		//成员列表

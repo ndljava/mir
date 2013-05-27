@@ -13,10 +13,12 @@ package com.leyou.ui.stall {
 	import com.ace.ui.scrollPane.children.ScrollPane;
 	import com.ace.ui.window.children.AlertWindow;
 	import com.ace.ui.window.children.WindInfo;
+	import com.leyou.config.Core;
 	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Stall;
+	import com.leyou.ui.stall.child.StallGrid;
 	import com.leyou.ui.stall.child.StallListRender;
 	
 	import flash.events.MouseEvent;
@@ -68,6 +70,8 @@ package com.leyou.ui.stall {
 
 				this.itemRenderArr.push(render);
 			}
+			
+			this.confirmBtn.text="确认摆摊";
 		}
 
 		private function updateInfo(vec:Vector.<TClientItem>):void {
@@ -81,21 +85,44 @@ package com.leyou.ui.stall {
 
 		private function onBtnClick(evt:MouseEvent):void {
 			if (evt.target.name == "confirmBtn") { //确定按钮
-				if (this.stallInput.text != null && this.stallInput.text != "") {
-					if (this.itemSelfDataArr.length == 0) {
-						PopupManager.showAlert("你没有物品!");
-						return;
-					}
+				if (this.confirmBtn.text.indexOf("取消") == -1) {
+					if (this.stallInput.text != null && this.stallInput.text != "") {
+						if (this.itemSelfDataArr.length == 0) {
+							PopupManager.showAlert("你没有物品!");
+							return;
+						}
+
+						this.confirmBtn.text="取消摆摊";
+						Core.me.info.moveLocked=true;
+						
+						if (MyInfoManager.getInstance().isOnMount) {
+							Cmd_Chat.cm_say("@下马");
+						}
+
+						Cmd_Stall.cm_btItem_confirm(this.stallInput.text);
+						UIManager.getInstance().backPackWnd.hide();
+					} else
+						PopupManager.showAlert("请输入名字!!!");
 					
-					if (MyInfoManager.getInstance().isOnMount) {
-						Cmd_Chat.cm_say("@下马");
-					}
+				} else {
 					
-					Cmd_Stall.cm_btItem_confirm(this.stallInput.text);
-					UIManager.getInstance().backPackWnd.hide();
-					this.confirmBtn.setActive(false);
-				} else
-					PopupManager.showAlert("请输入名字!");
+					this.confirmBtn.text="确认摆摊";
+					Cmd_Stall.cm_canclebtitem();
+					
+					this.itemSelfDataArr.length=0;
+					this.itemOtherDataArr.length=0;
+					
+					this.updateInfo(this.itemSelfDataArr);
+					
+					Core.me.info.moveLocked=false;
+					
+					if (UIManager.getInstance().backPackWnd.visible) {
+						if (UIManager.getInstance().backPackWnd.rightBorder)
+							UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width;
+						else
+							UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width - 100;
+					}
+				}
 			}
 		}
 
@@ -107,7 +134,21 @@ package com.leyou.ui.stall {
 
 			this.itemSelfDataArr.length=0;
 			this.itemOtherDataArr.length=0;
-			this.confirmBtn.setActive(true);
+			//this.confirmBtn.setActive(true);
+
+			Core.me.info.moveLocked=false;
+
+			if (UIManager.getInstance().backPackWnd.visible) {
+				if (UIManager.getInstance().backPackWnd.rightBorder)
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width;
+				else
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width - 100;
+			}
+
+			if (StallGrid.POPWIND != null) {
+				StallGrid.POPWIND.close();
+				StallGrid.POPWIND=null;
+			}
 		}
 
 		/**
@@ -128,7 +169,7 @@ package com.leyou.ui.stall {
 		}
 
 		/**
-		 *删除自己的物品
+		 *	删除自己的物品
 		 * @param info
 		 *
 		 */
@@ -164,7 +205,7 @@ package com.leyou.ui.stall {
 			this.stallInput.text=MyInfoManager.getInstance().name + "-摊位";
 
 			//锁定人物;
-
+			Core.me.info.moveLocked=true;
 		}
 
 		/**
@@ -185,6 +226,10 @@ package com.leyou.ui.stall {
 			var player:LivingModel=UIManager.getInstance().mirScene.getPlayer(selectPlayerID);
 			if (player != null)
 				this.stallInput.text="" + player.infoB.stallName
+		}
+
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT - this.height) / 2;
 		}
 
 	}

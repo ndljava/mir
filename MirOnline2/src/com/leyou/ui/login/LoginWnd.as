@@ -5,6 +5,7 @@ package com.leyou.ui.login {
 	import com.ace.ui.button.children.CheckBox;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.input.children.HideInput;
+	import com.ace.ui.lable.Label;
 	import com.ace.ui.window.children.PopWindow;
 	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.config.Core;
@@ -12,7 +13,7 @@ package com.leyou.ui.login {
 	import com.leyou.net.NetGate;
 	import com.leyou.net.protocol.login.Cmd_Login;
 	import com.leyou.ui.selectUser.info.SelectUserInfo;
-
+	
 	import flash.events.MouseEvent;
 
 	public class LoginWnd extends AutoSprite {
@@ -33,13 +34,19 @@ package com.leyou.ui.login {
 			this.loginBtn=this.getUIbyID("loginBtn") as NormalButton;
 			this.rememberNameCheBox=this.getUIbyID("rememberNameCheBox") as CheckBox;
 			this.rememberNameCheBox.turnOn(false); //默认选中
-
+			
 			this.loginBtn.addEventListener(MouseEvent.CLICK, onClick);
 
 //			this.userNameTinput.text="face41";//注意以后该类如果只是名称修改的话，不要提交
 //			this.userNameTinput.text="face3";
 //			this.userPwdTinput.text="asdfasdf";
 			this.readName();
+			
+			
+			
+			
+			var gameVersionLbl:Label=this.getUIbyID("gameVersionLbl") as Label;
+			gameVersionLbl.text+="0.3.3"
 		}
 
 		private function onClick(evt:MouseEvent):void {

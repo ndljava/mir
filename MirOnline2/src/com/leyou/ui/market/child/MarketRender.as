@@ -14,7 +14,7 @@ package com.leyou.ui.market.child {
 		private var itemNameLbl:Label;
 		private var prePriceLbl:Label;
 		private var nowPriceLbl:Label;
-		private var previewBtn:NormalButton;
+//		private var previewBtn:NormalButton;
 		private var givingBtn:NormalButton;
 		private var buyBtn:NormalButton;
 		private var item:TShopInfo;
@@ -33,11 +33,11 @@ package com.leyou.ui.market.child {
 			this.itemNameLbl=this.getUIbyID("itemNameLbl") as Label;
 			this.prePriceLbl=this.getUIbyID("prePriceLbl") as Label;
 			this.nowPriceLbl=this.getUIbyID("nowPriceLbl") as Label;
-			this.previewBtn=this.getUIbyID("previewBtn") as NormalButton;
+//			this.previewBtn=this.getUIbyID("previewBtn") as NormalButton;
 			this.givingBtn=this.getUIbyID("givingBtn") as NormalButton;
 			this.buyBtn=this.getUIbyID("buyBtn") as NormalButton;
 
-			this.previewBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
+//			this.previewBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
 			this.givingBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
 			this.buyBtn.addEventListener(MouseEvent.CLICK, onBtnClick);
 
@@ -89,8 +89,8 @@ package com.leyou.ui.market.child {
 		}
 		
 		public function set previewBtnSta(sta:Boolean):void{
-			this.previewBtn.mouseEnabled=sta;
-			this.previewBtn.setActive(sta);
+//			this.previewBtn.mouseEnabled=sta;
+//			this.previewBtn.setActive(sta);
 		}
 
 		private function drawLine(lbl:Label):void {

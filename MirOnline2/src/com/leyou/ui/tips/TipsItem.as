@@ -1,10 +1,14 @@
 package com.leyou.ui.tips {
 	import com.ace.enum.FontEnum;
 	import com.ace.enum.ItemEnum;
+	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.backPack.TClientItem;
+	import com.ace.gameData.backPack.TSClientItem;
 	import com.ace.gameData.player.MyInfoManager;
+	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
+	import com.ace.ui.img.child.Image;
 	import com.ace.ui.lable.Label;
 	import com.leyou.data.net.lostAndFind.TLostItemBind;
 	import com.leyou.data.net.market.TShopInfo;
@@ -15,11 +19,12 @@ package com.leyou.ui.tips {
 	import com.leyou.enum.TipsEnum;
 	import com.leyou.manager.TimerManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.tips.child.TipsGrid;
 	import com.leyou.utils.TaskUtils;
 	import com.leyou.utils.TimeUtil;
 	import com.leyou.utils.TipsUtil;
-
+	
 	import flash.display.Sprite;
 	import flash.events.TimerEvent;
 	import flash.globalization.DateTimeFormatter;
@@ -36,6 +41,7 @@ package com.leyou.ui.tips {
 
 		private var time:Number=0;
 		private var timestr:String="";
+		private var img:Image;
 
 		public function TipsItem() {
 			super();
@@ -72,9 +78,14 @@ package com.leyou.ui.tips {
 			this.lbll.y=this.grid.y + this.grid.height;
 			this.lbll.defaultTextFormat=format;
 			this.addChild(this.lbll);
+			
+			this.img=new Image();
+			this.img.updateBmp("ui/other/tips_equip.png");
+			this.addChild(this.img);
+			this.img.visible=false;
 		}
 
-		private function updataInfo(info:ItemTipsInfo):void {
+		private function updataInfo(info:ItemTipsInfo,f:Boolean):void {
 			var i:int;
 			this.lbll.htmlText="";
 			this.lbl.htmlText=TipsUtil.getColorStr(info.name, TipsEnum.COLOR_YELLOW);
@@ -116,6 +127,12 @@ package com.leyou.ui.tips {
 			else
 				this.Bg.setSize(this.w + 2, this.lbl.height + 2);
 			this.grid.updataInfo(info);
+			
+			if(f){
+				this.img.x=this.w-this.img.width;
+				this.img.visible=true;
+			}
+			else this.img.visible=false;
 		}
 
 		/**
@@ -123,7 +140,7 @@ package com.leyou.ui.tips {
 		 * @param info
 		 *
 		 */
-		public function bagTips(info:TClientItem):void {
+		public function bagTips(info:TClientItem,f:Boolean=false):void {
 			this.info.clearMe();
 			this.info.name=info.s.name;
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.s.type, info.s.shape)];
@@ -157,15 +174,38 @@ package com.leyou.ui.tips {
 			} else {
 				//				this.info.limit=TipsUtil.getLimitStr(info.s.limitType, info.s.limitLevle);
 			}
-			this.updataInfo(this.info);
+			this.updataInfo(this.info,f);
 		}
 
+		public function otherRoleItem(info:TSClientItem):void{
+			var tInfo:TItemInfo=TableManager.getInstance().getItemInfo(info.wIndex - 1);
+			//			tInfo.source=info.
+			if (tInfo == null)
+				return;
+			this.info.clearMe();
+			tInfo=Cmd_backPack.GetItemAddValue(null, tInfo, info.btValue);
+			this.info.name=tInfo.name;
+			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(tInfo.type,tInfo.shape)];
+			this.info.weight=tInfo.weight;
+			this.info.instruct1=TipsUtil.getInstructionByFlag(tInfo.limitCheck, TipsEnum.TYPE_TIPS_ITEM);
+			this.info.instruct2=tInfo.note;
+//			this.info.limit=TipsUtil.getLimitStr(tInfo.limitType, tInfo.limitLevle, false);
+			
+			this.info.Looks=tInfo.appr;
+			if (tInfo.type == 25) //毒药 和 符
+				this.info.numStr=info.Dura + "/" + info.DuraMax;
+			else
+				this.info.numStr=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
+//			this.info.properArr=TipsUtil.getProperNum(tInfo);
+			
+			this.updataInfo(this.info,false);
+		}
 		/**
 		 *商店中的道具
 		 * @param shopInfo
 		 *
 		 */
-		public function shopTip(shopInfo:TStdItem):void {
+		public function shopTip(shopInfo:TStdItem,f:Boolean=false):void {
 			this.info.clearMe();
 			this.info.name=shopInfo.Name;
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(shopInfo.StdMode, shopInfo.Shape)];
@@ -177,7 +217,7 @@ package com.leyou.ui.tips {
 			this.info.weight=shopInfo.Weight;
 			this.info.instruct1=TipsUtil.getInstructionByFlag(shopInfo.LimitCheck, TipsEnum.TYPE_TIPS_ITEM);
 			this.info.Looks=shopInfo.Looks;
-			this.updataInfo(this.info);
+			this.updataInfo(this.info,f);
 		}
 
 		/**
@@ -185,7 +225,7 @@ package com.leyou.ui.tips {
 		 * @param info
 		 *
 		 */
-		public function marketTip(info:TShopInfo, btnIdx:int):void {
+		public function marketTip(info:TShopInfo, btnIdx:int,f:Boolean=false):void {
 			this.info.clearMe();
 			this.info.name=info.stdInfo.Name;
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.stdInfo.StdMode, info.stdInfo.Shape)];
@@ -213,7 +253,7 @@ package com.leyou.ui.tips {
 			this.info.instruct1=TipsUtil.getInstructionByFlag(info.stdInfo.LimitCheck, TipsEnum.TYPE_TIPS_ITEM);
 			this.info.instruct2=info.sIntroduce;
 			this.info.Looks=info.stdInfo.Looks;
-			this.updataInfo(this.info);
+			this.updataInfo(this.info,f);
 		}
 
 		/**
@@ -235,17 +275,18 @@ package com.leyou.ui.tips {
 			timestr=str;
 
 			var d:Date=new Date();
+			d.month+=1;
 			var st:Date=TimeUtil.getDateTo24hour(TimeUtil.getStringToDate(info.sTime));
 			if (d < st) {
-				d.month+=1;
+
 				time=(st.time - d.time) / 1000;
-				
+
 				if (info.sSendUserItem == MyInfoManager.getInstance().name)
 					str+=TipsUtil.getColorStr("获得赎金:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
 				else if (info.sBindName == MyInfoManager.getInstance().name)
 					str+=TipsUtil.getColorStr("折扣时限:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
-				
-				TimerManager.getInstance().add(lostTimer);
+
+				TimerManager.getInstance().add(lostTimer, "lostrender");
 			}
 
 			this.lbl.htmlText=str;
@@ -258,16 +299,23 @@ package com.leyou.ui.tips {
 			this.grid.visible=false;
 		}
 
+		override public function set visible(value:Boolean):void {
+			super.visible=value;
+			if (!value)
+				TimerManager.getInstance().remove(lostTimer);
+		}
+
 		private function lostTimer():void {
 			time--;
-
-			if (this.lbl.text.indexOf("折扣时限") < -1)
-				this.lbl.htmlText=timestr + TipsUtil.getColorStr("折扣时限:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
-			else
-				this.lbl.htmlText=timestr + TipsUtil.getColorStr("获得赎金:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
-
 			if (time <= 0) {
 				TimerManager.getInstance().remove(lostTimer);
+				this.lbl.htmlText=timestr;
+			} else {
+				if (this.lbl.text.indexOf("折扣时限") !=-1)
+					this.lbl.htmlText=timestr + TipsUtil.getColorStr("折扣时限:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+				else
+					this.lbl.htmlText=timestr + TipsUtil.getColorStr("获得赎金:" + TimeUtil.getIntToTime(time), TipsEnum.COLOR_RED) + "\n";
+
 			}
 		}
 

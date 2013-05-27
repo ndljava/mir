@@ -9,6 +9,7 @@ package com.leyou.ui.guild.child {
 	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Guild;
+	import com.leyou.ui.guild.child.children.GuildStoreGrid;
 	import com.leyou.ui.guild.child.children.ShopRender;
 	import com.leyou.utils.GuildUtils;
 	
@@ -123,7 +124,7 @@ package com.leyou.ui.guild.child {
 
 		private function onContainSPClick(evt:MouseEvent):void {
 			if (evt.target is ShopRender) {
-				var idx:int=this.renderArr.indexOf(evt.target);
+				var idx:int=this.renderArr.indexOf(evt.target as ShopRender);
 				if (this.selectRenderIdx == idx && this.selectRenderIdx>=this.renderArr.length)
 					return;
                                   
@@ -165,7 +166,7 @@ package com.leyou.ui.guild.child {
 
 		private function onConTainSPOver(evt:MouseEvent):void {
 			if (evt.target is ShopRender) {
-				var idx:int=this.renderArr.indexOf(evt.target);
+				var idx:int=this.renderArr.indexOf(evt.target as ShopRender);
 				if (this.selectRenderIdx == idx || this.overRenderIdx == idx)
 					return;
 

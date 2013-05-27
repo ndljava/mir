@@ -1,17 +1,17 @@
 package com.leyou.ui.setting {
 	import com.ace.gameData.player.MyInfoManager;
+	import com.ace.gameData.setting.SettingGameInfo;
+	import com.ace.gameData.setting.SettingVideoInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
 	import com.ace.ui.tabbar.TabbarModel;
 	import com.ace.ui.tabbar.children.TabBar;
-	import com.leyou.data.setting.SettingGameInfo;
-	import com.leyou.data.setting.SettingVideoInfo;
 	import com.leyou.manager.ShareObjManage;
 	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.ui.setting.child.SettingGamePanel;
 	import com.leyou.ui.setting.child.SettingVideoPanel;
-
+	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
@@ -48,6 +48,7 @@ package com.leyou.ui.setting {
 
 			this.settingTabBar.addToTab(settingGamePanel, 0);
 			this.settingTabBar.addToTab(settingVideoPanel, 1);
+			 
 		}
 
 		override public function show(toTop:Boolean=true, toCenter:Boolean=true):void {
@@ -87,6 +88,11 @@ package com.leyou.ui.setting {
 			this.settingGamePanel.updataInfo(this.settingGameInfo);
 		}
 
+		public function initData():void{
+			this.getClientData();
+			this.updata();
+		}
+		
 		//点击导航栏
 		private function onTabBarChangeIndex(evt:Event):void {
 			trace(this.settingTabBar.turnOnIndex);
@@ -233,5 +239,10 @@ package com.leyou.ui.setting {
 			}
 			return this.settingVideoPanel.settingVideoInfo;
 		}
+		
+		public function get settingGamePane():SettingGamePanel{
+			return this.settingGamePanel;
+		}
+		
 	}
 }

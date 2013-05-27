@@ -100,5 +100,9 @@ package com.leyou.ui.chat.child {
 		public function setComboxSta(sta:Boolean):void {
 			this.combox.setItemSta(sta);
 		}
+		
+		public function setComBoxFocs():void{
+			this.combox.setFocs();
+		}
 	}
 }

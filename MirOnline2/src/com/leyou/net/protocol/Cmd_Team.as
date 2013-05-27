@@ -1,8 +1,11 @@
 package com.leyou.net.protocol {
 	import com.ace.ui.window.children.AlertWindow;
+	import com.leyou.enum.ChatEnum;
+	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.protocol.scene.CmdScene;
+	import com.leyou.ui.systemNotice.NoticeMidDownUproll;
 
 	public class Cmd_Team {
 		//新建组队[第一次创建队伍发生2次，第2次带参数；如果有队伍，只发送一次即可，不需要参数]
@@ -19,6 +22,7 @@ package com.leyou.net.protocol {
 		static public function sm_createGroup_ok(td:TDefaultMessage, body:String):void {
 			//无返回值
 			trace("新建组队-成功");
+			UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_COMPOSITE,"新建组队-成功");
 		}
 
 		//新建组队-失败
@@ -27,18 +31,23 @@ package com.leyou.net.protocol {
 				case -1:
 					//提示：编组还未成立。
 					trace("编组还未成立。")
+					 
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("编组还未成立。",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -2:
 					//提示：输入的人物名称不正确。
 					trace("输入的人物名称不正确")
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("输入的人物名称不正确",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -3:
 					//提示：您想邀请加入编组的人已经加入了其它组。
 					trace("您想邀请加入编组的人已经加入了其它组")
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您想邀请加入编组的人已经加入了其它组",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -4:
 					//提示：对方不允许编组。
 					trace("对方不允许编组。")
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("对方不允许编组。",SystemNoticeEnum.IMG_WRONG);
 					break;
 			}
 		}
@@ -70,22 +79,27 @@ package com.leyou.net.protocol {
 				case -1:
 					//提示：非队长不能操作。
 					trace("非队长不能操作");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("非队长不能操作",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -2:
 					//提示：输入的人物名称不正确。
 					trace("输入的人物名称不正确");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("输入的人物名称不正确",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -3:
 					//提示：已经加入编组。
 					trace("已经加入编组");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("已经加入编组",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -4:
 					//提示：对方不允许编组。
 					trace("对方不允许编组。");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("对方不允许编组。",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -5:
 					//提示：您想邀请加入编组的人已经加入了其它组！
 					trace("您想邀请加入编组的人已经加入了其它组");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您想邀请加入编组的人已经加入了其它组",SystemNoticeEnum.IMG_WRONG);
 					break;
 			}
 		}
@@ -108,14 +122,17 @@ package com.leyou.net.protocol {
 				case -1:
 					//提示：编组还未成立.
 					trace("编组还未成立");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("编组还未成立",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -2:
 					//提示：输入的人物名称不正确.
 					trace("输入的人物名称不正确");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("输入的人物名称不正确",SystemNoticeEnum.IMG_WRONG);
 					break;
 				case -3:
 					//提示：此人不在本组中.
 					trace("此人不在本组中");
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("此人不在本组中",SystemNoticeEnum.IMG_WRONG);
 					break;
 			}
 		}

@@ -1,13 +1,14 @@
 package com.leyou.ui.setting.child {
+	import com.ace.gameData.setting.SettingGameInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.CheckBox;
 	import com.ace.ui.button.children.RadioButton;
 	import com.ace.ui.button.event.ButtonEvent;
-	import com.leyou.data.setting.SettingGameInfo;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Chat;
-
+	import com.leyou.net.protocol.Cmd_Team;
+	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
@@ -147,7 +148,6 @@ package com.leyou.ui.setting.child {
 			} else {
 				this.gruopChBox.turnOff(false);
 			}
-
 			UIManager.getInstance().teamWnd.setTeamState((infor.gruop == 1 ? true : false));
 
 			if (infor.joinGuild == 1)
@@ -250,12 +250,14 @@ package com.leyou.ui.setting.child {
 					Cmd_Chat.cm_say("@拒绝交易");
 					break;
 				case "gruopChBox": //允许组队
+					//					Cmd_Chat.cm_say("@允许组队");
 					if (this.gruopChBox.isOn)
 						this._settinginfor.gruop=1;
 					else
 						this._settinginfor.gruop=0;
+
 					UIManager.getInstance().settingWnd.saveClientData();
-					UIManager.getInstance().teamWnd.setTeamState(this._settinginfor.gruop==1?true:false);
+					UIManager.getInstance().teamWnd.setTeamState(this._settinginfor.gruop == 1 ? true : false);
 					break;
 				case "joinGuildChBox": //允许加入行会
 					if (this.joinGuildChBox.isOn)
@@ -290,12 +292,27 @@ package com.leyou.ui.setting.child {
 					else
 						this._settinginfor.loginLock=0;
 					UIManager.getInstance().settingWnd.saveClientData();
-					break;
+					break; //“加入行会” 1019
 			}
 		}
 
 		public function get settingInfo():SettingGameInfo {
 			return _settinginfor;
+		}
+
+		public function setSettingIsOnTeam(v:Boolean):void {
+			if(v)
+				this.gruopChBox.turnOn();
+			else 
+				this.gruopChBox.turnOff();
+			
+			if (this.gruopChBox.isOn)
+				this._settinginfor.gruop=1;
+			else
+				this._settinginfor.gruop=0;
+			
+			UIManager.getInstance().settingWnd.saveClientData();
+			UIManager.getInstance().teamWnd.setTeamState(this._settinginfor.gruop == 1 ? true : false);
 		}
 
 		public function check(body:String):void {

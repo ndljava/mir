@@ -1,6 +1,8 @@
 package com.leyou.ui.role.child {
+	import com.ace.game.manager.TableManager;
+	import com.ace.gameData.table.TItemAvatarInfo;
 	import com.ace.ui.img.child.Image;
-
+	
 	import flash.display.Sprite;
 	import flash.media.Video;
 
@@ -18,17 +20,14 @@ package com.leyou.ui.role.child {
 
 		public function Avator():void {
 			this.bodyImg=new Image();
-			this.bodyImg.x=28;
-			this.bodyImg.y=42;
+			this.bodyImg.x=44;
 			this.addChild(this.bodyImg);
-			this.weaponImg=new Image();
-			this.addChild(this.weaponImg);
 			this.clothImg=new Image();
 			this.addChild(this.clothImg);
 			this.hatImg=new Image();
-			this.hatImg.x=66;
-			this.hatImg.y=32;
 			this.addChild(this.hatImg);
+			this.weaponImg=new Image();
+			this.addChild(this.weaponImg);
 		}
 
 		public function updateBody(id:int):void {
@@ -40,6 +39,13 @@ package com.leyou.ui.role.child {
 		}
 
 		public function updateWeapon(id:int):void {
+			var info:TItemAvatarInfo=TableManager.getInstance().getItemAvatarInfo(id.toString());
+			if(info==null){
+				this.weaponImg.bitmapData=null;
+				return;
+			}
+			this.weaponImg.x=info.px;
+			this.weaponImg.y=info.py;
 			this._weapon=id;
 			if (_weapon > 0)
 				this.weaponImg.updateBmp("itemAvatar/" + _weapon + ".png");
@@ -48,6 +54,13 @@ package com.leyou.ui.role.child {
 		}
 
 		public function updateCloth(id:int):void {
+			var info:TItemAvatarInfo=TableManager.getInstance().getItemAvatarInfo(id.toString());
+			if(info==null){
+				this.clothImg.bitmapData=null;
+				return;
+			}
+			this.clothImg.x=info.px;
+			this.clothImg.y=info.py;
 			this._cloth=id;
 			if (_cloth > 0) {
 				this.clothImg.updateBmp("itemAvatar/" + _cloth + ".png");
@@ -56,6 +69,13 @@ package com.leyou.ui.role.child {
 		}
 
 		public function updateHat(id:int):void {
+			var info:TItemAvatarInfo=TableManager.getInstance().getItemAvatarInfo(id.toString());
+			if(info==null){
+				this.hatImg.bitmapData=null;
+				return;
+			}
+			this.hatImg.x=info.px;
+			this.hatImg.y=info.py;
 			this._hat=id;
 			if (_hat > 0) {
 				this.hatImg.updateBmp("itemAvatar/" + _hat + ".png");

@@ -1,4 +1,5 @@
 package com.leyou.ui.task {
+	import com.ace.enum.UIEnum;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.button.children.NormalButton;
@@ -12,18 +13,20 @@ package com.leyou.ui.task {
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
 	import flash.text.StyleSheet;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 
 	public class TaskWnd extends AutoWindow {
 		private var cloceBtn:NormalButton;
 		private var returnBtn:NormalButton;
 
-		private var contentTxt:Label;
+		private var contentTxt:TextField;
 
 		public var npcId:int=0;
 
 		private var tips:TipsEquipsEmpty;
-		 
+
 		public function TaskWnd() {
 			super(LibManager.getInstance().getXML("config/ui/TaskWnd.xml"));
 			this.init();
@@ -34,27 +37,23 @@ package com.leyou.ui.task {
 			this.cloceBtn=this.getUIbyID("cloceBtn") as NormalButton;
 			this.returnBtn=this.getUIbyID("returnBtn") as NormalButton;
 
-			this.contentTxt=new Label;
-			
+			this.contentTxt=new TextField();
 			this.contentTxt.width=420;
-			this.contentTxt.height=110;
-			
+			this.contentTxt.height=170;
+
 			this.contentTxt.x=30;
 			this.contentTxt.y=50;
-			
+
 			this.contentTxt.addEventListener(TextEvent.LINK, onClickLink);
 			this.contentTxt.addEventListener(MouseEvent.MOUSE_MOVE, onshowTips)
 			this.contentTxt.mouseEnabled=true;
 
-			this.contentTxt.defaultTextFormat=new TextFormat("",12,null,false,false);
-			
 			var css:StyleSheet=new StyleSheet();
-			//css.setStyle("a:hover", {textDecoration:'underline'});
-			css.setStyle(".c", {textDecoration:'underline'});
-			css.setStyle(".b", {textDecoration:'none'});
-			
+			css.setStyle(".c", {textDecoration: 'underline'});
+			css.setStyle(".b", {textDecoration: 'none'});
+			css.setStyle(".z", {leading: '0'});
 			this.contentTxt.styleSheet=css;
-			
+			this.contentTxt.selectable=false;
 			this.addToPane(this.contentTxt);
 
 			this.tips=new TipsEquipsEmpty();
@@ -87,17 +86,14 @@ package com.leyou.ui.task {
 				PopupManager.showConfirm(arr[2], function():void {
 					Cmd_Task.cm_merchantDlgSelect(npcId, eve.substr(2));
 				});
-
 			} else if (eve.indexOf("@@") > -1) {
-				PopupManager.showConfirm(arr[2], function(i:String):void {
+				PopupManager.showConfirmInput(arr[2], function(i:String):void {
 					if (i == null || i == "" || i == "0" || i == " ")
 						return;
-
-					Cmd_Task.cm_merchantDlgSelect(npcId, eve.substr(1) + "," + i);
+					Cmd_Task.cm_merchantDlgSelect(npcId, eve+"\r"+ i);
 				});
 			} else
 				Cmd_Task.cm_merchantDlgSelect(npcId, eve);
-
 		}
 
 		override public function hide():void {
@@ -106,7 +102,7 @@ package com.leyou.ui.task {
 		}
 
 		private function onshowTips(e:MouseEvent):void {
-			var lb:Label=Label(e.target);
+			var lb:TextField=TextField(e.target);
 			if (lb.getCharIndexAtPoint(e.localX, e.localY) == -1) {
 				this.tips.visible=false;
 				return;
@@ -125,16 +121,24 @@ package com.leyou.ui.task {
 
 				this.tips.showTaskTips(tip);
 
-				this.tips.x=this.mouseX + 5;
-				this.tips.y=this.mouseY + 5
+				this.tips.x=this.mouseX + 10;
+				this.tips.y=this.mouseY + 20;
 				this.tips.visible=true;
 			} else
 				this.tips.visible=false;
 		}
 
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
+		}
+		
 		public function updateInfo(content:String):void {
 			content=TaskUtils.getTaskContent(content);
-			var arr:Array=content.split("|")
+			var arr:Array=content.split("|");
+
+			if(arr[0]=="QFunction")
+				arr[0]="会员";
+			
 			this.titleLbl.text=arr[0];
 			this.contentTxt.htmlText=arr[1];
 		}

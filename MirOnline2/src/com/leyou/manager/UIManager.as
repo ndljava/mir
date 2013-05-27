@@ -16,7 +16,6 @@ package com.leyou.manager {
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.backpack.BackpackWnd;
 	import com.leyou.ui.backpack.BatchUsedMessageWnd;
-	import com.leyou.ui.backpack.SplitMessageWnd;
 	import com.leyou.ui.backpack.child.BagDropPanel;
 	import com.leyou.ui.backpack.child.BagSplitPanel;
 	import com.leyou.ui.backpack.child.DiscardMessageWnd;
@@ -36,8 +35,7 @@ package com.leyou.manager {
 	import com.leyou.ui.market.FittingRoomWnd;
 	import com.leyou.ui.market.MarketWnd;
 	import com.leyou.ui.otherRole.OtherRoleWnd;
-	import com.leyou.ui.role.PropertyPointWnd;
-	import com.leyou.ui.role.PropertyWnd;
+	import com.leyou.ui.role.PointDistributionWnd;
 	import com.leyou.ui.role.RoleWnd;
 	import com.leyou.ui.roleHead.OtherRoleHeadWnd;
 	import com.leyou.ui.roleHead.RoleHeadWnd;
@@ -60,6 +58,10 @@ package com.leyou.manager {
 	import com.leyou.ui.team.TeamWnd;
 	import com.leyou.ui.tools.ToolsWnd;
 	import com.leyou.ui.trade.TradeWnd;
+	
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
+	import flash.ui.KeyboardType;
 
 	public class UIManager implements IResize {
 		private static var instance:UIManager;
@@ -74,9 +76,6 @@ package com.leyou.manager {
 		public var backPackDropWnd:BagDropPanel;
 		public var storageWnd:StorageWnd;
 		public var skillWnd:SkillWnd;
-		public var friendWnd:FriendWnd;
-		public var roleWnd:RoleWnd;
-		public var propertyWnd:PropertyWnd;
 		public var settingWnd:SettingWnd;
 		public var teamWnd:TeamWnd;
 		public var teamAddWnd:TeamAddWnd;
@@ -89,7 +88,7 @@ package com.leyou.manager {
 		public var guildAddCtbWnd:GuildAddContributPanel
 		public var taskWnd:TaskWnd;
 		public var manageMessageWnd:ManageMessageWnd;
-		public var splitMessageWnd:SplitMessageWnd;
+		public var pointDistributionWnd:PointDistributionWnd;
 		public var batchUsedMessageWnd:BatchUsedMessageWnd;
 		public var discardMessagewnd:DiscardMessageWnd;
 		public var sellMessageWnd:SellMessageWnd;
@@ -106,11 +105,12 @@ package com.leyou.manager {
 		public var noticeMidDownUproll:NoticeMidDownUproll;
 		public var noticeCountDown:NoticeCountDown;
 		public var creatUserWnd:CreatUserWnd;
-		public var propertyPointWnd:PropertyPointWnd;
 		public var forgeWnd:ForgeWnd;
 		public var otherRoleWnd:OtherRoleWnd;
 		public var buf:Buff;
 		public var lostWnd:LostAndFoundWnd;
+		public var roleWnd:RoleWnd;
+		public var friendWnd:FriendWnd;
 
 		public static function getInstance():UIManager {
 			if (!instance)
@@ -147,9 +147,11 @@ package com.leyou.manager {
 
 		//创建角色
 		public function addCreatUserWnd():void {
-			if (this.creatUserWnd == null)
+			if (this.creatUserWnd == null) {
 				this.creatUserWnd=new CreatUserWnd();
+			}
 			LayerManager.getInstance().gameLayer.addChildAt(this.creatUserWnd, 0);
+
 		}
 
 		//显示加载面板
@@ -174,19 +176,11 @@ package com.leyou.manager {
 			this.mirScene=new MirScene();
 			SceneCore.sceneModel=this.mirScene;
 			LayerManager.getInstance().gameLayer.addChildAt(this.mirScene, 0);
-
-
-			this.mapWnd=new MapWnd();
-			LayerManager.getInstance().windowLayer.addChild(this.mapWnd);
-
-			this.smallMapWnd=new SmallMapWnd();
-			this.smallMapWnd.resize();
-			LayerManager.getInstance().mainLayer.addChild(this.smallMapWnd);
-
 			ResizeManager.getInstance().addToOnResize(this);
 			if (Core.bugTest)
 				return;
 
+			
 			this.chatWnd=new ChatWnd();
 			this.toolsWnd=new ToolsWnd();
 			this.backPackWnd=new BackpackWnd();
@@ -194,9 +188,8 @@ package com.leyou.manager {
 			this.backPackSplitWnd=new BagSplitPanel();
 			this.storageWnd=new StorageWnd();
 			this.skillWnd=new SkillWnd();
-			this.friendWnd=new FriendWnd();
-			this.roleWnd=new RoleWnd();
-			this.propertyWnd=new PropertyWnd();
+//			this.roleWnd=new RoleWnd();
+//			this.propertyWnd=new PropertyWnd();
 			this.settingWnd=new SettingWnd();
 			this.teamWnd=new TeamWnd();
 			this.teamAddWnd=new TeamAddWnd();
@@ -209,7 +202,7 @@ package com.leyou.manager {
 			this.guildAddCtbWnd=new GuildAddContributPanel();
 			this.taskWnd=new TaskWnd();
 			this.manageMessageWnd=new ManageMessageWnd();
-			this.splitMessageWnd=new SplitMessageWnd();
+			this.pointDistributionWnd=new PointDistributionWnd();
 			this.batchUsedMessageWnd=new BatchUsedMessageWnd();
 			this.discardMessagewnd=new DiscardMessageWnd();
 			this.sellMessageWnd=new SellMessageWnd();
@@ -223,11 +216,15 @@ package com.leyou.manager {
 			this.loadingWnd=new LoadingWnd();
 			this.noticeMidDownUproll=new NoticeMidDownUproll();
 			this.noticeCountDown=new NoticeCountDown();
-			this.propertyPointWnd=new PropertyPointWnd();
+//			this.propertyPointWnd=new PropertyPointWnd();
 			this.forgeWnd=new ForgeWnd();
 			this.otherRoleWnd=new OtherRoleWnd();
 			this.buf=new Buff();
 			this.lostWnd=new LostAndFoundWnd();
+			this.roleWnd=new RoleWnd();
+			this.friendWnd=new FriendWnd();
+			this.mapWnd=new MapWnd();
+			this.smallMapWnd=new SmallMapWnd();
 
 
 			this.toolsWnd.resize();
@@ -236,6 +233,7 @@ package com.leyou.manager {
 			this.noticeLeftroll.resize();
 			this.noticeMidDown.resize();
 			this.noticeCountDown.resize();
+			this.smallMapWnd.resize();
 
 
 			LayerManager.getInstance().windowLayer.addChild(this.backPackWnd);
@@ -243,9 +241,8 @@ package com.leyou.manager {
 			LayerManager.getInstance().windowLayer.addChild(this.backPackDropWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.storageWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.skillWnd);
-			LayerManager.getInstance().windowLayer.addChild(this.friendWnd);
 
-			LayerManager.getInstance().windowLayer.addChild(this.propertyWnd);
+//			LayerManager.getInstance().windowLayer.addChild(this.propertyWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.settingWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.teamWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.teamAddWnd);
@@ -257,23 +254,24 @@ package com.leyou.manager {
 			LayerManager.getInstance().windowLayer.addChild(this.guildAddCtbWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.taskWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.manageMessageWnd);
-			LayerManager.getInstance().windowLayer.addChild(this.splitMessageWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.batchUsedMessageWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.discardMessagewnd);
 			LayerManager.getInstance().windowLayer.addChild(this.sellMessageWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.stallWnd);
-			LayerManager.getInstance().windowLayer.addChild(this.roleWnd);
-			LayerManager.getInstance().windowLayer.addChild(this.propertyPointWnd);
+//			LayerManager.getInstance().windowLayer.addChild(this.roleWnd);
+//			LayerManager.getInstance().windowLayer.addChild(this.propertyPointWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.forgeWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.otherRoleWnd);
-			LayerManager.getInstance().windowLayer.addChild(this.buf);
-			LayerManager.getInstance().windowLayer.addChild(this.otherRoleHeadWnd);
 			LayerManager.getInstance().windowLayer.addChild(this.lostWnd);
-			
+			LayerManager.getInstance().windowLayer.addChild(this.roleWnd);
+			LayerManager.getInstance().windowLayer.addChild(this.friendWnd);
+
 			LayerManager.getInstance().mainLayer.addChild(this.chatWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.toolsWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.roleHeadWnd);
+			LayerManager.getInstance().mainLayer.addChild(this.otherRoleHeadWnd);
 			LayerManager.getInstance().mainLayer.addChild(this.teamListPanel);
+			LayerManager.getInstance().mainLayer.addChild(this.buf);
 
 			LayerManager.getInstance().mainLayer.addChild(this.noticeUproll);
 			LayerManager.getInstance().mainLayer.addChild(this.noticeLeftroll);
@@ -281,9 +279,15 @@ package com.leyou.manager {
 			LayerManager.getInstance().mainLayer.addChild(this.noticeMouseFollow);
 			LayerManager.getInstance().mainLayer.addChild(this.noticeMidDownUproll);
 			LayerManager.getInstance().mainLayer.addChild(this.noticeCountDown);
+			
+			LayerManager.getInstance().windowLayer.addChild(this.mapWnd);
+			LayerManager.getInstance().mainLayer.addChild(this.smallMapWnd);
+
+			this.roleWnd.addChild(this.pointDistributionWnd);
 
 
 			this.addKeyFun();
+			
 		}
 
 		private function addKeyFun():void {
@@ -292,7 +296,7 @@ package com.leyou.manager {
 			KeysManager.getInstance().addKeyFun(KeysEnum.V, Cmd_backPack.cm_addStarItem); //会员面板	V
 			KeysManager.getInstance().addKeyFun(KeysEnum.J, Cmd_Trade.cm_dealTry); //交易面板	J
 			KeysManager.getInstance().addKeyFun(KeysEnum.D, Cmd_Stall.cm_btItem); //摆摊功能	D  
-			KeysManager.getInstance().addKeyFun(KeysEnum.G, Cmd_Guild.cm_openGuildDlg); //帮会面板	G
+			KeysManager.getInstance().addKeyFun(KeysEnum.G, this.guildWnd.showkey); //帮会面板	G
 
 			//			KeysManager.getInstance().addKeyFun(KeysEnum.A, this.roleWnd.open); //切换PK模式	A
 
@@ -306,7 +310,14 @@ package com.leyou.manager {
 			KeysManager.getInstance().addKeyFun(KeysEnum.O, this.settingWnd.open); //系统设置	O
 
 			//			KeysManager.getInstance().addKeyFun(KeysEnum.xxxx, this.roleWnd.open);//   物品、技能快捷键	1-7QWE       
-			KeysManager.getInstance().addKeyFun(KeysEnum.ENTER, this.chatWnd.onStageEnter); //聊天焦点激活	Enter            
+			KeysManager.getInstance().addKeyFun(KeysEnum.ENTER, this.chatWnd.onStageEnter); //聊天焦点激活	Enter  
+			
+			
+			KeysManager.getInstance().addKeyFun(KeysEnum.KEY1,this.chatWnd.onSign1Down,KeyboardEvent.KEY_DOWN);
+			KeysManager.getInstance().addKeyFun(KeysEnum.KEY2,this.chatWnd.onSign2Down,KeyboardEvent.KEY_DOWN);
+			KeysManager.getInstance().addKeyFun(Keyboard.BACKQUOTE,this.chatWnd.onSign3Down,KeyboardEvent.KEY_DOWN);
+			KeysManager.getInstance().addKeyFun(Keyboard.SLASH,this.chatWnd.onSignDivideDown);
+			
 
 		}
 
@@ -316,15 +327,26 @@ package com.leyou.manager {
 		}
 
 		public function onResize():void {
-			this.smallMapWnd.resize();
 			if (Core.bugTest)
 				return;
+			this.smallMapWnd.resize();
 			this.toolsWnd.resize();
 			this.chatWnd.resize();
 			this.noticeUproll.resize();
 			this.noticeLeftroll.resize();
 			this.noticeMidDown.resize();
 			this.noticeCountDown.resize();
+			this.roleWnd.resize();
+			
+			this.lostWnd.resize();
+			this.backPackWnd.resize();
+			this.storageWnd.resize();
+			this.forgeWnd.resize();
+			this.teamAddWnd.resize();
+			this.teamWnd.resize();
+			this.stallWnd.resize();
+			this.taskWnd.resize();
+			this.tradeWnd.resize();
 		}
 
 	}

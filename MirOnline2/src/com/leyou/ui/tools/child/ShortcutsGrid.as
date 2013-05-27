@@ -5,6 +5,7 @@ package com.leyou.ui.tools.child {
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.playerSkill.TClientMagic;
+	import com.ace.manager.KeysManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.lable.Label;
 	import com.leyou.manager.UIManager;
@@ -12,7 +13,7 @@ package com.leyou.ui.tools.child {
 	import com.leyou.ui.cdTimer.CDTimer;
 	import com.leyou.utils.ItemUtil;
 	
-	import flash.display.Shape;
+	import flash.ui.Keyboard;
 
 	/**
 	 *
@@ -33,6 +34,16 @@ package com.leyou.ui.tools.child {
 
 		public function ShortcutsGrid(id:int=-1) {
 			super(id);
+			if(id<8&&id>0)
+				this.shortcutKeyLbl && (this.shortcutKeyLbl.text=this.gridId.toString());
+			else {
+				if(id==8)
+					this.shortcutKeyLbl.text="Q";
+				else if(id==9)
+					this.shortcutKeyLbl.text="W";
+				else if(id==0)
+					this.shortcutKeyLbl.text="E";
+			}
 		}
 
 		override protected function init():void {
@@ -61,10 +72,14 @@ package com.leyou.ui.tools.child {
 
 		override public function set gridId(value:int):void {
 			super.gridId=value;
-			this.shortcutKeyLbl && (this.shortcutKeyLbl.text=this.gridId.toString());
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
+			
+			UIManager.getInstance().backPackWnd.showDragGlowFilter(false);
+			UIManager.getInstance().toolsWnd.showDragGlowFilter(false);
+			UIManager.getInstance().storageWnd.showDragGlowFilter(false);
+			
 //			super.switchHandler(fromItem);
 			//如果是同类
 			if (fromItem.gridType == ItemEnum.TYPE_GRID_SHORTCUT) {
@@ -193,19 +208,27 @@ package com.leyou.ui.tools.child {
 		//使用
 		public function onUse():void {
 //			cdTimer();
+			if(KeysManager.getInstance().isDown(Keyboard.SHIFT))
+				return;
 			if (this.dataId == -1)
 				return;
 			//如果是药品
 			if (this._cloneGridType == ItemEnum.TYPE_GRID_BACKPACK) {
+				if(this.isCD==true)
+					return;
 				UIManager.getInstance().backPackWnd.useItem(this.dataId);
+//				UIManager.getInstance().toolsWnd.setCD(this);
 			}
 			//如果是技能
 			if (this._cloneGridType == ItemEnum.TYPE_GRID_SKILL) {
 				
-				if (UIManager.getInstance().mirScene.useMagic(MyInfoManager.getInstance().skills[this.dataId].def.wMagicId))
+				if (UIManager.getInstance().mirScene.useMagic(MyInfoManager.getInstance().skills[this.dataId].def.wMagicId)){
 //					this.cdTimer(10000);
-				UIManager.getInstance().toolsWnd.setCD(this);
+					UIManager.getInstance().toolsWnd.setCD(this);
+					trace("cd");
+				}	
 			}
+
 
 		}
 

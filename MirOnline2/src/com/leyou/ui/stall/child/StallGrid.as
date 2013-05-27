@@ -6,6 +6,7 @@ package com.leyou.ui.stall.child {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
 	import com.ace.ui.lable.Label;
+	import com.ace.ui.window.children.SimpleWindow;
 	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
@@ -15,6 +16,8 @@ package com.leyou.ui.stall.child {
 	public class StallGrid extends GridBase {
 		private var numLbl:Label;
 
+		public static var POPWIND:SimpleWindow;
+		
 		public function StallGrid(id:int=-1) {
 			super(id);
 		}
@@ -62,7 +65,7 @@ package com.leyou.ui.stall.child {
 		}
 
 		private function buyItem():void {
-			var renderIndex:int=UIManager.getInstance().stallWnd.itemRenderArr.indexOf(this.parent);
+			var renderIndex:int=UIManager.getInstance().stallWnd.itemRenderArr.indexOf(this.parent as StallListRender);
 
 			if (renderIndex >= UIManager.getInstance().stallWnd.itemOtherDataArr.length)
 				return;
@@ -84,7 +87,7 @@ package com.leyou.ui.stall.child {
 
 		public function confirmBuy():void {
 
-			var renderIndex:int=UIManager.getInstance().stallWnd.itemRenderArr.indexOf(this.parent);
+			var renderIndex:int=UIManager.getInstance().stallWnd.itemRenderArr.indexOf(this.parent as StallListRender);
 
 			if (renderIndex >= UIManager.getInstance().stallWnd.itemOtherDataArr.length)
 				return;
@@ -93,7 +96,7 @@ package com.leyou.ui.stall.child {
 			if (tc == null || tc.s == null)
 				return;
 
-			PopupManager.showConfirm("你确定要购买么?", buyItem);
+			POPWIND=PopupManager.showConfirm("你确定要购买么?", buyItem);
 		}
 
 		public function send_ChangeItem():void {
@@ -111,7 +114,7 @@ package com.leyou.ui.stall.child {
 			if (tc == null || tc.s == null || g.gridType != ItemEnum.TYPE_GRID_BACKPACK)
 				return;
 
-			PopupManager.showConfirmInput("请输入价钱:", okPrice, cancelFunc);
+			POPWIND=PopupManager.showConfirmInput("请输入价钱:", okPrice, cancelFunc);
 
 			function okPrice(i:String):void {
 				if (i == null || i == "0" || i == "" || int(i) == 0)
@@ -119,15 +122,14 @@ package com.leyou.ui.stall.child {
 
 				if (i != "" && i.match(/^[0-9]+$/g).length == 0) {
 					PopupManager.showAlert("请输入正确的价钱!", function():void {
-						PopupManager.showConfirmInput("请输入价钱:", okPrice);
+						POPWIND=PopupManager.showConfirmInput("请输入价钱:", okPrice);
 					});
 					return;
 				}
 
 				if (i.length >= 10) {
-
 					PopupManager.showAlert("请输入正确的数值!", function():void {
-						PopupManager.showConfirmInput("请输入价钱:", okPrice);
+						POPWIND=PopupManager.showConfirmInput("请输入价钱:", okPrice);
 					});
 					return;
 				}

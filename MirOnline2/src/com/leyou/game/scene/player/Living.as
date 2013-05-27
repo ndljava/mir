@@ -6,6 +6,7 @@ package com.leyou.game.scene.player {
 	import com.ace.gameData.table.TActInfo;
 	import com.ace.gameData.table.TActsInfo;
 	import com.ace.gameData.table.TPnfInfo;
+	import com.leyou.config.Core;
 	import com.leyou.game.skill.bullets.BulletManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
@@ -18,7 +19,7 @@ package com.leyou.game.scene.player {
 
 		override public function updataHealth(hp:int, maxHp:int):void {
 			super.updataHealth(hp, maxHp);
-			if (UIManager.getInstance().teamWnd.getPlayInTeam(this.infoB.name)) {
+			if (!Core.bugTest && UIManager.getInstance().teamWnd.getPlayInTeam(this.infoB.name)) {
 				UIManager.getInstance().teamWnd.updateTeamInfo();
 			}
 		}

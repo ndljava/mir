@@ -25,7 +25,7 @@ package com.leyou.ui.shop {
 		private var nextPageBtn:NormalButton;
 		private var currentPage:int=1; //当前页
 		private var sumPage:int=1; //总页数
-//		private var renderArr:Vector.<ShopListRender>;
+		//		private var renderArr:Vector.<ShopListRender>;
 		private var renderArr:Vector.<GridShop>;
 		private var overRenderIdx:int=-1;
 		private var clickRenderIdx:int;
@@ -43,7 +43,6 @@ package com.leyou.ui.shop {
 		}
 
 		private function init():void {
-
 			this.itemArr=new Vector.<TStdItem>;
 			this.pageLbl=this.getUIbyID("pageLbl") as Label;
 			this.prePageBtn=this.getUIbyID("prePageBtn") as NormalButton;
@@ -51,29 +50,7 @@ package com.leyou.ui.shop {
 
 			this.prePageBtn.addEventListener(MouseEvent.CLICK, onClick);
 			this.nextPageBtn.addEventListener(MouseEvent.CLICK, onClick);
-
-//			this.renderArr=new Vector.<ShopListRender>;
-//			for (var i:int=0; i < ShopEnum.PAGE_RENDER_NUM; i++) {
-//				var render:ShopListRender=new ShopListRender();
-//				render.name=i.toString();
-//				if (i % 2 == 0)
-//					render.x=32;
-//				else if (i % 2 == 1)
-//					render.x=200;
-//				render.y=58 + (Math.ceil((i + 1) / 2) - 1) * ShopEnum.SHOPRENDER_HEIGHT;
-//				render.visible=false;
-//				render.id=i;
-//				render.addEventListener(MouseEvent.CLICK, onRenderClick);
-//				render.addEventListener(MouseEvent.ROLL_OUT, onRenderOut);
-//				render.addEventListener(MouseEvent.MOUSE_OVER, onRenderOver);
-//				render.addEventListener(MouseEvent.MOUSE_UP,onRenderUp);
-//				
-//
-//				render.doubleClickEnabled=true;
-//				render.addEventListener(MouseEvent.DOUBLE_CLICK, onRenderDoubleClick);
-//				this.renderArr.push(render);
-//				this.addChild(render);
-//			}
+			
 			this.renderArr=new Vector.<GridShop>;
 			for (var i:int=0; i < ShopEnum.PAGE_RENDER_NUM; i++) {
 				var render:GridShop=new GridShop();
@@ -88,6 +65,7 @@ package com.leyou.ui.shop {
 				this.renderArr.push(render);
 				this.addChild(render);
 			}
+			
 		}
 
 		override public function show(toTop:Boolean=true, toCenter:Boolean=true):void {
@@ -101,34 +79,23 @@ package com.leyou.ui.shop {
 
 		override public function hide():void {
 			super.hide();
+			if(this.inputW!=null)
+				this.inputW.close();
 			UIManager.getInstance().backPackWnd.setShopBtnActive(false);
 			this.clearMe();
+
+			if (UIManager.getInstance().backPackWnd.visible) {
+				if (UIManager.getInstance().backPackWnd.rightBorder)
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width;
+				else
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width - 100;
+			}
 		}
 
 		private function clearMe():void {
 			this.currentPage=1;
 			this.itemArr.length=0;
 		}
-
-//
-//		public function updata(arr:Vector.<TStdItem>):void {
-//			if (arr == null)
-//				return;
-//			this.sumPage=Math.ceil(arr.length / ShopEnum.PAGE_RENDER_NUM);
-//			var render:ShopListRender;
-//			this.sumPage=Math.ceil(arr.length / ShopEnum.PAGE_RENDER_NUM);
-//			for (var i:int=(this.currentPage - 1) * ShopEnum.PAGE_RENDER_NUM; i < (this.currentPage) * ShopEnum.PAGE_RENDER_NUM; i++) {
-//				render=this.renderArr[i % ShopEnum.PAGE_RENDER_NUM];
-//				if (i >= arr.length) {
-//					render.visible=false;
-//					continue;
-//				} else {
-//					render.visible=true;
-//					render.updataInfo(arr[i]);
-//				}
-//			}
-//			this.pageLbl.text=String(currentPage + "/" + this.sumPage);
-//		}
 
 		public function updata(arr:Vector.<TStdItem>):void {
 			if (arr == null)
@@ -155,7 +122,6 @@ package com.leyou.ui.shop {
 					return;
 				this.currentPage++;
 				this.updata(itemArr);
-
 			} else if (evt.target.name == "prePageBtn") {
 				if (this.currentPage <= 1)
 					return;
@@ -165,34 +131,34 @@ package com.leyou.ui.shop {
 		}
 
 		//点击render
-//		private function onRenderClick(evt:MouseEvent):void {
-//			this.doubleClick=false;
-//			this._evt=evt;
-//			var timer:Timer=new Timer(260, 1);
-//			timer.addEventListener(TimerEvent.TIMER, checkRenderClick);
-//			timer.start();
-//		}
-//
-//		//双击
-//		private function onRenderDoubleClick(evt:MouseEvent):void {
-//			this.doubleClick=true;
-//			this._evt=evt;
-//		}
+		//		private function onRenderClick(evt:MouseEvent):void {
+		//			this.doubleClick=false;
+		//			this._evt=evt;
+		//			var timer:Timer=new Timer(260, 1);
+		//			timer.addEventListener(TimerEvent.TIMER, checkRenderClick);
+		//			timer.start();
+		//		}
+		//
+		//		//双击
+		//		private function onRenderDoubleClick(evt:MouseEvent):void {
+		//			this.doubleClick=true;
+		//			this._evt=evt;
+		//		}
 
-//		private function checkRenderClick(evt:TimerEvent):void {
-//			if (!(this._evt.target is ShopListRender) && !(this._evt.target is ShopGrid))
-//				return;
-//			var idx:int;
-//			if (this._evt.target is ShopListRender)
-//				idx=int((this._evt.target as ShopListRender).name);
-//			else if (this._evt.target is ShopGrid)
-//				idx=int((this._evt.target as ShopGrid).parent.name);
-//			if (this.doubleClick) {
-//				this.renderDoubleClick(idx);
-//			} else if (!this.doubleClick) {
-//				this.renderClick(idx);
-//			}
-//		}
+		//		private function checkRenderClick(evt:TimerEvent):void {
+		//			if (!(this._evt.target is ShopListRender) && !(this._evt.target is ShopGrid))
+		//				return;
+		//			var idx:int;
+		//			if (this._evt.target is ShopListRender)
+		//				idx=int((this._evt.target as ShopListRender).name);
+		//			else if (this._evt.target is ShopGrid)
+		//				idx=int((this._evt.target as ShopGrid).parent.name);
+		//			if (this.doubleClick) {
+		//				this.renderDoubleClick(idx);
+		//			} else if (!this.doubleClick) {
+		//				this.renderClick(idx);
+		//			}
+		//		}
 
 		private function ok(str:String):void {
 			if (str == "" || int(str) <= 0)
@@ -205,39 +171,40 @@ package com.leyou.ui.shop {
 
 		//移出render
 		private function onRenderOut(evt:MouseEvent):void {
-//			if (this.overRenderIdx != -1 && this.renderArr[this.overRenderIdx]) {
-//				this.renderArr[this.overRenderIdx].highLight=false;
-//				this.overRenderIdx=-1;
-//			}
+			//			if (this.overRenderIdx != -1 && this.renderArr[this.overRenderIdx]) {
+			//				this.renderArr[this.overRenderIdx].highLight=false;
+			//				this.overRenderIdx=-1;
+			//			}
 		}
 
 		//移过render
 		private function onRenderOver(evt:MouseEvent):void {
-//			if (evt.target is ShopListRender) {
-//				var idx:int=int((evt.target as ShopListRender).name);
-//				if (idx != this.overRenderIdx) {
-//					if (this.overRenderIdx != -1 && this.renderArr[this.overRenderIdx])
-//						this.renderArr[this.overRenderIdx].highLight=false;
-//					this.overRenderIdx=idx;
-//					if (this.renderArr[this.overRenderIdx])
-//						this.renderArr[this.overRenderIdx].highLight=true;
-//				}
-//			}
+			//			if (evt.target is ShopListRender) {
+			//				var idx:int=int((evt.target as ShopListRender).name);
+			//				if (idx != this.overRenderIdx) {
+			//					if (this.overRenderIdx != -1 && this.renderArr[this.overRenderIdx])
+			//						this.renderArr[this.overRenderIdx].highLight=false;
+			//					this.overRenderIdx=idx;
+			//					if (this.renderArr[this.overRenderIdx])
+			//						this.renderArr[this.overRenderIdx].highLight=true;
+			//				}
+			//			}
 		}
 
 
 		private var shopFlag:Boolean;
+
 		public function ser_ShowShopWnd(arr:Vector.<TStdItem>, npc:int, count:int, idx:int):void {
 			this.show(true, true);
 			this.npc=npc;
 			this.goodCount=count;
 			this.sumPage=goodCount;
 			this.goodIdx=idx;
-			if (this.shopFlag==true){
+			if (this.shopFlag == true) {
 				this.itemArr=this.itemArr.concat(arr);
 				this.shopFlag=false;
-			}
-			else this.itemArr=arr;
+			} else
+				this.itemArr=arr;
 			this.currentPage=1;
 			this.updata(this.itemArr);
 			Cmd_Task.cm_closeNpcWin();
@@ -283,19 +250,11 @@ package com.leyou.ui.shop {
 			var win:WindInfo=WindInfo.getInputInfo("请输入购买数量");
 			win.okFun=ok;
 			win.cancelFun=cancle;
-			inputW=PopWindow.showWnd(UIEnum.WND_TYPE_INPUT, win, "shop_inputWnd") as InputWindow;
-			inputW.textbox.text="1";
-			inputW.textbox.restrict="0-9";
-			inputW.textbox.input.maxChars=4;
-//			if (this.inputAlertWnd == null || !this.inputAlertWndSta) {
-//				this.inputAlertWnd=ConfirmInputWindow.showWin("请输入购买数量", ok, cancle, 1, null, true);
-//				this.inputAlertWnd.textbox.text="1";
-//				this.inputAlertWnd.textbox.restrict="0-9";
-//				this.inputAlertWnd.textbox.input.maxChars=4;
-//				this.inputAlertWndSta=true;
-//			} else if (this.inputAlertWndSta) {
-//				this.inputAlertWnd.textbox.text="1";
-//			}
+			this.inputW=PopWindow.showWnd(UIEnum.WND_TYPE_INPUT, win, "shop_inputWnd") as InputWindow;
+			this.inputW.textbox.text="1";
+			this.inputW.textbox.restrict="0-9";
+			this.inputW.textbox.input.maxChars=4;
+			this.inputW.textbox.input.setSelection(this.inputW.textbox.input.length,this.inputW.textbox.input.length);
 		}
 
 		public function renderDoubleClick(idx:int):void {

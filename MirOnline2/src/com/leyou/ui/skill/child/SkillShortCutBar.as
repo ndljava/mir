@@ -32,7 +32,16 @@ package com.leyou.ui.skill.child {
 				if(i==9)
 					grid.id=0;
 				else grid.id=i+1;
-				grid.numberLbl=grid.id;
+				if(grid.id>0&&grid.id<8)
+					grid.numberLbl=grid.id+"";
+				else {
+					if(grid.id==8)
+						grid.numberLbl="Q";
+					else if(grid.id==9)
+						grid.numberLbl="W";
+					else if(grid.id==0)
+						grid.numberLbl="E";
+				}
 				this.gridArr.push(grid);
 				this.addChild(grid);
 			}

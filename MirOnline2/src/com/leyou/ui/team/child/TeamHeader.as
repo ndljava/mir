@@ -29,7 +29,7 @@ package com.leyou.ui.team.child {
 			this.iconImg=this.getUIbyID("iconImg") as Image;
 			this.hp=this.getUIbyID("iconHp") as Image;
 			this.mp=this.getUIbyID("iconMp") as Image;
-			this.iconImg.bitmapData=null;
+			//this.iconImg.bitmapData=null;
 		}
 
 		public function updateInfo(info:TeamInfo):void {

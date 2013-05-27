@@ -1,4 +1,5 @@
 package com.leyou.net.protocol {
+	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.tools.print;
 	import com.ace.utils.HexUtil;
@@ -134,10 +135,13 @@ package com.leyou.net.protocol {
 			//			AlertWindow.showWin("物品出售成功");
 			UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, "物品出售成功");
 			updataMoney(td.Recog);
-			var id:int=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemFromId].s.id;
-			MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
-			UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
-			UIManager.getInstance().toolsWnd.updataShortcutGrid(id);
+			
+//			var tc:TClientItem=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemFromId];
+//			
+//			var id:int=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemFromId].s.id;
+//			MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
+//			UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
+//			UIManager.getInstance().toolsWnd.updataShortcutGrid(id);
 			MyInfoManager.getInstance().resetWaitItem();
 		}
 
@@ -155,7 +159,7 @@ package com.leyou.net.protocol {
 
 		//结婚涉及到的
 		static public function sm_closeBigDialogBox(td:TDefaultMessage, body:String):void {
-			//			'您不能出售此物品.'
+			//'您不能出售此物品.'
 			UIManager.getInstance().taskWnd.serv_CLoseWind();
 		}
 
@@ -163,8 +167,7 @@ package com.leyou.net.protocol {
 		static public function sm_sendLostItemList(td:TDefaultMessage, body:String):void {
 
 			UIManager.getInstance().lostWnd.countPage=td.Tag;
-			
-			var goodIndex:int=td.Param;
+			//UIManager.getInstance().lostWnd.currentPage=td.Param;
 			var arr:Array=body.split("/");
 
 			UIManager.getInstance().lostWnd.itemData.length=0;

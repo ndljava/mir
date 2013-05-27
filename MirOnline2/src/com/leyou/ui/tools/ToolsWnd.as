@@ -4,13 +4,16 @@ package com.leyou.ui.tools {
 	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.manager.LibManager;
+	import com.ace.manager.MouseManager;
 	import com.ace.tools.ScaleBitmap;
 	import com.ace.ui.auto.AutoSprite;
 	import com.ace.ui.button.children.ImgButton;
 	import com.ace.ui.button.children.NormalButton;
+	import com.ace.ui.img.child.Image;
 	import com.ace.ui.input.children.HideInput;
 	import com.greensock.TweenMax;
 	import com.leyou.data.tool.data.ShortCutGridInfo;
+	import com.leyou.enum.CDEnum;
 	import com.leyou.enum.SkillEnum;
 	import com.leyou.manager.ShareObjManage;
 	import com.leyou.manager.UIManager;
@@ -20,12 +23,13 @@ package com.leyou.ui.tools {
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.net.protocol.Cmd_backPack;
-	import com.leyou.ui.skill.child.SkillGrid;
+	import com.leyou.ui.backpack.child.ItemTip;
 	import com.leyou.ui.tools.child.ShortcutsGrid;
 	import com.leyou.utils.FilterUtil;
 	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
 	public class ToolsWnd extends AutoSprite {
@@ -48,6 +52,7 @@ package com.leyou.ui.tools {
 		private var expScaleBitMap:ScaleBitmap;
 		private var expWidth:int;
 		private var expHight:int;
+		private var expSp:Sprite;
 
 		private var tw:TweenMax;
 
@@ -80,11 +85,22 @@ package com.leyou.ui.tools {
 
 			this.expScaleBitMap=new ScaleBitmap(LibManager.getInstance().getImg("ui/mainUI/main_exp_bar_hp.png"));
 			this.expScaleBitMap.scale9Grid=new Rectangle(2, 2, 715, 6);
-			this.expScaleBitMap.x=110.5;
-			this.expScaleBitMap.y=93;
-			this.addChildAt(this.expScaleBitMap, this.numChildren - 7);
+//			this.expScaleBitMap.x=110.5;
+//			this.expScaleBitMap.y=93;
+//			this.addChildAt(this.expScaleBitMap, this.numChildren - 7);
+			var expBg:Image=new Image("ui/mainUI/main_exp_bar_emp.png");
+//			LibManager.getInstance().getImg("ui/mainUI/main_exp_bar_emp.png") as Image;
 			this.expWidth=717;
 			this.expHight=8;
+			this.expSp=new Sprite();
+			this.expSp.x=110.5;
+			this.expSp.y=93;
+			this.expSp.addChild(expBg);
+			this.expSp.addChild(this.expScaleBitMap);
+			this.addChildAt(this.expSp,this.numChildren-7);
+			this.expSp.addEventListener(MouseEvent.MOUSE_OVER,onExpOverFun);
+			this.expSp.addEventListener(MouseEvent.MOUSE_OUT,onExpOutFun);
+			
 
 
 //			this.expScaleBitMap.setSize(this.expImg.width, this.expImg.height);
@@ -109,6 +125,12 @@ package com.leyou.ui.tools {
 
 			this.addShoruCutKey();
 			this.addEventListener(MouseEvent.CLICK, onThisCLick);
+			
+			MouseManager.getInstance().addFun(MouseEvent.MOUSE_UP,onStageMouseUp);
+		}
+		
+		private function onStageMouseUp(e:MouseEvent):void{
+			showDragGlowFilter();
 		}
 
 		private function onThisCLick(evt:MouseEvent):void {
@@ -125,6 +147,10 @@ package com.leyou.ui.tools {
 					keyGrid=new ShortcutsGrid(0);
 				else
 					keyGrid=new ShortcutsGrid(i + 1);
+				keyGrid.x=(i * 42);
+//				if(i<7)
+//					keyGrid=new ShortcutsGrid(i + 1);
+//				else 
 				keyGrid.x=(i * 42);
 				this.gridBg.addChild(keyGrid);
 				this.shortCutDic[i]=keyGrid;
@@ -155,8 +181,7 @@ package com.leyou.ui.tools {
 					UIManager.getInstance().friendWnd.open();
 					break;
 				case "playerBtn":
-					UIManager.getInstance().roleWndI.open();
-//					UIManager.getInstance().roleWnd.open();
+					UIManager.getInstance().roleWnd.open();
 					break;
 				case "settingBtn":
 					UIManager.getInstance().settingWnd.open();
@@ -226,7 +251,7 @@ package com.leyou.ui.tools {
 		 *显示拖拽光圈
 		 *
 		 */
-		public function showDragGlowFilter(v:Boolean):void {
+		public function showDragGlowFilter(v:Boolean=false):void {
 			if (v)
 				tw=FilterUtil.showGlowFilter(this.gridBg);
 			else {
@@ -239,9 +264,29 @@ package com.leyou.ui.tools {
 		//快捷键按下
 		public function onShortcutDown(keyNum:int):void {
 			for each (var render:ShortcutsGrid in this.shortCutDic) {
-				if (render.gridId == keyNum) {
-					render.onUse();
-					return;
+				if(keyNum>0&&keyNum<8){
+					if (render.gridId == keyNum) {
+						render.onUse();
+						return;
+					}
+				}
+				else {
+					if(keyNum==87-48){//w
+						if(render.gridId==9){
+							render.onUse();
+							return;
+						}
+					}else if(keyNum==81-48){//Q
+						if(render.gridId==8){
+							render.onUse();
+							return;
+						}
+					}else if(keyNum==69-48){//E
+						if(render.gridId==0){
+							render.onUse();
+							return;
+						}
+					}	
 				}
 			}
 		}
@@ -290,26 +335,56 @@ package com.leyou.ui.tools {
 		}
 
 		public function setCD(grid:ShortcutsGrid):void {
+			if(grid.isEmpty==false&&grid.cloneGridType==ItemEnum.TYPE_GRID_BACKPACK){
+				grid.cdTimer(CDEnum.GRUG_CD_TIME);
+				return;
+			}	
 			var time:int=TableManager.getInstance().getSkillInfo(MyInfoManager.getInstance().skills[grid.dataId].def.wMagicId).delay;
-			for (var i:int=0; i < 10; i++) {
-				if(shortCutDic[i].isEmpty||shortCutDic[i].cloneGridType!=ItemEnum.TYPE_GRID_SKILL)
-					continue;
-				var t:int=TableManager.getInstance().getSkillInfo(MyInfoManager.getInstance().skills[shortCutDic[i].dataId].def.wMagicId).delay;
-				if (i != grid.gridId&&shortCutDic[i].isEmpty==false&&shortCutDic[i].cloneGridType==ItemEnum.TYPE_GRID_SKILL) {
-//					if(shortCutDic[i].isCD)
-						
-					if (time < t) {
-						this.shortCutDic[i].cdTimer(time);
-					}
-					else {
-						this.shortCutDic[i].cdTimer(t);
-					}
-				} else if(i==grid.gridId)
-					this.shortCutDic[i].cdTimer(t);
-			}
+			grid.cdTimer(time);
 			UIManager.getInstance().skillWnd.setCD(MyInfoManager.getInstance().skills[grid.dataId]);
+			if(time<SkillEnum.SKILL_PUBLIC_CD_TIME)
+				return;
+			for (var i:int=0; i < 10; i++) {
+				if (this.shortCutDic[i].isEmpty||this.shortCutDic[i].cloneGridType!=ItemEnum.TYPE_GRID_SKILL)
+					continue;
+				if (grid.dataId!=this.shortCutDic[i].dataId) {
+					var t:int=TableManager.getInstance().getSkillInfo(MyInfoManager.getInstance().skills[shortCutDic[i].dataId].def.wMagicId).delay;
+					if (shortCutDic[i].isCD) {
+//						if (time < t) {
+//							this.shortCutDic[i].cdTimer(time);
+//						} else {
+//							this.shortCutDic[i].cdTimer(t);
+//						}
+					} else
+					{
+//						if(t)
+						this.shortCutDic[i].cdTimer(SkillEnum.SKILL_PUBLIC_CD_TIME);
+					}
+				}
+			}
+			
 		}
 
+		public function bagItemCD(id:int):void{
+			for(var i:int=0;i<10;i++){
+				if (shortCutDic[i].isEmpty)
+					continue;
+				if(shortCutDic[i].cloneGridType==ItemEnum.TYPE_GRID_BACKPACK&&shortCutDic[i].dataId==id)
+					this.setCD(shortCutDic[i]);
+			}
+		}
+		
+		private function onExpOverFun(evt:MouseEvent):void{
+			var str:String=MyInfoManager.getInstance().baseInfo.Exp+"/"+MyInfoManager.getInstance().baseInfo.MaxExp;
+			ItemTip.getInstance().showString(str);
+			var p:Point=this.localToGlobal(new Point(this.mouseX,this.mouseY));
+			ItemTip.getInstance().updataPs(p.x,p.y);
+		}
+		
+		private function onExpOutFun(evt:MouseEvent):void{
+			ItemTip.getInstance().hide();
+		}
+		
 		public function resize():void {
 			this.x=(UIEnum.WIDTH - 934) / 2;
 			this.y=UIEnum.HEIGHT - 105;

@@ -26,7 +26,6 @@ package com.leyou.ui.buff {
 				return;
 			var buff:BuffItem=new BuffItem();
 			buff.time=info.nTime / 1000;
-//			buff.time=10;
 			buff.iconIdx=info.nImgIndex;
 			buff.tipsStr=info.str;
 			buff.timeStart();
@@ -62,7 +61,11 @@ package com.leyou.ui.buff {
 
 		private function checkBuff(info:TBuff):Boolean {
 			for (var i:int=0; i < this.buffList.length; i++) {
-				if (this.buffList[i].iconIdx == info.nImgIndex && this.buffList[i].iconIdx == info.nImgIndex) {
+//				if (this.buffList[i].iconIdx == info.nImgIndex &&
+//					this.buffList[i].time == int(info.nTime/1000)&&
+//					this.buffList[i].tipsStr==info.str) {
+				if(this.buffList[i].iconIdx == info.nImgIndex){
+					this.buffList[i].tipsStr=info.str;
 					this.buffList[i].timeStop();
 //					this.buffList[i].time=10;
 					this.buffList[i].time=info.nTime / 1000;

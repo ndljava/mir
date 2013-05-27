@@ -5,7 +5,7 @@ package com.leyou.ui.setting.child {
 	import com.ace.ui.dropMenu.children.ComboBox;
 	import com.ace.ui.scrollBar.event.ScrollBarEvent;
 	import com.ace.ui.slider.children.HSlider;
-	import com.leyou.data.setting.SettingVideoInfo;
+	import com.ace.gameData.setting.SettingVideoInfo;
 	import com.leyou.manager.UIManager;
 	
 	import flash.events.Event;

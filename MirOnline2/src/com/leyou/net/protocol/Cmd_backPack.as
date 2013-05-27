@@ -1,5 +1,6 @@
 package com.leyou.net.protocol {
 	import com.ace.enum.ItemEnum;
+	import com.ace.game.backpack.GridBase;
 	import com.ace.game.manager.TableManager;
 	import com.ace.gameData.backPack.TClientItem;
 	import com.ace.gameData.backPack.TSClientItem;
@@ -215,8 +216,14 @@ package com.leyou.net.protocol {
 			var info:TClientItem=analysisItem(body);
 			UIManager.getInstance().roleWnd.serv_removeItem(info);
 			UIManager.getInstance().stallWnd.serv_removeItem(info);
-			
+
 			UIManager.getInstance().backPackWnd.dropOneGridByMakeIndex(info.MakeIndex);
+		}
+
+		static public function sm_delItems(td:TDefaultMessage, body:String):void {
+			var arr:Array=body.split("/");
+			UIManager.getInstance().roleWnd.dropEquip(arr);
+			
 		}
 
 		static public function sm_updateItem(td:TDefaultMessage, body:String):void {
@@ -237,7 +244,11 @@ package com.leyou.net.protocol {
 					info.Addvalue[0]=td.Param;
 					UIManager.getInstance().backPackWnd.updatOneGrid(i);
 					UIManager.getInstance().toolsWnd.updataShortcutGrid(info.s.id);
-					UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, info.s.name + "被发现");
+
+					if (MyInfoManager.getInstance().waitItemUse != -1) {
+
+					} else
+						UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, info.s.name + "被发现");
 					return;
 				}
 			}
@@ -305,11 +316,13 @@ package com.leyou.net.protocol {
 			if (MyInfoManager.getInstance().waitItemFromId == -1)
 				return;
 
+			var toid:int=UIManager.getInstance().storageWnd.IsSwapItem(MyInfoManager.getInstance().waitItemToId);
+
 			//如果仓库为空，存到该地方，并且置空背包
-			if (MyInfoManager.getInstance().itemIsJustFill(MyInfoManager.getInstance().waitItemToId)) {
-				MyInfoManager.getInstance().switchItems(MyInfoManager.getInstance().waitItemFromId, MyInfoManager.getInstance().waitItemToId);
+			if (toid != -1) {
+				MyInfoManager.getInstance().switchItems(MyInfoManager.getInstance().waitItemFromId, toid);
 				UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
-				UIManager.getInstance().storageWnd.updatOneGrid(MyInfoManager.getInstance().waitItemToId);
+				UIManager.getInstance().storageWnd.updatOneGrid(toid);
 				MyInfoManager.getInstance().resetWaitItem();
 
 			} else {
@@ -317,13 +330,12 @@ package com.leyou.net.protocol {
 				//如果仓库不为空，找地方存放,并且置空背包
 				cu=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemFromId];
 				ps=MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_STORAGE, cu);
-				UIManager.getInstance().storageWnd.updatOneGrid(ps);
-
 				MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
 				UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
+				UIManager.getInstance().storageWnd.updatOneGrid(ps,MyInfoManager.getInstance().waitItemToId);
 				MyInfoManager.getInstance().resetWaitItem();
 			}
-			
+
 			UIManager.getInstance().backPackWnd.updateBackType();
 			UIManager.getInstance().backPackWnd.mouseChildren=true;
 		}
@@ -358,7 +370,7 @@ package com.leyou.net.protocol {
 			MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemFromId);
 			UIManager.getInstance().storageWnd.updatOneGrid(MyInfoManager.getInstance().waitItemFromId);
 			MyInfoManager.getInstance().resetWaitItem();
-		 
+
 			UIManager.getInstance().backPackWnd.updateBackType();
 		}
 
@@ -413,7 +425,7 @@ package com.leyou.net.protocol {
 			MyInfoManager.getInstance().resetWaitUse();
 			bagUseItem=null;
 			UIManager.getInstance().backPackWnd.updateBackType();
-			
+
 			UIManager.getInstance().roleWnd.resetDragPos();
 		}
 
@@ -425,6 +437,7 @@ package com.leyou.net.protocol {
 				PopupManager.showAlert(info.s.name + "使用失败");
 				MyInfoManager.getInstance().waitItemUse=-1;
 			}
+
 			//			var info:TClientItem=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemUse];
 			//			PopupManager.showAlert(info.s.name + "使用失败");
 			//			MyInfoManager.getInstance().waitItemUse=-1;
@@ -440,22 +453,21 @@ package com.leyou.net.protocol {
 		//吃药成功
 		static public function sm_eat_ok(td:TDefaultMessage, body:String):void {
 			trace("吃药成功");
-			//if (MyInfoManager.getInstance().waitItemUse != -1)
-			//	UIManager.getInstance().backPackWnd.delOneGridByID(MyInfoManager.getInstance().waitItemUse);
 
 			var wait:int=-1; //为了使工具栏与背包同步显示
 			if (MyInfoManager.getInstance().waitItemUse >= 0)
 				wait=MyInfoManager.getInstance().backpackItems[MyInfoManager.getInstance().waitItemUse].s.id;
 
-			if (bagUseItem != null)
+			if (bagUseItem != null) {
 				MyInfoManager.getInstance().addItem(ItemEnum.TYPE_GRID_BACKPACK, bagUseItem, MyInfoManager.getInstance().waitItemUse);
-			else if (MyInfoManager.getInstance().waitItemUse > 0)
+			} else if (MyInfoManager.getInstance().waitItemUse > 0)
 				MyInfoManager.getInstance().resetItem(MyInfoManager.getInstance().waitItemUse);
-			
+
 			UIManager.getInstance().backPackWnd.updatOneGrid(MyInfoManager.getInstance().waitItemUse);
 			UIManager.getInstance().backPackWnd.updateBackType();
 			bagUseItem=null;
 			MyInfoManager.getInstance().resetWaitUse();
+
 			//更新工具栏
 			if (wait > 0)
 				UIManager.getInstance().toolsWnd.updataShortcutGrid(wait);
@@ -470,6 +482,7 @@ package com.leyou.net.protocol {
 		//向客户端发送游戏币,游戏点,金刚石,灵符数量
 		static public function sm_gameGoldName(td:TDefaultMessage, body:String):void {
 			Cmd_Task.updataMoney(-1, td.Recog, td.Series);
+			UIManager.getInstance().roleWnd.updateGamePoint(td.Param);
 		}
 	}
 }

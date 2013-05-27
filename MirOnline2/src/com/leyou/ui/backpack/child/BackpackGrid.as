@@ -10,7 +10,6 @@ package com.leyou.ui.backpack.child {
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.menu.data.MenuInfo;
 	import com.leyou.data.net.lostAndFind.TLostItemBind;
-	import com.leyou.data.net.lostAndFind.TUserItem;
 	import com.leyou.enum.SystemNoticeEnum;
 	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.PopupManager;
@@ -23,6 +22,7 @@ package com.leyou.ui.backpack.child {
 	import com.leyou.net.protocol.Cmd_Trade;
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.scene.CmdScene;
+	import com.leyou.ui.backpack.BackpackWnd;
 	import com.leyou.ui.cdTimer.CDTimer;
 	import com.leyou.ui.lost.child.LostRender;
 	import com.leyou.ui.storage.child.StorageGrid;
@@ -32,12 +32,14 @@ package com.leyou.ui.backpack.child {
 	
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.text.TextFieldAutoSize;
+	import flash.text.TextFormat;
 
 	public class BackpackGrid extends GridBase implements IMenu {
 
 		private var numLbl:Label;
 		private var isCDIng:Boolean;
-
+		private var cd:CDTimer;
 		private var ilbl:Label;
 		public static var menuState:int=-1;
 
@@ -56,11 +58,6 @@ package com.leyou.ui.backpack.child {
 			this.numLbl.y=24;
 			this.addChild(this.numLbl);
 
-			this.ilbl=new Label();
-			//			this.numLbl.x=22;
-			//			this.numLbl.y=24;
-			this.addChild(this.ilbl);
-
 			this.bgBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/bg.png");
 			this.iconBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/lock.png");
 			this.selectBmp.bitmapData=LibManager.getInstance().getImg("ui/backpack/select.png");
@@ -77,21 +74,21 @@ package com.leyou.ui.backpack.child {
 				return;
 			}
 
-			//trace("ooo", this.dataId,info.s.name,TClientItem(info).MakeIndex,TClientItem(info).s.appr);
-
 			super.updataInfo(info);
 
 			if (TClientItem(info).Addvalue[0] > 1) {
-				this.numLbl.text=TClientItem(info).Addvalue[0];
+				this.numLbl.htmlText="<font face='宋体' size='12'>" + TClientItem(info).Addvalue[0] + "</font>";
 			} else {
 				this.numLbl.text="";
 			}
+
+			this.numLbl.x=this.width - this.numLbl.length * 12;
 
 			this.iconBmp.updateBmp("items/" + TClientItem(info).s.appr + ".png");
 			this.iconBmp.x=this.iconBmp.y=(ItemEnum.ITEM_BG_WIDTH - ItemEnum.ITEM_ICO_WIDTH) / 2;
 
 			this.dataId=MyInfoManager.getInstance().backpackItems.indexOf(info);
-			 
+
 		}
 
 		override protected function reset():void {
@@ -127,15 +124,19 @@ package com.leyou.ui.backpack.child {
 
 				Cmd_backPack.cm_userStorageItem(MyInfoManager.getInstance().talkNpcId, data);
 				UIManager.getInstance().backPackWnd.mouseChildren=false;
+				
+				DragManager.getInstance().turnOff()
 				return;
 			} else if (UIManager.getInstance().shopWnd.visible && UIManager.getInstance().backPackWnd.isShopBtn) { //npc 批量卖出
 
 				if (data == null || data.s == null)
 					return;
-
+				DragManager.getInstance().turnOff()
+				this.enable=false;
 				PopupManager.showConfirm("确认卖出?", function():void {
-					MyInfoManager.getInstance().waitItemFromId=this.dataId;
+					MyInfoManager.getInstance().waitItemFromId=dataId;
 					UIManager.getInstance().shopWnd.sellItem(data.MakeIndex, data.s.name);
+					this.enable=true;
 				});
 				return;
 			} else if (UIManager.getInstance().tradeWnd.visible && UIManager.getInstance().tradeWnd.isshelves) { //交易上架
@@ -143,7 +144,7 @@ package com.leyou.ui.backpack.child {
 				var tc:TClientItem=this.data as TClientItem;
 				if (this.dataId == -1 || tc == null || tc.s == null)
 					return;
-
+				DragManager.getInstance().turnOff()
 				MyInfoManager.getInstance().waitItemFromId=this.initId;
 				UIManager.getInstance().tradeWnd.waitIndex=10;
 				//协议
@@ -244,14 +245,15 @@ package com.leyou.ui.backpack.child {
 		override public function dropHandler():void {
 			if (this.data == null || this.data.s == null)
 				return;
-
-			UIManager.getInstance().backPackDropWnd.showPanel(data);
+			
+			this.enable=false;
+			UIManager.getInstance().backPackDropWnd.showPanel(this);
 		}
 
 		override public function switchHandler(fromItem:GridBase):void {
 			UIManager.getInstance().storageWnd.showDragGlowFilter(false);
 			UIManager.getInstance().toolsWnd.showDragGlowFilter(false);
-
+			UIManager.getInstance().backPackWnd.showDragGlowFilter(false);
 			MyInfoManager.getInstance().resetWaitItem();
 
 			if (this.gridType == fromItem.gridType) {
@@ -306,7 +308,7 @@ package com.leyou.ui.backpack.child {
 						return;
 
 					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从仓库
-					MyInfoManager.getInstance().waitItemToId=this.gridId; //到背包
+					MyInfoManager.getInstance().waitItemToId=this.initId; //到背包
 
 					if (fromItem.dataId == -1)
 						return;
@@ -344,6 +346,7 @@ package com.leyou.ui.backpack.child {
 
 				//角色
 				if (fromItem.gridType == ItemEnum.TYPE_GRID_EQUIP) {
+					fromItem.enable=true;
 					var equip:TClientItem;
 					//多个物品id当到一个格子的问题
 					if (fromItem.dataId == 2 || fromItem.dataId == 0 || fromItem.dataId == 4) {
@@ -396,11 +399,11 @@ package com.leyou.ui.backpack.child {
 					if (tinfo == null)
 						return;
 
-					if(tinfo.sBindName!=MyInfoManager.getInstance().name){
+					if (tinfo.sBindName != MyInfoManager.getInstance().name) {
 						PopupManager.showAlert("非装备主人不能取回");
-						return ;
+						return;
 					}
-					
+
 					Cmd_Task.cm_userGetBackLostItem(UIManager.getInstance().taskWnd.npcId, tinfo.UserItem.MakeIndex, tinfo.UserItem.toTClientItem().s.name, 1);
 				}
 			}
@@ -417,7 +420,6 @@ package com.leyou.ui.backpack.child {
 				return;
 
 			if (UIManager.getInstance().lostWnd.visible) {
-				
 				PopupManager.showConfirm("确定提交" + data.s.name + "么?", okfunc);
 
 				function okfunc():void {
@@ -425,7 +427,7 @@ package com.leyou.ui.backpack.child {
 				}
 				return;
 			}
-			
+
 			var menuArr:Vector.<MenuInfo>=new Vector.<MenuInfo>;
 
 			if (ItemUtil.EQUIP_TYPE.indexOf(data.s.type) > -1)
@@ -444,12 +446,12 @@ package com.leyou.ui.backpack.child {
 				menuArr.push(new MenuInfo("丢弃", 5));
 
 			MenuManager.getInstance().show(menuArr, this, new Point($x, $y));
-			//MyInfoManager.getInstance().resetWaitItem();
 		}
 
 		override public function set enable(value:Boolean):void {
 			super.enable=value;
-
+			this.mouseChildren=value;
+			this.mouseEnabled=value
 			if (!value) {
 				this.iconBmp.filters=[FilterUtil.enablefilter];
 			} else {
@@ -474,12 +476,15 @@ package com.leyou.ui.backpack.child {
 		private var tt:Array=[5, 6, 10, 11, 15, 16, 19, 20, 21, 22, 23, 24, 26, 30, 25, 52, 62, 53, 63, 54, 64, 42, 41, 29, 7];
 
 		public function onUse():void {
+			if (isCDIng)
+				return;
+
 			var info:TClientItem=data;
 			if (info == null || info.s == null)
 				return;
 
 			if (info.s.name == "千里传音卷轴") {
-				//				AlertWindow.showWin("请在聊天中的 世界频道 使用千里传音 ");
+				//AlertWindow.showWin("请在聊天中的 世界频道 使用千里传音 ");
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr("请在聊天中的 世界频道 使用千里传音卷轴 ", SystemNoticeEnum.IMG_WRONG);
 				return;
 			}
@@ -518,22 +523,35 @@ package com.leyou.ui.backpack.child {
 					CmdScene.cm_sendDefaultMsgII(MirProtocol.CM_EAT, info.MakeIndex, 0, 0, 0, info.s.name);
 					break;
 			}
+
+			if ([0, 1, 2, 3, 4, 5].indexOf(info.s.type) != -1) {
+				this.cdTimer(500);
+				UIManager.getInstance().toolsWnd.bagItemCD(info.s.id);
+			}
+
 		}
 
-		//		private function cdTimer(time:int):void {
-		//			if (this.isCDIng == true)
-		//				return;
-		//			var cd:CDTimer=new CDTimer(this.width, this.height);
-		//			cd.cdEndFun=this.cdEnd;
-		//			cd.start(time);
-		//			this.addChild(cd);
-		//			this.mouseEnabled=false;
-		//			this.isCDIng=true;
-		//		}
+		public function cdTimer(time:int):void {
+			if (this.isCDIng == true)
+				return;
+
+			cd=new CDTimer(this.width, this.height);
+			cd.cdEndFun=this.cdEnd;
+			cd.start(time);
+
+			this.addChild(cd);
+			this.mouseEnabled=false;
+			this.mouseChildren=false;
+			this.isLock=true;
+			this.isCDIng=true;
+		}
 
 		private function cdEnd():void {
 			this.isCDIng=false;
 			this.mouseEnabled=true;
+			this.mouseChildren=true;
+			this.isLock=false;
+			this.removeChild(cd);
 		}
 
 		//如果是手镯 或者项链 计算其位置

@@ -19,8 +19,6 @@ package com.leyou.ui.cdTimer {
 		public var enterFrameFun:Function;
 
 		public function CDTimer(w:Number, h:Number) {
-//			this.width=w+2;
-//			this.height=h+2;
 			this.w=w;
 			this.h=h;
 			this.init();
@@ -30,10 +28,10 @@ package com.leyou.ui.cdTimer {
 
 		private function init():void {
 			this.cdMask=new Sprite();
-			var r:Number=((w-7) / 2) * ((w-7) / 2) + ((h-7) / 2) * ((h-7) / 2)
+			var r:Number=((w - 7) / 2) * ((w - 7) / 2) + ((h - 7) / 2) * ((h - 7) / 2)
 			this.radius=Math.sqrt(r);
-			this.cdMask.x=(w+4) / 2;
-			this.cdMask.y=(h+4) / 2;
+			this.cdMask.x=(w + 7) / 2;
+			this.cdMask.y=(h + 7) / 2;
 			this.cdMask.graphics.beginFill(0x000000);
 			this.cdMask.alpha=.7;
 			this.cdMask.graphics.drawCircle(0, 0, this.radius);
@@ -42,30 +40,23 @@ package com.leyou.ui.cdTimer {
 
 			this.masker=new Sprite();
 			this.masker.graphics.beginFill(0xffffff);
-			this.masker.graphics.drawRect(0, 0, this.w-2, this.h-2);
+			this.masker.graphics.drawRect(0, 0, this.w - 2, this.h - 2);
 			this.mask=this.masker;
 			this.masker.x=2;
 			this.masker.y=2;
 			this.addChild(masker);
-//			this.reset();
-			this.width=this.w-4;
-			this.height=this.h-4;
+			this.width=this.w - 4;
+			this.height=this.h - 4;
 		}
 
 		public function reset():void {
-//			this.init();
-//			this.cdMask.graphics.beginFill(0x000000);
-//			this.cdMask.alpha=.7;
 			this.cdMask.graphics.clear();
 			this.cdMask.graphics.beginFill(0x000000);
 			this.cdMask.alpha=.7;
-			this.cdMask.graphics.lineTo(0,this.radius)
+			this.cdMask.graphics.lineTo(0, this.radius)
 			this.cdMask.graphics.moveTo(0, 0);
 			this.cdMask.graphics.drawCircle(0, 0, this.radius);
 			this.cdMask.graphics.moveTo(0, 0);
-//			this.masker.graphics.beginFill(0xffffff);
-//			this.masker.graphics.drawRect(0, 0, this.w-2, this.h-2);
-//			this.mask=this.masker;
 			this.idx=0;
 		}
 
@@ -89,17 +80,17 @@ package com.leyou.ui.cdTimer {
 
 		private function onEnterFrameHandle(evt:Event):void {
 			var angle:Number=this.idx * this.perAngle;
-			angle=(angle / 180) * Math.PI - 1/2 * Math.PI;
+			angle=(angle / 180) * Math.PI - 1 / 2 * Math.PI;
 			var toX:Number=radius * Math.cos(angle);
 			var toY:Number=radius * Math.sin(angle);
 			this.cdMask.graphics.lineTo(toX, toY);
 			this.idx++;
-			if(this.enterFrameFun!=null)
-				this.enterFrameFun(this.delayTime-(getTimer() - this.initTime));
+			if (this.enterFrameFun != null)
+				this.enterFrameFun(this.delayTime - (getTimer() - this.initTime));
 			if (this.delayTime <= getTimer() - this.initTime) {
 				this.stop();
 			}
-			
+
 		}
 
 

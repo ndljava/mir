@@ -14,16 +14,16 @@ package com.leyou.ui.backpack {
 	import com.ace.ui.tabbar.TabbarModel;
 	import com.ace.ui.tabbar.children.TabBar;
 	import com.greensock.TweenMax;
-	import com.greensock.easing.Back;
-	import com.greensock.easing.Elastic;
 	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.MirProtocol;
 	import com.leyou.net.protocol.Cmd_Stall;
 	import com.leyou.net.protocol.Cmd_backPack;
+	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.ui.backpack.child.BackpackGrid;
 	import com.leyou.utils.FilterUtil;
 	import com.leyou.utils.ItemUtil;
-
+	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 
@@ -53,6 +53,8 @@ package com.leyou.ui.backpack {
 		 * 特殊物品 记录
 		 */
 		public var useItem31:int=-1;
+
+		public var rightBorder:Boolean=false;
 
 		public function BackpackWnd() {
 			super(LibManager.getInstance().getXML("config/ui/BackpackWnd.xml"));
@@ -101,7 +103,6 @@ package com.leyou.ui.backpack {
 			if (e.target is BackpackWnd)
 				MenuManager.getInstance().visible(false);
 		}
-
 
 		public function setNeatenState(b:Boolean):void {
 			this.neatenBtn.mouseChildren=this.neatenBtn.mouseEnabled=b;
@@ -160,8 +161,8 @@ package com.leyou.ui.backpack {
 		private function changeType(type:Array, reverse:Boolean=false):void {
 			var arr:Vector.<TClientItem>=MyInfoManager.getInstance().backpackItems;
 
-			var tmp2:Vector.<TClientItem>=arr.filter(function(item:TClientItem, i:int, arr:Vector.<TClientItem>):Boolean {
-				if (item.s != null && i < ItemEnum.BACKPACK_GRID_TOTAL) {
+			var tmp2:Vector.<TClientItem>=arr.filter(function(item:TClientItem, _i:int, arr:Vector.<TClientItem>):Boolean {
+				if (item.s != null && _i < ItemEnum.BACKPACK_GRID_TOTAL) {
 					for (var i:int=0; i < type.length; i++) {
 						if (reverse) {
 							if (item.s.type == type[i])
@@ -190,8 +191,8 @@ package com.leyou.ui.backpack {
 			switch (evt.target.name) {
 				case "storageBtn":
 					UIManager.getInstance().storageWnd.show();
-					this.x=(UIEnum.WIDTH - this.width - UIManager.getInstance().storageWnd.width) / 2;
-					UIManager.getInstance().storageWnd.x=this.x + this.width + 5;
+					UIManager.getInstance().storageWnd.x=(UIEnum.WIDTH - this.width - UIManager.getInstance().storageWnd.width) / 2;
+					this.x=UIManager.getInstance().storageWnd.x + UIManager.getInstance().storageWnd.width + 5;
 					break;
 				case "stallBtn":
 					Cmd_Stall.cm_btItem();
@@ -229,7 +230,6 @@ package com.leyou.ui.backpack {
 
 			var g:GridBase;
 			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
-
 				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
 				if ((this.bagTabBar.turnOnIndex > 0) && (arr[i] == null || arr[i].s == null))
 					g.visible=false;
@@ -279,8 +279,19 @@ package com.leyou.ui.backpack {
 			}
 		}
 
+		public function updateCD(id:int):void {
+
+			var g:GridBase;
+			var i:int=getDragIdByDataID(id)
+			if (i == -1)
+				return;
+
+			g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i);
+			BackpackGrid(g).cdTimer(500);
+		}
+
 		public function updateBackType():void {
-			if (this.bagTabBar.turnOnIndex>0)
+			if (this.bagTabBar.turnOnIndex > 0)
 				this.updateTab();
 		}
 
@@ -325,7 +336,8 @@ package com.leyou.ui.backpack {
 			var id:int=MyInfoManager.getInstance().backpackItems.indexOf(info);
 			MyInfoManager.getInstance().resetItem(id)
 			updatOneGrid(id);
-			updateTab();
+			//updateTab();
+
 			UIManager.getInstance().toolsWnd.updataShortcutGrid(info.s.id);
 		}
 
@@ -346,8 +358,15 @@ package com.leyou.ui.backpack {
 			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_OPEN; i++) {
 				info=MyInfoManager.getInstance().backpackItems[i];
 				if (info.s && (info.s.id == itemId)) {
-					MyInfoManager.getInstance().waitItemUse=i;
-					Cmd_backPack.cm_eat(info);
+					if (info.s.name == "千里传音卷轴") {
+						MyInfoManager.getInstance().waitItemUse=i;
+						CmdScene.cm_sendDefaultMsgII(MirProtocol.CM_EAT, info.MakeIndex, 0, 0, 0, info.s.name);
+						return;
+					}
+					var ii:int=getDragIdByDataID(i);
+					var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, ii);
+					if (g)
+						(g as BackpackGrid).onUse();
 					return;
 				}
 			}
@@ -399,26 +418,47 @@ package com.leyou.ui.backpack {
 			super.show(toTop, toCenter);
 			DragManager.getInstance().turnOn();
 
+			this.x=UIEnum.WIDTH - this.width - 100;
+
 			if (UIManager.getInstance().storageWnd.visible) {
-				this.x=(UIEnum.WIDTH - this.width - UIManager.getInstance().storageWnd.width) / 2;
-				UIManager.getInstance().storageWnd.x=this.x + this.width + 5;
+				UIManager.getInstance().storageWnd.x=(UIEnum.WIDTH - this.width - UIManager.getInstance().storageWnd.width) / 2;
+				this.x=UIManager.getInstance().storageWnd.x + UIManager.getInstance().storageWnd.width + 5;
 			}
+		}
+
+		override public function set x(value:Number):void {
+			super.x=value;
+			//			trace(this.x + this.width, UIEnum.WIDTH)
+			//			if (this.x + this.width == UIEnum.WIDTH)
+			//				this.rightBorder=true;
+			//			else
+			//				this.rightBorder=false;
 		}
 
 		override public function hide():void {
 			DragManager.getInstance().turnOff();
 			super.hide();
 			MenuManager.getInstance().visible(false);
+
+			if (UIManager.getInstance().stallWnd.visible) {
+				UIManager.getInstance().stallWnd.x=(UIEnum.WIDTH - UIManager.getInstance().stallWnd.width) / 2;
+			}
+
+			if (UIManager.getInstance().storageWnd.visible) {
+				UIManager.getInstance().storageWnd.x=(UIEnum.WIDTH - UIManager.getInstance().storageWnd.width) / 2;
+			}
 		}
 
-
 		public function cdTest():void {
-			//			for (var i:int=0; i < ItemEnum.BACKPACK_GRID_TOTAL; i++) {
 			for (var i:int=0; i < 30; i++) {
 				var g:BackpackGrid;
 				g=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, i) as BackpackGrid;
-					//				g.startCD();
+					//g.startCD();
 			}
+		}
+
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
 		}
 
 	}

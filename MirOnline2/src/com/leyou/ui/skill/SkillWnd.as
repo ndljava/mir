@@ -7,6 +7,7 @@ package com.leyou.ui.skill {
 	import com.ace.gameData.playerSkill.TClientMagic;
 	import com.ace.gameData.table.TSkillInfo;
 	import com.ace.manager.LibManager;
+	import com.ace.manager.MouseManager;
 	import com.ace.ui.auto.AutoWindow;
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.scrollPane.children.ScrollPane;
@@ -19,6 +20,7 @@ package com.leyou.ui.skill {
 	import com.leyou.ui.skill.child.SkillShortCutBar;
 	import com.leyou.ui.tools.child.ShortcutsGrid;
 	
+	import flash.events.MouseEvent;
 	import flash.geom.Point;
 
 	public class SkillWnd extends AutoWindow {
@@ -43,6 +45,7 @@ package com.leyou.ui.skill {
 			this.addToPane(this.shortCutBar);
 			this.shortCutBar.visible=false;
 			this.renderArr=new Vector.<SkillListRender>;
+			MouseManager.getInstance().addFun(MouseEvent.MOUSE_UP, onStageMouseUP);
 		}
 
 		public function updata(arr:Vector.<TClientMagic>, frist:Boolean=false):void {
@@ -83,12 +86,19 @@ package com.leyou.ui.skill {
 				UIManager.getInstance().noticeMidDownUproll.setNoticeStr("您还没有学会此技能，不能设置快捷键", SystemNoticeEnum.IMG_WARN);
 				return;
 			}
+			else {
+				var id:int=MyInfoManager.getInstance().skills[idx].def.wMagicId;
+				if(TableManager.getInstance().getSkillInfo(id).delay<=0){
+					UIManager.getInstance().noticeMidDownUproll.setNoticeStr("此技能为被动技能，不能设置快捷键", SystemNoticeEnum.IMG_WARN);
+					return;
+				}
+			}
 			var p:Point=this.globalToLocal(new Point(_x, _y));
 			this.shortCutBar.y=p.y - this.shortCutBar.height - 20;
 			this.shortCutBar.status=true;
 			this.currentIdx=idx;
 			this.shortCutBar.update(UIManager.getInstance().toolsWnd.shortCutGrid);
-			var idx:int=UIManager.getInstance().toolsWnd.checkSKill(idx, false)
+			idx=UIManager.getInstance().toolsWnd.checkSKill(idx, false)
 			if (idx != -1) {
 				this.shortCutBar.cancelBtnSta=true;
 
@@ -171,7 +181,7 @@ package com.leyou.ui.skill {
 				if (equip[ItemEnum.U_BUJUK] == null || equip[ItemEnum.U_BUJUK].s == null || equip[ItemEnum.U_BUJUK].s.name.indexOf("护身符") == -1) {
 					id=getItemIdByName("护身符");
 					if (id[0] > -1)
-						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id[1]) as BackpackGrid).onUse();
 //						UIManager.getInstance().backPackWnd.useItem(id[0]);
 				}
 			} else if (SkillEnum.SKILL_USE_DRYG.indexOf(mgicId) > -1) { //使用药水
@@ -180,29 +190,26 @@ package com.leyou.ui.skill {
 					id=getItemIdByName("灰色药粉");
 					if (idd[0] != -1 && id[0] != -1) {
 						if (idd[1] > id[1])
-							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id[1]) as BackpackGrid).onUse();
 //							UIManager.getInstance().backPackWnd.useItem(id[0]);
 						else
-							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,idd[1]) as BackpackGrid).onUse();
+							(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, idd[1]) as BackpackGrid).onUse();
 //							UIManager.getInstance().backPackWnd.useItem(idd[0]);
-					}
-					else if(idd[0] != -1)
-						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,idd[1]) as BackpackGrid).onUse();
+					} else if (idd[0] != -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, idd[1]) as BackpackGrid).onUse();
 //						UIManager.getInstance().backPackWnd.useItem(idd[0]);
-					else if(id[0] != -1)
-						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+					else if (id[0] != -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id[1]) as BackpackGrid).onUse();
 //						UIManager.getInstance().backPackWnd.useItem(id[0]);
-				}
-				else if(equip[ItemEnum.U_BUJUK].s.name.indexOf("黄色药粉") > -1){
+				} else if (equip[ItemEnum.U_BUJUK].s.name.indexOf("黄色药粉") > -1) {
 					id=getItemIdByName("灰色药粉");
-					if(id[0]>-1)
-						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+					if (id[0] > -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id[1]) as BackpackGrid).onUse();
 //						UIManager.getInstance().backPackWnd.useItem(id[0]);
-				}
-				else if(equip[ItemEnum.U_BUJUK].s.name.indexOf("灰色药粉") > -1){
+				} else if (equip[ItemEnum.U_BUJUK].s.name.indexOf("灰色药粉") > -1) {
 					id=getItemIdByName("黄色药粉");
-					if(id[0]>-1)
-						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK,id[1]) as BackpackGrid).onUse();
+					if (id[0] > -1)
+						(DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, id[1]) as BackpackGrid).onUse();
 //						UIManager.getInstance().backPackWnd.useItem(id[0]);
 				}
 			}
@@ -220,21 +227,38 @@ package com.leyou.ui.skill {
 			}
 			return idarr;
 		}
-		
-		public function setCD(info:TClientMagic):void{
+
+		public function setCD(info:TClientMagic):void {
 			var time:int=TableManager.getInstance().getSkillInfo(info.def.wMagicId).delay;
-			for(var i:int=0;i<this.renderArr.length;i++){
+			var i:int=MyInfoManager.getInstance().skills.indexOf(info);
+			this.renderArr[i].grid.cdTime(time);
+			if(time<SkillEnum.SKILL_PUBLIC_CD_TIME)
+				return;
+			for (i=0; i < this.renderArr.length; i++) {
 				var inf:TClientMagic=MyInfoManager.getInstance().skills[i];
-				if(i!=MyInfoManager.getInstance().skills.indexOf(info)){
-					var t:int=TableManager.getInstance().getSkillInfo(inf.def.wMagicId).delay
-					if(time<t)
-						this.renderArr[i].grid.cdTime(time);
-					else this.renderArr[i].grid.cdTime(t);
-				}
-				else this.renderArr[i].grid.cdTime(time);
+				if (i != MyInfoManager.getInstance().skills.indexOf(info)) {
+					if(!this.renderArr[i].grid.isCD)
+						this.renderArr[i].grid.cdTime(SkillEnum.SKILL_PUBLIC_CD_TIME);
+//					var t:int;
+//					if (inf.isLearn) {
+//						t=TableManager.getInstance().getSkillInfo(inf.def.wMagicId).delay;
+//					} else
+//						t=TableManager.getInstance().getSkillInfo(inf.skillId).delay;
+//
+//					if (time < t)
+//						this.renderArr[i].grid.cdTime(time);
+//					else
+//						this.renderArr[i].grid.cdTime(t);
+				} 
+//				else
+//					this.renderArr[i].grid.cdTime(time);
 			}
 		}
-		
+
+		private function onStageMouseUP(evt:MouseEvent):void {
+			this.shortCutBar.status=false;
+		}
+
 		
 	}
 }

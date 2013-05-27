@@ -11,8 +11,10 @@ package com.leyou.utils {
 		public static var enablefilter:ColorMatrixFilter=new ColorMatrixFilter([0.3086, 0.6094, 0.082, 0, 0, 0.3086, 0.6094, 0.082, 0, 0, 0.3086, 0.6094, 0.082, 0, 0, 0, 0, 0, 1, 0]);
 
 		public static var greenGlowFilter:GlowFilter=new GlowFilter(0x0e8671);
-
+		public static var yellowGlowFilter:GlowFilter=new GlowFilter(0xffff00);
+		
 		public function FilterUtil() {
+			
 		}
 
 		/**

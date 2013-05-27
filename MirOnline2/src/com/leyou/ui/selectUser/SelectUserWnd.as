@@ -59,6 +59,7 @@ package com.leyou.ui.selectUser {
 				if (this.userBtn1.userNameLbl.text != "") {
 					Core.selectInfo.copy(this.arr[0]);
 					this.selectName=this.userBtn1.userNameLbl.text;
+					this.visible=true;
 				} else {
 					UIManager.getInstance().addCreatUserWnd();
 					this.visible=false;
@@ -68,6 +69,7 @@ package com.leyou.ui.selectUser {
 				if (this.userBtn2.userNameLbl.text != "") {
 					this.selectName=this.userBtn2.userNameLbl.text;
 					Core.selectInfo.copy(this.arr[1]);
+					this.visible=true;
 				} else {
 					UIManager.getInstance().addCreatUserWnd();
 					this.visible=false;

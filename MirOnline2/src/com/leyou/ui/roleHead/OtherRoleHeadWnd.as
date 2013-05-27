@@ -11,15 +11,18 @@ package com.leyou.ui.roleHead {
 	import com.ace.ui.lable.Label;
 	import com.ace.ui.menu.data.MenuInfo;
 	import com.leyou.data.net.role.TUserStateInfo;
+	import com.leyou.enum.FriendEnum;
 	import com.leyou.manager.MenuManager;
 	import com.leyou.manager.UIManager;
+	import com.leyou.net.protocol.Cmd_Role;
+	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_Team;
 	import com.leyou.utils.PlayerUtil;
-	
+
 	import flash.events.MouseEvent;
 
 	public class OtherRoleHeadWnd extends AutoSprite implements IMenu {
-		
+
 		private var userheadImg:Image;
 		private var hpImg:Image;
 		private var mpImg:Image;
@@ -33,7 +36,7 @@ package com.leyou.ui.roleHead {
 		private var btn2:ImgLabelButton;
 		private var btn3:ImgLabelButton;
 
-		private var info:TUserStateInfo;
+		private var playid:int=-1;
 
 		public function OtherRoleHeadWnd() {
 			super(LibManager.getInstance().getXML("config/ui/RoleHeadWnd.xml"));
@@ -75,14 +78,14 @@ package com.leyou.ui.roleHead {
 		private function onThisClick(evt:MouseEvent):void {
 			//trace("tttt", evt.target);
 			if (evt.target is OtherRoleHeadWnd) {
-				
-				return ;
+
+				return;
 				var arr:Vector.<MenuInfo>=new Vector.<MenuInfo>();
-				arr.push(new MenuInfo("",1));
-				arr.push(new MenuInfo("",2));
-				arr.push(new MenuInfo("",3));
-				
-				//MenuManager.getInstance().show(arr,this,);
+				arr.push(new MenuInfo("", 1));
+				arr.push(new MenuInfo("", 2));
+				arr.push(new MenuInfo("", 3));
+
+					//MenuManager.getInstance().show(arr,this,);
 			}
 			evt.stopPropagation();
 		}
@@ -90,16 +93,16 @@ package com.leyou.ui.roleHead {
 		public function onMenuClick(i:int):void {
 			switch (i) {
 				case 1:
-					
+
 					break;
 				case 2:
-					
+
 					break;
 				case 3:
-					
+
 					break;
 				case 4:
-					
+
 					break;
 			}
 		}
@@ -107,8 +110,9 @@ package com.leyou.ui.roleHead {
 		private function onClick(e:MouseEvent):void {
 			switch (e.target.name) {
 				case "btn1Txt1":
-					UIManager.getInstance().otherRoleWnd.updateInfo(info);
-					UIManager.getInstance().otherRoleWnd.show(true, true);
+					//					UIManager.getInstance().otherRoleWnd.updateInfo(info);
+					//					UIManager.getInstance().otherRoleWnd.show(true, true);
+					Cmd_Role.cm_queryUserState(playid, UIManager.getInstance().mirScene.getPlayer(playid).nowTilePt());
 					break;
 				case "btn1Txt2":
 					if (UIManager.getInstance().teamWnd.teamerInfo.length > 0) {
@@ -119,18 +123,20 @@ package com.leyou.ui.roleHead {
 					}
 					break;
 				case "btn1Txt3":
-					UIManager.getInstance().friendWnd.open();
+					//					Cmd_Task.cm_merchantDlgSelect(MyInfoManager.getInstance().talkNpcId, FriendEnum.ADD_FRIEND + "," +info.UserName);
 					break;
 			}
 		}
 
 		//更新显示信息
-		public function updataInfo(info:TUserStateInfo):void {
+		public function updataInfo(playerId:int):void {
+			var pinfo:LivingInfo=UIManager.getInstance().mirScene.getPlayer(playerId).infoB;
+			if (pinfo == null)
+				return;
+
+			this.playid=playerId;
+
 			this.visible=true;
-			this.info=info;
-
-			var pinfo:LivingInfo=UIManager.getInstance().mirScene.getPlayerByName(info.UserName).infoB
-
 			this.nameLbl.text=pinfo.name;
 			this.lvLbl.text=pinfo.level.toString();
 			this.raceLbl.text=PlayerUtil.getPlayerRaceByIdx(pinfo.race, 1);

@@ -6,7 +6,9 @@ package com.leyou.ui.storage.child {
 	import com.ace.gameData.player.MyInfoManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_backPack;
+	import com.leyou.ui.backpack.BackpackWnd;
 	import com.leyou.ui.backpack.child.BackpackGrid;
+	import com.leyou.ui.storage.StorageWnd;
 	import com.leyou.utils.ItemUtil;
 
 	public class StorageGrid extends BackpackGrid {
@@ -36,13 +38,20 @@ package com.leyou.ui.storage.child {
 		override public function mouseDownHandler($x:Number, $y:Number):void {
 			//仓库批量存取
 			if (UIManager.getInstance().backPackWnd.visible && UIManager.getInstance().storageWnd.isbatchSave) {
-				
-				if(this.dataId==-1 || MyInfoManager.getInstance().waitItemFromId!=-1) return ;
-				
+
+				if (this.dataId == -1 || MyInfoManager.getInstance().waitItemFromId != -1)
+					return;
+
 				MyInfoManager.getInstance().waitItemFromId=this.dataId; //从仓库
 				MyInfoManager.getInstance().waitItemToId=MyInfoManager.getInstance().findEmptyPs(ItemEnum.TYPE_GRID_BACKPACK);
-				Cmd_backPack.cm_userTakeBackStorageItem(MyInfoManager.getInstance().talkNpcId, data);
+				Cmd_backPack.cm_userTakeBackStorageItem(MyInfoManager.getInstance().talkNpcId, this.data);
 				UIManager.getInstance().storageWnd.mouseChildren=false;
+			} else {
+				if (DragManager.getInstance().grid != null && this.data != null && this.data.s != null) {
+					UIManager.getInstance().backPackWnd.showDragGlowFilter(true);
+					if (ItemUtil.EQUIP_TYPE.concat(ItemUtil.ITEM_TOOL).indexOf(this.data.s.type) > -1)
+						UIManager.getInstance().toolsWnd.showDragGlowFilter(true);
+				}
 			}
 		}
 
@@ -50,6 +59,7 @@ package com.leyou.ui.storage.child {
 
 			UIManager.getInstance().backPackWnd.showDragGlowFilter(false);
 			UIManager.getInstance().toolsWnd.showDragGlowFilter(false);
+			UIManager.getInstance().storageWnd.showDragGlowFilter(false);
 
 			super.switchHandler(fromItem);
 			if (this.gridType != fromItem.gridType) {
@@ -57,16 +67,16 @@ package com.leyou.ui.storage.child {
 				//如果来自背包
 				if (fromItem.gridType == ItemEnum.TYPE_GRID_BACKPACK) {
 
-					if (!UIManager.getInstance().storageWnd.matchToDrag(BackpackGrid(fromItem).data))
+					if (!UIManager.getInstance().storageWnd.matchToDrag(BackpackGrid(fromItem).data) || fromItem.dataId == -1)
 						return;
 
-					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从背包
+					MyInfoManager.getInstance().waitItemFromId=fromItem.dataId; //从背包 
 					MyInfoManager.getInstance().waitItemToId=this.initId; //到仓库
 					Cmd_backPack.cm_userStorageItem(MyInfoManager.getInstance().talkNpcId, MyInfoManager.getInstance().backpackItems[fromItem.dataId]);
-					return ;
+					return;
 				}
 			}
-			
+
 			MyInfoManager.getInstance().resetWaitItem();
 		}
 
@@ -84,32 +94,26 @@ package com.leyou.ui.storage.child {
 
 		override public function mouseOutHandler():void {
 			super.mouseOutHandler();
-			
-			if (DragManager.getInstance().grid != null && this.data!=null && this.data.s!=null) {
-				UIManager.getInstance().storageWnd.showDragGlowFilter(true);
-				if (ItemUtil.EQUIP_TYPE.concat(ItemUtil.ITEM_TOOL).indexOf(this.data.s.type) > -1)
-					UIManager.getInstance().toolsWnd.showDragGlowFilter(true);
-			}
 		}
 
 		override public function mouseUpHandler($x:Number, $y:Number):void {
 			//super.mouseUpHandler($x,$y);
 			if (BackpackGrid.menuState == 2) {
 				if (MyInfoManager.getInstance().waitItemFromId != -1) {
-					
+
 					var g:GridBase=DragManager.getInstance().getGrid(ItemEnum.TYPE_GRID_BACKPACK, MyInfoManager.getInstance().waitItemFromId);
 					var info1:TClientItem=BackpackGrid(g).data;
-					
+
 					if (info1 == null || info1.s == null)
 						return;
-					
+
 					MyInfoManager.getInstance().waitItemFromId=g.dataId; //从背包
 					MyInfoManager.getInstance().waitItemToId=this.dataId; //到仓库
 					Cmd_backPack.cm_userStorageItem(MyInfoManager.getInstance().talkNpcId, MyInfoManager.getInstance().backpackItems[g.dataId]);
 				}
-				
+
 				BackpackGrid.menuState=-1;
-				//MyInfoManager.getInstance().resetWaitItem();
+					//MyInfoManager.getInstance().resetWaitItem();
 			}
 		}
 

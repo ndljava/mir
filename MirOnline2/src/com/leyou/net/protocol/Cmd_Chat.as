@@ -69,10 +69,10 @@ package com.leyou.net.protocol {
 			if (td.Series == 1) { //中央向上1
 				UIManager.getInstance().noticeUproll.setNoticeStr(body);
 			}
-			if (td.Series == 4) { //
+			else if (td.Series == 4) { //
 				UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM, body);
 			}
-			if (td.Series == 2) { //倒计时
+			else if (td.Series == 2) { //倒计时
 				UIManager.getInstance().noticeCountDown.ser_CountDown(td, body); //tag 秒
 			}
 			else UIManager.getInstance().chatWnd.servOnChat(ChatEnum.CHANNEL_SYSTEM,body);

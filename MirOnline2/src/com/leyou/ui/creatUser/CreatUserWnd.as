@@ -11,6 +11,7 @@ package com.leyou.ui.creatUser {
 	import com.ace.ui.window.children.PopWindow;
 	import com.ace.ui.window.children.WindInfo;
 	import com.leyou.config.Core;
+	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.login.Cmd_Login;
 	import com.leyou.ui.creatUser.child.UserBtn;
 	
@@ -180,7 +181,9 @@ package com.leyou.ui.creatUser {
 				this.userBtnArr[i].removeEventListener(MouseEvent.MOUSE_OVER, onHeadOver);
 				this.userBtnArr[i].removeEventListener(MouseEvent.MOUSE_OUT, onHeadOut);
 			}
+			this.visible=false;
 			this.parent.removeChild(this);
+			UIManager.getInstance().selectUserWnd=null;
 		}
 	}
 }

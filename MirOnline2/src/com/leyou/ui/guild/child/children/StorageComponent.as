@@ -104,7 +104,7 @@ package com.leyou.ui.guild.child.children
 			
 			MenuManager.getInstance().show(menuarr,this,new Point(e.stageX,e.stageY));
 			
-			selectIndex=this.itemGridArr.indexOf(e.target);
+			selectIndex=this.itemGridArr.indexOf(e.target as GuildStoreGrid);
 		}
 
 		public function onMenuClick(i:int):void

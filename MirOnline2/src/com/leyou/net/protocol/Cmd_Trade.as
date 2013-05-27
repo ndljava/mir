@@ -33,6 +33,7 @@ package com.leyou.net.protocol {
 			//无返回值			两个玩家面对面才能进行相关交易.
 			trace("发起交易--失败");
 			//UIManager.getInstance().tradeWnd.open();
+			UIManager.getInstance().noticeMidDownUproll.setNoticeStr("发起交易失败!!!",0);
 		}
 
 		/**

@@ -13,7 +13,7 @@ package com.leyou.ui.tips {
 	import com.leyou.enum.TipsEnum;
 	import com.leyou.ui.tips.child.TipsGrid;
 	import com.leyou.utils.TipsUtil;
-	
+
 	import flash.display.Sprite;
 	import flash.text.TextFormat;
 
@@ -72,49 +72,51 @@ package com.leyou.ui.tips {
 					else
 						this.lbl.htmlText+=(TipsUtil.getColorStr("     需要技能书《" + info.name + "》", TipsEnum.COLOR_GREEN));
 				}
-			}else{
-				this.lbl.htmlText+=TipsUtil.getColorStr("当前等级："+info.skillLv+"级",TipsEnum.COLOR_WHITE);
-				if(info.skillLv==3){
-					this.lbl.htmlText+=TipsUtil.getColorStr("该技能已达到满级",TipsEnum.COLOR_WHITE);
+			} else {
+				this.lbl.htmlText+=TipsUtil.getColorStr("当前等级：" + info.skillLv + "级", TipsEnum.COLOR_WHITE);
+				if (info.skillLv == 3) {
+					this.lbl.htmlText+=TipsUtil.getColorStr("该技能已达到满级", TipsEnum.COLOR_WHITE);
+				} else if (info.skillLv < 3) {
+					this.lbl.htmlText+=TipsUtil.getColorStr("熟练程度：" + info.proficiency, TipsEnum.COLOR_GREEN);
+					this.lbl.htmlText+=TipsUtil.getColorStr("该技能最高可提升至3级", TipsEnum.COLOR_GREEN);
 				}
-				else if(info.skillLv<3){
-					this.lbl.htmlText+=TipsUtil.getColorStr("熟练程度："+ info.proficiency, TipsEnum.COLOR_GREEN);
-					this.lbl.htmlText+=TipsUtil.getColorStr("该技能最高可提升至3级",TipsEnum.COLOR_GREEN);
-				}
-				this.lbl.htmlText+=TipsUtil.getColorStr("使用条件：",TipsEnum.COLOR_BLUE);
-				if(info.name!="烈火剑法"&&info.name!="静寂圣剑"&&info.name!="半月弯刀"&&info.useMagic<=0)
-					this.lbl.htmlText+=TipsUtil.getColorStr("     被动技能",TipsEnum.COLOR_GREEN);
-				else{
-					var mp:int=MyInfoManager.getInstance().baseInfo.MP;//玩家魔法值
+				this.lbl.htmlText+=TipsUtil.getColorStr("使用条件：", TipsEnum.COLOR_BLUE);
+				if (info.name != "烈火剑法" && info.name != "静寂圣剑" && info.name != "半月弯刀" && info.useMagic <= 0)
+					this.lbl.htmlText+=TipsUtil.getColorStr("     被动技能", TipsEnum.COLOR_GREEN);
+				else {
+					var mp:int=MyInfoManager.getInstance().baseInfo.MP; //玩家魔法值
 					mp=HexUtil.LoWord(mp);
-					if(mp>=info.useMagic)
-						this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_GREEN);
-					else this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+info.useMagic+"点魔法值",TipsEnum.COLOR_RED);
+//					var needMagic:int=
+					if (mp >= info.useMagic)
+						this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗" + info.useMagic + "点魔法值", TipsEnum.COLOR_GREEN);
+					else
+						this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗" + info.useMagic + "点魔法值", TipsEnum.COLOR_RED);
 				}
-				if(TipsEnum.skill[info.name]!=null){
-					if(TipsUtil.checkItem(TipsEnum.skill[info.name].item,TipsEnum.skill[info.name].num)){
-						if((TipsEnum.skill[info.name].item as Array).length==2)
-							this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+TipsEnum.skill[info.name].num+"张【护身符】",TipsEnum.COLOR_GREEN);
-						else this.lbl.htmlText+=TipsUtil.getColorStr("     需要【灰色/黄色药粉】",TipsEnum.COLOR_GREEN);
-					}
-					else {
-						if((TipsEnum.skill[info.name].item as Array).length==2)
-							this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗"+TipsEnum.skill[info.name].num+"张【护身符】",TipsEnum.COLOR_RED);
-						else this.lbl.htmlText+=TipsUtil.getColorStr("     需要【灰色/黄色药粉】",TipsEnum.COLOR_RED);
+				if (TipsEnum.skill[info.name] != null) {
+					if (TipsUtil.checkItem(TipsEnum.skill[info.name].item, TipsEnum.skill[info.name].num)) {
+						if ((TipsEnum.skill[info.name].item as Array).length == 2)
+							this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗" + TipsEnum.skill[info.name].num + "张【护身符】", TipsEnum.COLOR_GREEN);
+						else
+							this.lbl.htmlText+=TipsUtil.getColorStr("     需要【灰色/黄色药粉】", TipsEnum.COLOR_GREEN);
+					} else {
+						if ((TipsEnum.skill[info.name].item as Array).length == 2)
+							this.lbl.htmlText+=TipsUtil.getColorStr("     每次消耗" + TipsEnum.skill[info.name].num + "张【护身符】", TipsEnum.COLOR_RED);
+						else
+							this.lbl.htmlText+=TipsUtil.getColorStr("     需要【灰色/黄色药粉】", TipsEnum.COLOR_RED);
 					}
 				}
-				if(info.skillLv<3){
-					this.lbl.htmlText+=TipsUtil.getColorStr("升级条件：",TipsEnum.COLOR_BLUE);
+				if (info.skillLv < 3) {
+					this.lbl.htmlText+=TipsUtil.getColorStr("升级条件：", TipsEnum.COLOR_BLUE);
 					if (MyInfoManager.getInstance().level >= info.limit)
 						this.lbl.htmlText+=TipsUtil.getColorStr("     人物等级达到" + info.limit + "级", TipsEnum.COLOR_GREEN);
 					else
 						this.lbl.htmlText+=TipsUtil.getColorStr("     人物等级达到" + info.limit + "级", TipsEnum.COLOR_RED);
-					this.lbl.htmlText+=TipsUtil.getColorStr("     熟练度达到"+info.needDru,TipsEnum.COLOR_RED);
+					this.lbl.htmlText+=TipsUtil.getColorStr("     熟练度达到" + info.needDru, TipsEnum.COLOR_RED);
 				}
 			}
 			if (info.instruction != null || info.instruction != "")
 				this.lbl.htmlText+=TipsUtil.getColorStr(info.instruction, TipsEnum.COLOR_BLUE);
-			this.lbl.htmlText+=TipsUtil.getColorStr(info.shortDer,TipsEnum.COLOR_YELLOW);
+			this.lbl.htmlText+=TipsUtil.getColorStr(info.shortDer, TipsEnum.COLOR_YELLOW);
 			this.grid.visible=true;
 			this.grid.updataInfo(info);
 			this.bg.setSize(this.w, this.lbl.height + 3);
@@ -151,7 +153,7 @@ package com.leyou.ui.tips {
 					this.info.proficiency="-";
 				else
 					this.info.proficiency=info.curTrain + "/" + needProficiency;
-				this.info.useMagic=info.def.wSpell;
+				this.info.useMagic=Math.round(info.def.wSpell / (info.def.btTrainLv + 1) * (info.level + 1)) + info.def.btDefSpell;
 				this.info.Looks=info.def.btEffect;
 				this.info.needDru=needProficiency;
 			} else if (info.isLearn == false) {
@@ -236,9 +238,9 @@ package com.leyou.ui.tips {
 				arr.push(TipsUtil.getColorStr("人物等级：" + needLv, TipsEnum.COLOR_RED));
 			return arr;
 		}
-		
-		
-		
-		
+
+
+
+
 	}
 }

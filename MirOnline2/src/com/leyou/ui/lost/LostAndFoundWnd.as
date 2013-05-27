@@ -18,7 +18,7 @@ package com.leyou.ui.lost {
 		private var pageLbl:Label;
 		private var prePageBtn:NormalButton;
 		private var nextPageBtn:NormalButton;
-		private var currentPage:int=1; //当前页
+		public var currentPage:int=1; //当前页
 
 		public var countPage:int=0;
 		
@@ -57,6 +57,8 @@ package com.leyou.ui.lost {
 
 				render.y=60 + Math.floor(i / 2) * render.height;
 			}
+			
+			this.titleLbl.text="失物招领";
 		}
 
 		private function update():void {
@@ -106,6 +108,10 @@ package com.leyou.ui.lost {
 			update();
 			
 			this.pageLbl.text=currentPage + "/"+countPage;
+		}
+		
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
 		}
 	}
 }

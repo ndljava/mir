@@ -163,6 +163,13 @@ package com.leyou.ui.trade {
 			UIManager.getInstance().backPackWnd.setNeatenState(true);
 
 			this.clearData();
+
+			if (UIManager.getInstance().backPackWnd.visible) {
+				if (UIManager.getInstance().backPackWnd.rightBorder)
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width;
+				else
+					UIManager.getInstance().backPackWnd.x=UIEnum.WIDTH - UIManager.getInstance().backPackWnd.width - 100;
+			}
 		}
 
 		/**
@@ -262,6 +269,10 @@ package com.leyou.ui.trade {
 			}
 		}
 
+		public function resize():void {
+			this.y=(UIEnum.HEIGHT-this.height)/2;
+		}
+		
 		public function serv_showPanel(body:String):void {
 			this.show();
 

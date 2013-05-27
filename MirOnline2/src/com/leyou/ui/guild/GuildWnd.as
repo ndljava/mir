@@ -9,14 +9,10 @@ package com.leyou.ui.guild {
 	import com.ace.utils.HexUtil;
 	import com.leyou.enum.GuildEnum;
 	import com.leyou.enum.TaskEnum;
-	import com.leyou.net.MirProtocol;
-	import com.leyou.net.NetEnum;
-	import com.leyou.net.protocol.Cmd_Chat;
 	import com.leyou.net.protocol.Cmd_Guild;
 	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.TDefaultMessage;
-	import com.leyou.net.protocol.scene.CmdScene;
 	import com.leyou.ui.guild.child.GuildMainPanel;
 	import com.leyou.ui.guild.child.GuildMemberPanel;
 	import com.leyou.ui.guild.child.GuildPurviewPanel;
@@ -24,12 +20,8 @@ package com.leyou.ui.guild {
 	import com.leyou.ui.guild.child.GuildStoragePanel;
 	import com.leyou.ui.guild.child.GuildWagePanel;
 	import com.leyou.utils.GuildUtils;
-
+	
 	import flash.events.Event;
-	import flash.system.System;
-	import flash.system.SystemUpdater;
-
-	import org.osmf.net.NetClient;
 
 	public class GuildWnd extends AutoWindow {
 
@@ -161,6 +153,13 @@ package com.leyou.ui.guild {
 				this.devoteLab.text=guildContent[2] + "";
 				this.guildMainPanel.updateData(guildContent);
 			}
+		}
+
+		public function showkey():void {
+			if (this.visible)
+				this.hide();
+			else
+				Cmd_Guild.cm_openGuildDlg();
 		}
 
 		/**

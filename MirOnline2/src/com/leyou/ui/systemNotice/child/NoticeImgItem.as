@@ -94,6 +94,7 @@ package com.leyou.ui.systemNotice.child {
 			this.timer=new Timer(time);
 			this.timer.addEventListener(TimerEvent.TIMER, onTimerHander);
 			this.timer.start();
+			
 		}
 
 		private function onTimerHander(evt:TimerEvent):void {

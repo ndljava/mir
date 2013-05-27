@@ -6,12 +6,12 @@ package com.leyou.ui.market {
 	import com.ace.ui.lable.Label;
 	import com.leyou.data.net.market.TShopInfo;
 	import com.leyou.enum.MarketEnum;
+	import com.leyou.manager.UIManager;
 	import com.leyou.net.protocol.Cmd_Market;
 	import com.leyou.ui.market.child.MarketRender;
-	
+	import com.leyou.utils.ItemUtil;
+
 	import flash.events.MouseEvent;
-	
-	import flashx.textLayout.elements.BreakElement;
 
 	public class MarketWnd extends AutoWindow {
 		private var btnArr:Vector.<NormalButton>;
@@ -99,7 +99,7 @@ package com.leyou.ui.market {
 			for (var i:int=this.currentPage * MarketEnum.CLIENT_NUM_PER_PAGE; i < (this.currentPage + 1) * MarketEnum.CLIENT_NUM_PER_PAGE; i++) {
 				if (i < itemArr.length) {
 					this.renderArr[i % 12].visible=true;
-					this.renderArr[i % 12].updataInfo(itemArr[i],this.currentBtnIdx);
+					this.renderArr[i % 12].updataInfo(itemArr[i], this.currentBtnIdx);
 					if (this.currentBtnIdx == MarketEnum.BAR_HOT || this.currentBtnIdx == MarketEnum.BAR_SPECIAL)
 						this.renderArr[i % 12].previewBtnSta=false;
 					else
@@ -245,18 +245,19 @@ package com.leyou.ui.market {
 		 *
 		 */
 		public function updataGold():void {
-			this.moneyLbl.text=MyInfoManager.getInstance().baseInfo.gameGold.toString();
+			this.moneyLbl.text=ItemUtil.getSplitMoneyTextTo4(MyInfoManager.getInstance().baseInfo.gameGold.toString());
 			this.updateIntegration();
 		}
 
 		/**
-		 *更新积分数量 
-		 * 
-		 */		
-		public function updateIntegration():void{
+		 *更新积分数量
+		 *
+		 */
+		public function updateIntegration():void {
 			//暂无
-			this.integralLbl.text=MyInfoManager.getInstance().baseInfo.gameScore.toString();
+			this.integralLbl.text=ItemUtil.getSplitMoneyTextTo4(MyInfoManager.getInstance().baseInfo.gameScore.toString());
 		}
+
 		/**
 		 *添加商品
 		 * @param itemArr
@@ -349,6 +350,7 @@ package com.leyou.ui.market {
 		//更新页码显示
 		private function updataPage():void {
 			this.pageLbl.text=this.currentPage + 1 + "/" + this.currentSumPage;
+//			this.pageLbl.text="100/100";
 		}
 
 		/**
@@ -431,9 +433,17 @@ package com.leyou.ui.market {
 			}
 			return info;
 		}
-		
-		public function get currentBtnIndex():int{
+
+		public function get currentBtnIndex():int {
 			return this.currentBtnIdx;
 		}
+
+		override public function hide():void {
+			super.hide();
+			UIManager.getInstance().fittingRoomWnd.hide();
+		}
+		
+		
+		
 	}
 }

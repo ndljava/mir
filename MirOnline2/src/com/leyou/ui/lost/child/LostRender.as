@@ -20,6 +20,7 @@ package com.leyou.ui.lost.child {
 	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.text.TextFieldAutoSize;
 
 	public class LostRender extends Sprite {
 
@@ -53,11 +54,12 @@ package com.leyou.ui.lost.child {
 
 			this.itemName=new Label();
 			this.addChild(this.itemName);
-
+			this.itemName.textColor=0xffff00;
 			this.itemName.x=itemGrid.x + itemGrid.width + 3;
 			this.itemName.y=itemGrid.y;
-
+			
 			this.playName=new Label();
+			this.playName.autoSize=TextFieldAutoSize.LEFT;
 			this.addChild(this.playName);
 
 			this.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -93,11 +95,11 @@ package com.leyou.ui.lost.child {
 				if (info == null)
 					return;
 
-				if(info.sBindName!=MyInfoManager.getInstance().name){
+				if (info.sBindName != MyInfoManager.getInstance().name) {
 					PopupManager.showAlert("非装备主人不能取回");
-					return ;
+					return;
 				}
-				
+
 				Cmd_Task.cm_userGetBackLostItem(UIManager.getInstance().taskWnd.npcId, info.UserItem.MakeIndex, info.UserItem.toTClientItem().s.name, 1);
 				isDown=false;
 			} else {
@@ -127,13 +129,17 @@ package com.leyou.ui.lost.child {
 			} else {
 
 				var titeminfo:TItemInfo=TableManager.getInstance().getItemInfo(this.info.UserItem.wIndex - 1);
-				this.itemName.text=titeminfo.name + "";
-				this.playName.text=this.info.sSendUserItem + "";
-
-				itemGrid.updataInfo(titeminfo);           
+				itemGrid.updataInfo(titeminfo);
 				
-				this.playName.x=this.width - this.playName.width - 5;
-				this.playName.y=this.height - this.playName.height - 5;       
+				this.itemName.text=titeminfo.name + "";
+				this.playName.x=0;
+				this.playName.y=0;
+				this.playName.text=this.info.sBindName + "";
+				this.playName.width=this.playName.length*12;
+				
+				this.playName.x=this.width - this.playName.width-5;
+				this.playName.y=this.height - this.playName.height - 5;
+				
 			}
 		}
 

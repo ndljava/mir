@@ -8,6 +8,7 @@ package com.leyou.ui.tips {
 	import com.ace.gameData.table.TItemInfo;
 	import com.ace.manager.LibManager;
 	import com.ace.tools.ScaleBitmap;
+	import com.ace.ui.img.child.Image;
 	import com.ace.ui.lable.Label;
 	import com.leyou.data.net.market.TShopInfo;
 	import com.leyou.data.net.shop.TStdItem;
@@ -18,7 +19,7 @@ package com.leyou.ui.tips {
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.ui.tips.child.TipsGrid;
 	import com.leyou.utils.TipsUtil;
-
+	
 	import flash.display.Sprite;
 	import flash.text.TextFormat;
 
@@ -29,6 +30,7 @@ package com.leyou.ui.tips {
 		private var grid:TipsGrid;
 		private var info:EquipTipsInfo;
 		private var lbll:Label;
+		private var img:Image;
 
 		public function TipsEquip() {
 			super();
@@ -66,10 +68,15 @@ package com.leyou.ui.tips {
 			this.lbll.y=this.grid.y + this.grid.height;
 			this.lbll.defaultTextFormat=format;
 			this.addChild(this.lbll);
+			
+			this.img=new Image();
+			this.img.updateBmp("ui/other/tips_equip.png");
+			this.img.visible=false;
+			this.addChild(img);
 
 		}
 
-		private function updateInfo(info:EquipTipsInfo):void {
+		private function updateInfo(info:EquipTipsInfo,f:Boolean):void {
 			var i:int;
 			this.lbll.htmlText="";
 			this.lbl.htmlText=TipsUtil.getColorStr(info.name, TipsEnum.COLOR_YELLOW);
@@ -114,6 +121,11 @@ package com.leyou.ui.tips {
 				this.bg.setSize(this.w + 2, this.lbl.height + 2);
 
 			this.grid.updataInfo(info);
+			if(f){
+				this.img.x=this.w-this.img.width;
+				this.img.visible=true;
+			}
+			else this.img.visible=false;
 		}
 
 		/**
@@ -121,7 +133,7 @@ package com.leyou.ui.tips {
 		 * @param info
 		 *
 		 */
-		public function bagTip(info:TClientItem):void {
+		public function bagTip(info:TClientItem,flag:Boolean=false):void {
 			if (info == null || info.s == null)
 				return;
 			this.info.clearMe();
@@ -141,7 +153,7 @@ package com.leyou.ui.tips {
 			this.info.Looks=info.s.appr;
 			if (info.s.type == 25)
 				this.info.numStr=info.Dura + "/" + info.DuraMax;
-			this.updateInfo(this.info);
+			this.updateInfo(this.info,flag);
 		}
 
 		/**
@@ -149,7 +161,7 @@ package com.leyou.ui.tips {
 		 * @param info
 		 *
 		 */
-		public function marketTip(info:TShopInfo, btnIdx:int):void {
+		public function marketTip(info:TShopInfo, btnIdx:int,f:Boolean=false):void {
 			if (info == null)
 				return;
 			this.info.clearMe();
@@ -173,27 +185,34 @@ package com.leyou.ui.tips {
 			this.info.Looks=info.stdInfo.Looks;
 			this.info.wight=info.stdInfo.Weight;
 //			this.info.numStr=info.
-			this.updateInfo(this.info);
+			this.updateInfo(this.info,f);
 		}
 
 		/**
 		 *商店中的装备
 		 *
 		 */
-		public function shopTip(info:TStdItem):void {
+		public function shopTip(info:TStdItem,f:Boolean=false):void {
 			if (info == null)
 				return;
 			this.info.clearMe();
 			this.info.name=info.Name;
 			this.info.instruction1=TipsUtil.getInstructionByFlag(info.LimitCheck, TipsEnum.TYPE_TIPS_EQUIP);
 //			this.info.instruction2=info.n
-			this.info.price=info.Price + "金币";
+			if (MyInfoManager.getInstance().baseInfo.gameCoin >= info.Price)
+				this.info.price=TipsUtil.getColorStr("售价：" + info.Price+ "金币", TipsEnum.COLOR_GREEN);
+			else
+				this.info.price=TipsUtil.getColorStr("售价：" + info.Price + "金币", TipsEnum.COLOR_RED);
+//			this.info.price=info.Price + "金币";
 			this.info.type=ItemEnum.itemNameDic[TipsUtil.getTypeName(info.StdMode,info.Shape)];
 			this.info.Looks=info.Looks;
 			this.info.wight=info.Weight;
-//			this.info.properArr=//属性
+			var tInfo:TItemInfo=TableManager.getInstance().getItemByName(info.Name);
+			this.info.properArr=TipsUtil.getProperNum(tInfo);//属性
+			this.info.limit=TipsUtil.getLimitStr(info.Need,info.NeedLevel);
+			this.info.durability=Math.ceil(info.DuraMax / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
 //			this.info.durability=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
-			this.updateInfo(this.info);
+			this.updateInfo(this.info,f);
 		}
 
 		/**
@@ -219,8 +238,10 @@ package com.leyou.ui.tips {
 				this.info.durability=Math.ceil(info.Dura / 1000) + "/" + Math.ceil(info.DuraMax / 1000);
 			this.info.properArr=TipsUtil.getProperNum(tInfo);
 			this.info.wight=tInfo.weight;
-			this.updateInfo(this.info);
-
+			this.updateInfo(this.info,false);
 		}
+		
+		
+		
 	}
 }

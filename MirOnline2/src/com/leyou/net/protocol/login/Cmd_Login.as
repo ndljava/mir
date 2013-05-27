@@ -1,21 +1,15 @@
 package com.leyou.net.protocol.login {
 	import com.ace.delayCall.DelayCallManager;
 	import com.ace.enum.PlayerEnum;
-	import com.ace.game.scene.npc.NpcUI;
 	import com.ace.gameData.player.MyInfoManager;
 	import com.ace.gameData.player.PlayerInfo;
-	import com.ace.ui.window.children.AlertWindow;
-	import com.ace.ui.window.children.WindInfo;
 	import com.ace.utils.HexUtil;
 	import com.leyou.config.Core;
-	import com.leyou.enum.TaskEnum;
 	import com.leyou.manager.PopupManager;
 	import com.leyou.manager.UIManager;
 	import com.leyou.net.MirProtocol;
 	import com.leyou.net.NetEncode;
-	import com.leyou.net.NetEnum;
 	import com.leyou.net.NetGate;
-	import com.leyou.net.protocol.Cmd_Task;
 	import com.leyou.net.protocol.Cmd_backPack;
 	import com.leyou.net.protocol.TDefaultMessage;
 	import com.leyou.net.protocol.scene.CmdScene;
@@ -45,6 +39,34 @@ package com.leyou.net.protocol.login {
 		static public function sm_Login(td:TDefaultMessage, body:String):void {
 			serBody=body;
 			cm_SelectServer(body.split("/")[0]);
+		}
+
+		static public function sm_passwd_fail(td:TDefaultMessage, body:String):void {
+			var errorStr:String;
+			switch (td.Recog) {
+				case -1:
+					errorStr="密码输入错误。";
+					break;
+				case -2:
+					errorStr="密码输入错误超过3次，此帐号被暂时锁定，请稍候再登录。";
+					break;
+				case -3:
+					errorStr="此帐号已经登录或被异常锁定，请稍候再登录！";
+					break;
+				case -4:
+					errorStr="这个帐号访问失败。";
+					break;
+				case -5:
+					errorStr="这个帐号被锁定。";
+					break;
+				case -6:
+					errorStr="客户端版本过低，请更新最新版本！";
+					break;
+				default:
+					errorStr="帐号不存在，请检查你的帐号。";
+					break;
+			}
+			trace("登录失败：" + errorStr)
 		}
 
 		//选服务器
@@ -84,9 +106,16 @@ package com.leyou.net.protocol.login {
 		}
 
 		static public function sm_QueryChr(td:TDefaultMessage, body:String):void {
-			UIManager.getInstance().addSelectUserWnd();
+			if(UIManager.getInstance().selectUserWnd!=null){
+				UIManager.getInstance().selectUserWnd.ser_updataUser(body);
+				UIManager.getInstance().addSelectUserWnd();
+			}
+			else {
+				UIManager.getInstance().addSelectUserWnd();
+				UIManager.getInstance().selectUserWnd.ser_updataUser(body);
+			}
 			UIManager.getInstance().loginWnd.die();
-			UIManager.getInstance().selectUserWnd.ser_updataUser(body);
+			
 		}
 
 		//创建角色【账号 + '/' + 角色名称 + '/' + 头发 + '/' + 职业 + '/' + 性别】
@@ -100,22 +129,22 @@ package com.leyou.net.protocol.login {
 		static public function sm_newChr_success(td:TDefaultMessage, body:String):void {
 			cm_QueryChr(0);
 			UIManager.getInstance().creatUserWnd.die();
-			
+
 		}
 
 		//创建角色-fail
 		static public function sm_newChr_fail(td:TDefaultMessage, body:String):void {
-			if(td.Recog==0)
+			if (td.Recog == 0)
 				PopupManager.showAlert("输入的名称包含非法字符！");
-			else if(td.Recog==2)
+			else if (td.Recog == 2)
 				PopupManager.showAlert("创建的名称服务器已有！");
-			else if(td.Recog==3)
+			else if (td.Recog == 3)
 				PopupManager.showAlert("服务器只能创建两个游戏人物！");
-			else if(td.Recog==4)
+			else if (td.Recog == 4)
 				PopupManager.showAlert("创建游戏人物时出现错误！");
 			else
 				PopupManager.showAlert("创建游戏人物时出现未知错误！");
-				
+
 		/*case td.Recog of
 		0: ('[错误] 输入的名称包含非法字符！', [mbOk]);
 		2:  ('[错误] 创建的名称服务器已有', [mbOk]);
@@ -210,11 +239,6 @@ package com.leyou.net.protocol.login {
 			onLogon();
 
 			return;
-			if (!Core.me) {
-				DelayCallManager.getInstance().add(UIManager.getInstance().mirScene, UIManager.getInstance().mirScene.addMe, "addme", 48, td);
-				return;
-			}
-			UIManager.getInstance().mirScene.addMe(td);
 		}
 
 		//登录时发送的
